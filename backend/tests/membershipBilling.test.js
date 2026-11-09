@@ -15,6 +15,25 @@ test('calculates remaining balance after successful cash/online membership payme
   });
 });
 
+test('deducts admission advance only from the first membership purchase', () => {
+  const result = calculateMembershipBalance(
+    { _id: 'first-membership', plan_price_snapshot: 2500, advance_paid: 500, membership_type: 'initial' },
+    [{
+      membership_id: 'first-membership',
+      payment_type: 'membership_advance',
+      status: 'success',
+      allocated_amount: 500,
+    }],
+  );
+
+  assert.deepEqual(result, {
+    advancePaid: 500,
+    amountReceived: 0,
+    amountDue: 2000,
+    paymentStatus: 'pending',
+  });
+});
+
 test('counts only successful membership payments, not pending or failed attempts', () => {
   const result = calculateMembershipBalance(
     { _id: 'membership-1', plan_price_snapshot: 2500, membership_type: 'initial' },
