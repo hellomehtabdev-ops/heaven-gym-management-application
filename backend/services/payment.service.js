@@ -160,7 +160,35 @@ export async function createRazorpayOrder(userId, { orderId, membershipId }) {
     }));
     throw new ApiError(502, 'Online payment is temporarily unavailable. Please try again shortly.');
   }
-  const payment = await Payment.create({ user_id: userId, order_id: orderId || null, membership_id: membershipId || null, amount, payment_type: paymentType, payment_method: 'online', status: 'pending', razorpay_order_id: razorpayOrder.id });
+  let payment;
+  try {
+    payment = await Payment.create({
+      user_id: userId,
+      order_id: orderId || null,
+      membership_id: membershipId || null,
+      amount,
+      payment_type: paymentType,
+      payment_method: 'online',
+      status: 'pending',
+      razorpay_order_id: razorpayOrder.id,
+    });
+  } catch (error) {
+    // A concurrent checkout may win the unique pending-payment index after
+    // this request has created its provider order. Reuse the winning attempt.
+    if (error?.code !== 11000) throw error;
+    const pendingPayment = await Payment.findOne({
+      user_id: userId,
+      ...targetFilter,
+      status: 'pending',
+      razorpay_order_id: { $ne: '' },
+    });
+    if (!pendingPayment) throw error;
+    const pendingGatewayOrder = await gateway().orders.fetch(pendingPayment.razorpay_order_id).catch(() => null);
+    if (!pendingGatewayOrder) {
+      throw new ApiError(409, 'An earlier payment request is being prepared. Refresh and try again shortly.');
+    }
+    return { payment: pendingPayment, keyId: process.env.RAZORPAY_KEY_ID, razorpayOrder: pendingGatewayOrder };
+  }
   return { payment, keyId: process.env.RAZORPAY_KEY_ID, razorpayOrder };
 }
 
