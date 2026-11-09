@@ -11,5 +11,9 @@ const notificationSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 notificationSchema.index({ user_id: 1 });
+notificationSchema.index(
+  { user_id: 1, related_id: 1, related_type: 1 },
+  { unique: true, partialFilterExpression: { related_type: 'membership_expiry', related_id: { $type: 'objectId' } } },
+);
 
 export default mongoose.model('Notification', notificationSchema);
