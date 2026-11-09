@@ -65,4 +65,93 @@ export async function getAdminStats() {
   };
 }
 
-// Revenue analytics and user dashboard functions are preserved below.
+export async function getRevenueAnalytics(period) {
+  const now = new Date();
+  const { year, month, day } = zonedDateParts(now);
+  const start = new Date(Date.UTC(Number(year), Number(month) - 1, Number(day)));
+  let groupFormat = '%Y-%m-%d';
+
+  switch (period) {
+    case '7d':
+      start.setUTCDate(start.getUTCDate() - 6);
+      break;
+    case '30d':
+      start.setUTCDate(start.getUTCDate() - 29);
+      break;
+    case '3m':
+      start.setUTCDate(1);
+      start.setUTCMonth(start.getUTCMonth() - 2);
+      groupFormat = '%Y-%m';
+      break;
+    case '6m':
+      start.setUTCDate(1);
+      start.setUTCMonth(start.getUTCMonth() - 5);
+      groupFormat = '%Y-%m';
+      break;
+    case '1y':
+      start.setUTCDate(1);
+      start.setUTCMonth(start.getUTCMonth() - 11);
+      groupFormat = '%Y-%m';
+      break;
+    default:
+      start.setUTCDate(start.getUTCDate() - 29);
+  }
+
+  const dateKey = start.toISOString().slice(0, 10);
+  const offset = TIMEZONE === 'Asia/Kolkata' ? '+05:30' : 'Z';
+  const startDate = new Date(`${dateKey}T00:00:00${offset}`);
+  const groupStage = { $dateToString: { format: groupFormat, date: '$payment_date', timezone: TIMEZONE } };
+  const [gymData, storeData, offlineStoreData] = await Promise.all([
+    Payment.aggregate([{ $match: { status: 'success', payment_type: { $in: ['membership_full', 'membership_advance', 'membership_installment'] }, payment_date: { $gte: startDate } } }, { $group: { _id: groupStage, total: { $sum: '$amount' } } }, { $sort: { _id: 1 } }]),
+    Payment.aggregate([{ $match: { status: 'success', payment_type: 'order', payment_date: { $gte: startDate } } }, { $group: { _id: groupStage, total: { $sum: '$amount' } } }, { $sort: { _id: 1 } }]),
+    OfflineSale.aggregate([{ $match: { createdAt: { $gte: startDate } } }, { $group: { _id: { $dateToString: { format: groupFormat, date: '$createdAt', timezone: TIMEZONE } }, total: { $sum: '$total_amount' } } }, { $sort: { _id: 1 } }]),
+  ]);
+  const storeTotalsByDate = new Map();
+  for (const entry of [...storeData, ...offlineStoreData]) {
+    storeTotalsByDate.set(entry._id, (storeTotalsByDate.get(entry._id) || 0) + entry.total);
+  }
+  return {
+    gymRevenue: gymData.map((d) => ({ date: d._id, amount: d.total })),
+    storeRevenue: [...storeTotalsByDate.entries()].sort(([a], [b]) => a.localeCompare(b)).map(([date, amount]) => ({ date, amount })),
+  };
+}
+
+export async function getUserDashboard(userId) {
+  const [admission, payments, orders, memberships, measurements] = await Promise.all([
+    GymAdmission.findOne({ user_id: userId }).lean(),
+    Payment.find({ user_id: userId }).select('-razorpay_signature').sort({ createdAt: -1 }).lean(),
+    Order.find({ user_id: userId }).sort({ createdAt: -1 }).lean(),
+    getMembershipsByUserId(userId),
+    BodyMeasurement.find({ user_id: userId }).sort({ measurement_date: -1 }).lean(),
+  ]);
+
+  const isAdmitted = admission?.status === 'active';
+
+  const activeMembership = memberships.find((membership) => (
+    ['active', 'scheduled'].includes(membership.status) && membership.payment_status === 'paid'
+  )) || null;
+  const pendingMembership = memberships.find((membership) => (
+    membership.payment_status === 'pending' && Number(membership.amount_due) > 0
+  )) || null;
+
+  return {
+    memberships,
+    payments,
+    orders,
+    measurements,
+    admission,
+    gym_access: {
+      is_admitted: isAdmitted,
+      admission_status: admission?.status || 'not_admitted',
+      has_membership: Boolean(activeMembership),
+      membership_status: pendingMembership ? 'payment_pending' : activeMembership?.status || 'not_purchased',
+      message: pendingMembership
+        ? 'Your membership payment is pending. Complete the payment to activate your gym access.'
+        : !isAdmitted
+          ? 'Your gym admission is pending. Contact the gym admin to complete admission.'
+          : !activeMembership
+            ? 'Your gym admission is complete. Choose a membership plan to activate your gym membership.'
+            : '',
+    },
+  };
+}
