@@ -27,7 +27,10 @@ function validatePlan(data, partial = false) {
   if (data.offer_start_date && data.offer_end_date && new Date(data.offer_start_date) > new Date(data.offer_end_date)) throw new ApiError(400, 'Offer end date must be after start date');
 }
 
-export async function getAllPlans() { return MembershipPlan.find().sort({ display_order: 1, createdAt: -1 }); }
+export async function getAllPlans({ includeInactive = false } = {}) {
+  const filter = includeInactive ? {} : { is_active: true };
+  return MembershipPlan.find(filter).sort({ display_order: 1, createdAt: -1 });
+}
 
 export async function createPlan(data) {
   const normalized = normalize(data);
