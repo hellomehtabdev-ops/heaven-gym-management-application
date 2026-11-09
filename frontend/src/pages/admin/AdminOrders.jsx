@@ -1,0 +1,183 @@
+import { useEffect, useMemo, useState } from 'react';
+import { Search, X } from 'lucide-react';
+import { useDispatch, useSelector } from 'react-redux';
+import AdminLoadingSkeleton from '@/components/admin/AdminLoadingSkeleton';
+import Card from '@/components/ui/Card';
+import Badge from '@/components/ui/Badge';
+import Button from '@/components/ui/Button';
+import EmptyState from '@/components/ui/EmptyState';
+import { fetchAllOrders, updateOrderStatus } from '@/redux/slices/orderSlice';
+import { formatCurrency, formatDate } from '@/utils/formatters';
+
+const ORDER_STATUSES = ['pending', 'processing', 'ready_for_pickup', 'out_for_delivery', 'collected', 'delivered', 'cancelled', 'confirmed', 'shipped'];
+const STATUS_LABELS = { pending: 'Pending payment', processing: 'Processing', ready_for_pickup: 'Ready for pickup', out_for_delivery: 'Out for delivery', collected: 'Collected', delivered: 'Delivered', cancelled: 'Cancelled', confirmed: 'Confirmed (legacy)', shipped: 'Shipped (legacy)' };
+
+export default function AdminOrders() {
+  const dispatch = useDispatch();
+  const { adminItems, adminPagination, loading } = useSelector((state) => state.orders);
+  const [query, setQuery] = useState('');
+  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
+
+  useEffect(() => {
+    dispatch(fetchAllOrders({ search: query, status: statusFilter, page, limit }));
+  }, [dispatch, query, statusFilter, page, limit]);
+
+  const totalPages = Math.max(1, Number(adminPagination?.pages) || 1);
+  const totalOrders = Number(adminPagination?.total) || 0;
+  const firstItem = totalOrders ? ((page - 1) * limit) + 1 : 0;
+  const lastItem = Math.min(page * limit, totalOrders);
+  const pageNumbers = useMemo(() => {
+    const first = Math.max(1, Math.min(page - 2, totalPages - 4));
+    return Array.from({ length: Math.min(5, totalPages) }, (_, index) => first + index);
+  }, [page, totalPages]);
+
+  if (loading && adminItems.length === 0) return <AdminLoadingSkeleton variant="section" />;
+
+  async function handleStatusChange(orderId, newStatus) {
+    try {
+      await dispatch(updateOrderStatus({ id: orderId, status: newStatus })).unwrap();
+      if (selectedOrder?.id === orderId) setSelectedOrder((prev) => ({ ...prev, status: newStatus }));
+      dispatch(fetchAllOrders({ search: query, status: statusFilter, page, limit }));
+    } catch (err) { console.error(err); }
+  }
+
+  function getTimelineIndex(status) {
+    const steps = ['confirmed', 'shipped'].includes(selectedOrder?.status)
+      ? ['confirmed', 'shipped', 'delivered']
+      : selectedOrder?.fulfillment_method === 'store_pickup'
+        ? ['processing', 'ready_for_pickup', 'collected']
+        : ['processing', 'out_for_delivery', 'delivered'];
+    return steps.indexOf(status);
+  }
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <h1 className="font-display text-2xl font-bold text-ink-950 dark:text-white">Orders</h1>
+        <p className="mt-1 text-sm text-surface-500">Manage supplement store orders</p>
+      </div>
+
+      <Card>
+        <div className="relative">
+          <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-surface-400" />
+          <input value={query} onChange={(e) => { setQuery(e.target.value); setPage(1); }} placeholder="Search by order number or customer..." className="w-full rounded-xl border border-surface-300 bg-white py-3 pl-12 pr-4 text-sm text-ink-900 outline-none focus:border-brand-500 dark:border-surface-700 dark:bg-surface-950 dark:text-white" />
+        </div>
+        <div className="mt-3 flex flex-wrap gap-2">
+          {['all', ...ORDER_STATUSES].map((s) => (
+            <button key={s} onClick={() => { setStatusFilter(s); setPage(1); }} className={`rounded-lg px-4 py-2 text-xs font-semibold capitalize transition ${statusFilter === s ? 'bg-brand-600 text-white' : 'bg-surface-100 text-surface-500 dark:bg-surface-800'}`}>{STATUS_LABELS[s] || s}</button>
+          ))}
+        </div>
+      </Card>
+
+      {adminItems.length > 0 ? (
+        <Card padding={false}>
+          <div className="admin-table-scroll w-full min-w-0" style={{ display: 'block', width: '100%', maxWidth: '100%', overflowX: 'auto', overflowY: 'hidden', WebkitOverflowScrolling: 'touch' }}>
+            <table className="admin-data-table text-sm" style={{ width: '900px', minWidth: '900px', maxWidth: 'none', tableLayout: 'auto' }}>
+              <thead>
+                <tr className="border-b border-surface-200 text-left text-xs text-surface-500 dark:border-surface-800">
+                  <th className="px-5 py-4 font-medium">Order #</th>
+                  <th className="px-5 py-4 font-medium">Customer</th>
+                  <th className="px-5 py-4 font-medium">Date</th>
+                  <th className="px-5 py-4 font-medium">Amount</th>
+                  <th className="px-5 py-4 font-medium">Payment</th>
+                  <th className="px-5 py-4 font-medium">Status</th>
+                  <th className="px-5 py-4 font-medium text-right">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {adminItems.map((o) => (
+                  <tr key={o.id} className="border-b border-surface-100 last:border-0 dark:border-surface-800">
+                    <td data-label="Order" className="px-5 py-4 font-medium text-ink-900 dark:text-white">{o.order_number}</td>
+                    <td data-label="Customer" className="px-5 py-4 text-surface-600 dark:text-surface-300">{o.customer_name || o.user_id?.full_name || '—'}<div className="text-xs text-surface-500">{o.fulfillment_method === 'store_pickup' ? 'Store pickup' : 'Admin delivery'}</div></td>
+                    <td data-label="Date" className="px-5 py-4 text-surface-500">{formatDate(o.created_at)}</td>
+                    <td data-label="Amount" className="px-5 py-4 font-semibold">{formatCurrency(o.total_amount)}</td>
+                    <td data-label="Payment" className="px-5 py-4"><Badge tone={o.payment_status === 'success' ? 'success' : 'warning'}>{o.payment_status}</Badge></td>
+                    <td data-label="Status" className="px-5 py-4"><Badge tone={o.status === 'delivered' ? 'success' : o.status === 'cancelled' ? 'danger' : 'info'}>{STATUS_LABELS[o.status] || o.status}</Badge></td>
+                    <td data-label="Action" className="px-5 py-4 text-right"><Button variant="ghost" size="sm" onClick={() => setSelectedOrder(o)}>View</Button></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </Card>
+      ) : loading ? <AdminLoadingSkeleton variant="table" rows={6} /> : <EmptyState title="No orders found" description="Try changing your search or status filter." />}
+      <div className="flex flex-col gap-3 rounded-xl border border-surface-200 bg-white px-4 py-3 dark:border-surface-800 dark:bg-surface-900 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-wrap items-center gap-3">
+          <p className="text-xs text-surface-500">Showing <strong className="text-ink-900 dark:text-white">{firstItem}–{lastItem}</strong> of <strong className="text-ink-900 dark:text-white">{totalOrders}</strong> orders</p>
+          <label className="flex items-center gap-2 text-xs font-medium text-surface-600 dark:text-surface-300">
+            Rows
+            <select value={limit} onChange={(e) => { setLimit(Number(e.target.value)); setPage(1); }} className="min-h-9 rounded-lg border border-surface-300 bg-white px-2 text-xs dark:border-surface-700 dark:bg-surface-950 dark:text-white">
+              <option value={5}>5</option><option value={10}>10</option><option value={20}>20</option><option value={50}>50</option>
+            </select>
+          </label>
+        </div>
+        <div className="flex flex-wrap items-center justify-start gap-1 sm:justify-end">
+          <button type="button" disabled={page <= 1 || loading} onClick={() => setPage((current) => current - 1)} className="flex min-h-9 items-center gap-1 rounded-lg border border-surface-300 px-3 text-xs font-semibold text-surface-700 disabled:opacity-40 dark:border-surface-700 dark:text-surface-200">‹ Previous</button>
+          {pageNumbers.map((number) => <button key={number} type="button" aria-current={page === number ? 'page' : undefined} disabled={loading} onClick={() => setPage(number)} className={`h-9 min-w-9 rounded-lg px-2 text-xs font-bold ${page === number ? 'bg-brand-600 text-white' : 'border border-surface-300 text-surface-700 dark:border-surface-700 dark:text-surface-200'}`}>{number}</button>)}
+          <button type="button" disabled={page >= totalPages || loading} onClick={() => setPage((current) => current + 1)} className="flex min-h-9 items-center gap-1 rounded-lg border border-surface-300 px-3 text-xs font-semibold text-surface-700 disabled:opacity-40 dark:border-surface-700 dark:text-surface-200">Next ›</button>
+        </div>
+      </div>
+
+      {selectedOrder && (
+        <div className="fixed inset-0 z-[10000] flex items-center justify-center bg-black/60 p-4" onClick={() => setSelectedOrder(null)}>
+          <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-surface-200 bg-white shadow-2xl dark:border-surface-800 dark:bg-surface-900" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between border-b border-surface-200 px-6 py-4 dark:border-surface-800">
+              <h2 className="font-display text-lg font-bold text-ink-950 dark:text-white">{selectedOrder.order_number}</h2>
+              <button onClick={() => setSelectedOrder(null)} className="rounded-lg p-2 text-surface-400 hover:bg-surface-100 dark:hover:bg-surface-800"><X size={18} /></button>
+            </div>
+            <div className="space-y-5 p-6">
+              <div className="rounded-xl bg-surface-50 p-4 dark:bg-surface-800">
+                <p className="text-sm font-medium text-ink-900 dark:text-white">{selectedOrder.user_id?.full_name || '—'}</p>
+                <p className="text-xs text-surface-500">{selectedOrder.user_id?.email || ''}</p>
+                <p className="mt-2 text-xs text-surface-500">Phone: {selectedOrder.customer_phone || '—'}</p><p className="mt-1 text-xs text-surface-500">{selectedOrder.fulfillment_method === 'store_pickup' ? 'Store Pickup' : 'Delivery Address: ' + (selectedOrder.shipping_address || 'No address')}</p>
+              </div>
+
+              <div>
+                <h4 className="mb-2 text-sm font-semibold text-ink-900 dark:text-white">Items</h4>
+                <div className="space-y-2">
+                  {(selectedOrder.order_items || []).map((item, i) => (
+                    <div key={i} className="flex justify-between text-sm">
+                      <span className="text-surface-600 dark:text-surface-300">{item.product_name_snapshot} × {item.quantity}</span>
+                      <span className="font-medium">{formatCurrency(item.subtotal)}</span>
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-3 flex justify-between border-t border-surface-200 pt-3 text-sm font-bold dark:border-surface-700">
+                  <span>Total</span><span>{formatCurrency(selectedOrder.total_amount)}</span>
+                </div>
+              </div>
+
+              <div>
+                <h4 className="mb-3 text-sm font-semibold text-ink-900 dark:text-white">Tracking Timeline</h4>
+                <div className="flex items-center justify-between">
+                  {(['confirmed', 'shipped'].includes(selectedOrder.status) ? ['confirmed', 'shipped', 'delivered'] : selectedOrder.fulfillment_method === 'store_pickup' ? ['processing', 'ready_for_pickup', 'collected'] : ['processing', 'out_for_delivery', 'delivered']).map((status, i) => {
+                    const currentIdx = getTimelineIndex(selectedOrder.status);
+                    const isDone = i <= currentIdx && selectedOrder.status !== 'cancelled';
+                    return (
+                      <div key={status} className="flex flex-1 flex-col items-center">
+                        <div className={`flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold ${isDone ? 'bg-brand-600 text-white' : 'bg-surface-200 text-surface-500 dark:bg-surface-800'}`}>{i + 1}</div>
+                        <span className="mt-1 text-[10px] capitalize text-surface-500">{STATUS_LABELS[status]}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div>
+                <h4 className="mb-2 text-sm font-semibold text-ink-900 dark:text-white">Update Status</h4>
+                <div className="flex flex-wrap gap-2">
+                  {(selectedOrder.status === 'processing' ? (selectedOrder.fulfillment_method === 'store_pickup' ? ['ready_for_pickup'] : ['out_for_delivery']) : selectedOrder.status === 'ready_for_pickup' ? ['collected'] : selectedOrder.status === 'out_for_delivery' ? ['delivered'] : selectedOrder.status === 'confirmed' ? ['shipped'] : selectedOrder.status === 'shipped' ? ['delivered'] : []).map((s) => (
+                    <button key={s} onClick={() => handleStatusChange(selectedOrder.id, s)} className={`rounded-lg px-3 py-2 text-xs font-semibold capitalize transition ${selectedOrder.status === s ? 'bg-brand-600 text-white' : 'bg-surface-100 text-surface-500 hover:bg-surface-200 dark:bg-surface-800'}`}>{STATUS_LABELS[s] || s}</button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
