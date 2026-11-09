@@ -28,18 +28,29 @@ import { errorHandler } from './middlewares/errorHandler.middleware.js';
 import { persistentRateLimit } from './middlewares/persistentRateLimit.middleware.js';
 
 const app = express();
-const allowedOrigins = String(process.env.CLIENT_URL || 'http://localhost:5173').split(',').map((value) => value.trim()).filter(Boolean);
+const defaultAllowedOrigins = [
+  'https://heaven-gym-management-frontend.vercel.app',
+  'http://localhost:5173',
+];
+const allowedOrigins = String(process.env.CLIENT_URL || defaultAllowedOrigins.join(','))
+  .split(',')
+  .map((value) => value.trim().replace(/\/$/, ''))
+  .filter(Boolean);
+
 app.disable('x-powered-by');
 app.set('trust proxy', 1);
 app.use((req, res, next) => { req.requestId = randomUUID(); res.setHeader('X-Request-Id', req.requestId); next(); });
 app.use(helmet());
 app.use(cors({
   origin(origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) return callback(null, true);
+    const normalizedOrigin = origin?.replace(/\/$/, '');
+    if (!normalizedOrigin || allowedOrigins.includes(normalizedOrigin)) return callback(null, true);
     return callback(new Error('CORS origin not allowed'));
   },
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  methods: ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  optionsSuccessStatus: 204,
 }));
 
 const authLimiter = persistentRateLimit({ windowMs: 15 * 60 * 1000, limit: 60, message: 'Too many authentication requests. Try again later.' });
