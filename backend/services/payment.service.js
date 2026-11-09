@@ -281,10 +281,29 @@ async function finalizeSuccessfulPayment(paymentId, userId, razorpayPaymentId, s
       membership.status = 'pending';
     }
     await membership.save({ session });
+
+    if (membership.payment_status === 'paid') {
+      const preferences = await AppSettings.findOne({ user_id: payment.user_id })
+        .select('notify_membership')
+        .session(session)
+        .lean();
+      if (preferences?.notify_membership !== false) {
+        await Notification.create([{
+          user_id: payment.user_id,
+          title: membership.status === 'scheduled' ? 'Membership scheduled' : 'Membership activated',
+          message: membership.status === 'scheduled'
+            ? 'Your membership payment is complete. Your membership will activate on its scheduled start date.'
+            : 'Your membership payment is complete. Your membership is now active.',
+          type: 'membership',
+          related_id: membership._id,
+          related_type: 'membership',
+        }], { session });
+      }
+    }
   }
   if (payment.membership_id || reservedOrder) {
     const preferences = await AppSettings.findOne({ user_id: payment.user_id })
-      .select('notify_membership notify_orders notify_payments')
+      .select('notify_orders notify_payments')
       .session(session)
       .lean();
 
