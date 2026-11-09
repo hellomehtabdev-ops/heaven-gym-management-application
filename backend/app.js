@@ -6,6 +6,7 @@ import morgan from 'morgan';
 import cookieParser from 'cookie-parser';
 import mongoose from 'mongoose';
 import { randomUUID } from 'node:crypto';
+import { connectDB } from './config/db.config.js';
 import authRoutes from './routes/auth.route.js';
 import userRoutes from './routes/user.route.js';
 import admissionRoutes from './routes/admission.route.js';
@@ -52,6 +53,34 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
   optionsSuccessStatus: 204,
 }));
+
+// Vercel runs the exported Express app without starting server.js.
+// Reuse one MongoDB connection across warm invocations and let CORS preflight
+// requests finish without waiting for the database.
+let databaseConnectionPromise;
+async function ensureDatabaseConnection() {
+  if (mongoose.connection.readyState === 1) return;
+
+  if (!databaseConnectionPromise) {
+    databaseConnectionPromise = connectDB().catch((error) => {
+      databaseConnectionPromise = null;
+      throw error;
+    });
+  }
+
+  await databaseConnectionPromise;
+}
+
+app.use(async (req, res, next) => {
+  if (req.method === 'OPTIONS') return next();
+
+  try {
+    await ensureDatabaseConnection();
+    return next();
+  } catch (error) {
+    return next(error);
+  }
+});
 
 const authLimiter = persistentRateLimit({ windowMs: 15 * 60 * 1000, limit: 60, message: 'Too many authentication requests. Try again later.' });
 const loginLimiter = persistentRateLimit({ windowMs: 15 * 60 * 1000, limit: 10, message: 'Too many login attempts. Try again later.' });
