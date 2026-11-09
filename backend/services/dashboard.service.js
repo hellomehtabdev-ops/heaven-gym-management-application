@@ -50,7 +50,7 @@ export async function getAdminStats() {
     Payment.aggregate([{ $match: { status: 'success', payment_date: { $gte: monthStart } } }, { $group: { _id: null, total: { $sum: '$amount' } } }]),
     OfflineSale.aggregate([{ $match: { createdAt: { $gte: monthStart } } }, { $group: { _id: null, total: { $sum: '$total_amount' } } }]),
     Membership.find({ status: 'active', end_date: { $gte: now, $lte: twoDaysFromNow } }).populate({ path: 'user_id', select: 'full_name email' }).sort({ end_date: 1 }).limit(5).lean(),
-    Product.find({ is_active: true, stock_quantity: { $lte: 10 } }).select('name stock_quantity').sort({ stock_quantity: 1 }).limit(5).lean(),
+    Product.find({ is_active: true, is_deleted: { $ne: true }, $expr: { $lte: [{ $subtract: ['$stock_quantity', '$reserved_quantity'] }, '$low_stock_threshold'] } }).select('name stock_quantity reserved_quantity low_stock_threshold').sort({ stock_quantity: 1 }).limit(5).lean(),
     Order.find().populate({ path: 'user_id', select: 'full_name email' }).sort({ createdAt: -1 }).limit(5).lean(),
     Payment.find().select('-razorpay_signature').populate({ path: 'user_id', select: 'full_name email' }).sort({ createdAt: -1 }).limit(8).lean(),
   ]);
@@ -61,7 +61,7 @@ export async function getAdminStats() {
   const monthRevenue = (monthRevenueAgg[0]?.total || 0) + (monthOfflineRevenueAgg[0]?.total || 0);
   return {
     stats: { totalUsers, totalAdmitted, notAdmitted: Math.max(0, totalUsers - totalAdmitted), activeMemberships, expiredMemberships, totalOrders, pendingOrders, totalProducts, gymRevenue, storeRevenue, totalRevenue: gymRevenue + storeRevenue, todayRevenue, monthRevenue },
-    expiringMemberships, lowStockProducts, recentOrders, recentPayments,
+    expiringMemberships,\n    lowStockProducts: lowStockProducts.map((product) => ({\n      ...product,\n      available_quantity: Math.max(0, Number(product.stock_quantity || 0) - Number(product.reserved_quantity || 0)),\n    })),\n    recentOrders, recentPayments,
   };
 }
 
