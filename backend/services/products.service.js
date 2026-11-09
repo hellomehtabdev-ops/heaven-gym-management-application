@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import Product from '../models/product.model.js';
 import ProductCategory from '../models/productCategory.model.js';
 import InventoryMovement from '../models/inventoryMovement.model.js';
@@ -332,7 +333,7 @@ export async function adjustStock(id, data, performedBy) {
   const reason = String(data.reason || '').trim();
   if (!reason) throw new ApiError(400, 'A reason is required for every stock adjustment');
 
-  const session = await Product.startSession();
+  const session = await mongoose.startSession();
   let updatedProduct;
   try {
     await session.withTransaction(async () => {
