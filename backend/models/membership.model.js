@@ -24,6 +24,12 @@ const membershipSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 membershipSchema.index({ user_id: 1, status: 1 });
+// A user may have only one unpaid membership attempt at a time.
+// The partial unique index closes the race that an application-level check cannot prevent.
+membershipSchema.index(
+  { user_id: 1 },
+  { unique: true, partialFilterExpression: { status: 'pending' } },
+);
 membershipSchema.index({ status: 1, start_date: 1 });
 membershipSchema.index({ status: 1, end_date: 1 });
 

@@ -3,6 +3,8 @@ import Order from '../models/order.model.js';
 import Product from '../models/product.model.js';
 import InventoryMovement from '../models/inventoryMovement.model.js';
 import Payment from '../models/payment.model.js';
+import Notification from '../models/notification.model.js';
+import AppSettings from '../models/appSetting.model.js';
 import { generateOrderNumber } from '../utils/generators.utils.js';
 import { ApiError } from '../utils/errors.utils.js';
 
@@ -137,6 +139,28 @@ export async function updateOrderStatus(orderId, status) {
       if (!isLegacyOrder && status === 'out_for_delivery' && order.fulfillment_method !== 'admin_delivery') throw new ApiError(409, 'This order is for store pickup');
       order.status = status;
       await order.save({ session });
+
+      const preferences = await AppSettings.findOne({ user_id: order.user_id })
+        .select('notify_orders')
+        .session(session)
+        .lean();
+      if (preferences?.notify_orders !== false) {
+        const statusLabels = {
+          ready_for_pickup: 'ready for pickup',
+          out_for_delivery: 'out for delivery',
+          collected: 'collected',
+          delivered: 'delivered',
+          shipped: 'shipped',
+        };
+        await Notification.create([{
+          user_id: order.user_id,
+          title: 'Order status updated',
+          message: `Your order ${order.order_number} is now ${statusLabels[status] || status}.`,
+          type: 'order',
+          related_id: order._id,
+          related_type: 'order_status',
+        }], { session });
+      }
       updatedOrder = order;
     });
     return updatedOrder;

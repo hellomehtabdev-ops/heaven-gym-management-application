@@ -134,12 +134,12 @@ export async function verifyEmailOtp({ email, otp }) {
     throw new ApiError(429, 'Too many incorrect attempts. Request a new code.');
   }
   if (record.otp_hash !== otpHash(otp)) {
-    await EmailOtp.updateOne({ _id: record._id }, { $inc: { attempts: 1 } });
+    await EmailOtp.updateOne({ _id: record._id, consumed_at: null, attempts: { $lt: MAX_OTP_ATTEMPTS } }, { $inc: { attempts: 1 } });
     throw new ApiError(400, 'Incorrect verification code');
   }
 
   const consumed = await EmailOtp.updateOne(
-    { _id: record._id, consumed_at: null, expires_at: { $gt: new Date() }, otp_hash: otpHash(otp) },
+    { _id: record._id, consumed_at: null, expires_at: { $gt: new Date() }, attempts: { $lt: MAX_OTP_ATTEMPTS }, otp_hash: otpHash(otp) },
     { $set: { consumed_at: new Date() } }
   );
   if (consumed.modifiedCount !== 1) throw new ApiError(400, 'Verification code is invalid or already used');
@@ -300,7 +300,7 @@ export async function verifyPasswordResetOtp({ email, otp }) {
 
   const submittedHash = otpHash(otp);
   if (record.otp_hash !== submittedHash) {
-    await EmailOtp.updateOne({ _id: record._id, consumed_at: null }, { $inc: { attempts: 1 } });
+    await EmailOtp.updateOne({ _id: record._id, consumed_at: null, attempts: { $lt: MAX_OTP_ATTEMPTS } }, { $inc: { attempts: 1 } });
     throw new ApiError(400, 'Incorrect reset code');
   }
 

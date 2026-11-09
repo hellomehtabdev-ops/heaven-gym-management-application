@@ -68,7 +68,7 @@ export default function AdminNotifications() {
           </div>
           <div>
             <h3 className="font-display text-lg font-semibold text-ink-950 dark:text-white">Notification Management</h3>
-            <p className="text-sm text-surface-500">Use the broadcast feature above to send announcements. Individual notifications are automatically created by the system for membership expiry, payments, and orders.</p>
+            <p className="text-sm text-surface-500">Use the broadcast feature above to send announcements. Membership expiry reminders, successful payment alerts, and order status updates are generated automatically when enabled in a member’s notification preferences.</p>
           </div>
         </div>
       </Card>

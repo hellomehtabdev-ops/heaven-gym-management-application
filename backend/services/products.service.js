@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import Product from '../models/product.model.js';
 import ProductCategory from '../models/productCategory.model.js';
 import InventoryMovement from '../models/inventoryMovement.model.js';
@@ -254,26 +255,42 @@ export async function createProduct(data, image) {
     const category = await ProductCategory.findOne({ _id: data.category_id, is_active: true });
     if (!category) throw new ApiError(400, 'Category not found or inactive');
   }
-  const product = await Product.create({
-    ...values,
-    sku,
-    category_id: data.category_id || null,
-    slug: `${slugify(values.name)}-${sku.toLowerCase()}`,
-    description: String(data.description || '').trim(),
-    net_quantity: String(data.net_quantity || '').trim(),
-    expiry_date: data.expiry_date || null,
-    image_url: image?.secure_url || '',
-    image_public_id: image?.public_id || '',
-    images: image ? [{ url: image.secure_url, public_id: image.public_id, alt_text: values.name, is_primary: true }] : [],
-    is_active: data.is_active !== false && data.is_active !== 'false',
-  });
-  if (values.stock_quantity > 0) {
-    await InventoryMovement.create({
-      product_id: product._id, movement_type: 'opening_stock', quantity: values.stock_quantity,
-      stock_before: 0, stock_after: values.stock_quantity, reason: 'Opening stock',
+  const session = await mongoose.startSession();
+  let createdProduct;
+  try {
+    await session.withTransaction(async () => {
+      const [product] = await Product.create([{
+        ...values,
+        sku,
+        category_id: data.category_id || null,
+        slug: slugify(values.name) + '-' + sku.toLowerCase(),
+        description: String(data.description || '').trim(),
+        net_quantity: String(data.net_quantity || '').trim(),
+        expiry_date: data.expiry_date || null,
+        image_url: image?.secure_url || '',
+        image_public_id: image?.public_id || '',
+        images: image ? [{ url: image.secure_url, public_id: image.public_id, alt_text: values.name, is_primary: true }] : [],
+        is_active: data.is_active !== false && data.is_active !== 'false',
+      }], { session });
+
+      if (values.stock_quantity > 0) {
+        await InventoryMovement.create([{
+          product_id: product._id,
+          movement_type: 'opening_stock',
+          quantity: values.stock_quantity,
+          stock_before: 0,
+          stock_after: values.stock_quantity,
+          reserved_before: 0,
+          reserved_after: 0,
+          reason: 'Opening stock',
+        }], { session });
+      }
+      createdProduct = product;
     });
+    return cleanProduct(createdProduct);
+  } finally {
+    await session.endSession();
   }
-  return cleanProduct(product);
 }
 
 export async function updateProduct(id, data, image) {
@@ -325,24 +342,59 @@ export async function deleteProduct(id) {
 
 export async function adjustStock(id, data, performedBy) {
   const quantity = Number(data.quantity);
-  if (!Number.isFinite(quantity) || !Number.isInteger(quantity) || quantity === 0) throw new ApiError(400, 'Stock adjustment must be a non-zero whole number');
+  if (!Number.isFinite(quantity) || !Number.isInteger(quantity) || quantity === 0) {
+    throw new ApiError(400, 'Stock adjustment must be a non-zero whole number');
+  }
+
   const reason = String(data.reason || '').trim();
   if (!reason) throw new ApiError(400, 'A reason is required for every stock adjustment');
-  const product = await Product.findOne({ _id: id, is_deleted: { $ne: true } });
-  if (!product) throw new ApiError(404, 'Supplement not found');
-  const before = product.stock_quantity;
-  const after = before + quantity;
-  if (after < product.reserved_quantity) throw new ApiError(409, 'Cannot reduce stock below the quantity reserved for orders');
-  if (after < 0) throw new ApiError(409, 'Stock cannot become negative');
-  product.stock_quantity = after;
-  await product.save();
-  await InventoryMovement.create({
-    product_id: product._id, movement_type: quantity > 0 ? 'stock_in' : 'stock_out',
-    quantity, stock_before: before, stock_after: after,
-    reserved_before: product.reserved_quantity, reserved_after: product.reserved_quantity,
-    reason, performed_by: performedBy || null,
-  });
-  return product;
+
+  const session = await mongoose.startSession();
+  let updatedProduct;
+  try {
+    await session.withTransaction(async () => {
+      const beforeProduct = await Product.findOneAndUpdate(
+        {
+          _id: id,
+          is_deleted: { $ne: true },
+          $expr: {
+            $gte: [
+              { $add: ['$stock_quantity', quantity] },
+              '$reserved_quantity',
+            ],
+          },
+        },
+        { $inc: { stock_quantity: quantity } },
+        { new: false, session },
+      );
+
+      if (!beforeProduct) {
+        const exists = await Product.exists({ _id: id, is_deleted: { $ne: true } }).session(session);
+        if (!exists) throw new ApiError(404, 'Supplement not found');
+        throw new ApiError(409, 'Stock cannot be reduced below reserved quantity or zero');
+      }
+
+      const stockBefore = beforeProduct.stock_quantity;
+      const stockAfter = stockBefore + quantity;
+      await InventoryMovement.create([{
+        product_id: beforeProduct._id,
+        movement_type: quantity > 0 ? 'stock_in' : 'stock_out',
+        quantity,
+        stock_before: stockBefore,
+        stock_after: stockAfter,
+        reserved_before: beforeProduct.reserved_quantity,
+        reserved_after: beforeProduct.reserved_quantity,
+        reason,
+        performed_by: performedBy || null,
+      }], { session });
+
+      updatedProduct = await Product.findById(id).session(session);
+    });
+
+    return updatedProduct;
+  } finally {
+    await session.endSession();
+  }
 }
 
 export async function getStockHistory(id) {

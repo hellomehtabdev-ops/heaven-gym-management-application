@@ -35,9 +35,12 @@ api.interceptors.response.use(
     const originalRequest = error.config;
     const requestUrl = originalRequest?.url || '';
     const isAuthRequest = requestUrl.includes('/auth/');
-    const canRefreshCurrentUser = originalRequest?.method?.toLowerCase() === 'get'
-      && /(?:^|\/)auth\/me(?:\?|$)/.test(requestUrl);
-    if (error.response?.status !== 401 || !originalRequest || originalRequest._retry || (isAuthRequest && !canRefreshCurrentUser)) return Promise.reject(error);
+    const requestMethod = originalRequest?.method?.toLowerCase();
+    const canRefreshAuthSession = (requestMethod === 'get'
+      && /(?:^|\/)auth\/(?:me|sessions\/summary)(?:\?|$)/.test(requestUrl))
+      || (requestMethod === 'post'
+        && /(?:^|\/)auth\/(?:logout|logout-all|change-password)(?:\?|$)/.test(requestUrl));
+    if (error.response?.status !== 401 || !originalRequest || originalRequest._retry || (isAuthRequest && !canRefreshAuthSession)) return Promise.reject(error);
     originalRequest._retry = true;
     refreshPromise ||= refreshWithCrossTabLock().finally(() => { refreshPromise = null; });
     try {

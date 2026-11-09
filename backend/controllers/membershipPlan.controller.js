@@ -6,6 +6,12 @@ export const getAllPlans = async (req, res, next) => {
     res.json(plans);
   } catch (err) { next(err); }
 };
+export const getAdminPlans = async (req, res, next) => {
+  try {
+    const plans = await membershipPlanService.getAllPlans({ includeInactive: true });
+    res.json(plans);
+  } catch (err) { next(err); }
+};
 export const createPlan = async (req, res, next) => {
   try {
     const plan = await membershipPlanService.createPlan(req.body);

@@ -199,7 +199,7 @@ export default function AdminDashboard() {
                 {adminStats.lowStockProducts.slice(0, 5).map((p) => (
                   <div key={p.id} className="flex items-center justify-between border-b border-surface-100 pb-3 last:border-0 dark:border-surface-800">
                     <p className="text-sm font-medium text-ink-900 dark:text-white">{p.name}</p>
-                    <Badge tone={p.stock_quantity === 0 ? 'danger' : 'warning'}>{p.stock_quantity} left</Badge>
+                    <Badge tone={p.available_quantity === 0 ? 'danger' : 'warning'}>{p.available_quantity} available</Badge>
                   </div>
                 ))}
               </div>

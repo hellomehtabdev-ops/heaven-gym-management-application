@@ -104,7 +104,7 @@ export default function AdminMembershipPlans() {
   const [formMode, setFormMode] = useState('normal');
   const [editingPlan, setEditingPlan] = useState(null);
 
-  useEffect(() => { dispatch(fetchMembershipPlans()); }, [dispatch]);
+  useEffect(() => { dispatch(fetchMembershipPlans({ includeInactive: true })); }, [dispatch]);
 
   function openCreate(mode) { setFormMode(mode); setEditingPlan(null); setShowForm(true); }
   function openEdit(plan) { setEditingPlan(plan); setShowForm(true); }

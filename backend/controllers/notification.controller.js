@@ -59,12 +59,20 @@ export const broadcastNotification = async (req, res, next) => {
   try {
     const { title, message } = req.body;
 
-    if (!title || !title.trim()) {
+    if (typeof title !== 'string' || !title.trim()) {
       throw new ApiError(400, 'Title is required');
     }
 
-    if (!message || !message.trim()) {
+    if (typeof message !== 'string' || !message.trim()) {
       throw new ApiError(400, 'Message is required');
+    }
+
+    if (title.trim().length > 120) {
+      throw new ApiError(400, 'Title must be 120 characters or fewer');
+    }
+
+    if (message.trim().length > 1000) {
+      throw new ApiError(400, 'Message must be 1000 characters or fewer');
     }
 
     const users = await User.find({}, '_id').lean();

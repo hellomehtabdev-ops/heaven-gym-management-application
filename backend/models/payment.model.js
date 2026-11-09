@@ -25,5 +25,13 @@ paymentSchema.index({ user_id: 1, membership_id: 1 });
 paymentSchema.index({ user_id: 1, gym_admission_id: 1, payment_type: 1, status: 1 });
 paymentSchema.index({ user_id: 1, status: 1, createdAt: -1 });
 paymentSchema.index({ order_id: 1, status: 1 });
+paymentSchema.index(
+  { user_id: 1, order_id: 1 },
+  { unique: true, partialFilterExpression: { status: 'pending', order_id: { $type: 'objectId' } } },
+);
+paymentSchema.index(
+  { user_id: 1, membership_id: 1 },
+  { unique: true, partialFilterExpression: { status: 'pending', membership_id: { $type: 'objectId' } } },
+);
 
 export default mongoose.model('Payment', paymentSchema);

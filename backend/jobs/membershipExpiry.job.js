@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import Membership from '../models/membership.model.js';
 import Notification from '../models/notification.model.js';
+import AppSettings from '../models/appSetting.model.js';
 import { releaseExpiredOrderReservations } from '../services/order.service.js';
 
 export async function activateScheduledMemberships() {
@@ -12,8 +13,11 @@ export async function activateScheduledMemberships() {
 }
 
 export async function expireMemberships() {
+  const now = new Date();
+  // Scheduled renewals must not remain stuck as "scheduled" if the worker
+  // was offline when their membership period ended.
   const result = await Membership.updateMany(
-    { status: 'active', end_date: { $lt: new Date() } },
+    { status: { $in: ['active', 'scheduled'] }, end_date: { $lte: now } },
     { $set: { status: 'expired' } }
   );
   return { expired: result.modifiedCount || 0 };
@@ -23,20 +27,29 @@ export async function sendExpiryReminders() {
   const now = new Date();
   const twoDaysFromNow = new Date(now.getTime() + 2 * 24 * 60 * 60 * 1000);
   const expiringSoon = await Membership.find({ status: 'active', end_date: { $gte: now, $lte: twoDaysFromNow } }).populate({ path: 'user_id', select: 'full_name' });
+  const userIds = expiringSoon.filter((membership) => membership.user_id).map((membership) => membership.user_id._id);
+  const settings = await AppSettings.find({ user_id: { $in: userIds } }).select('user_id notify_membership').lean();
+  const disabledUsers = new Set(settings.filter((item) => item.notify_membership === false).map((item) => String(item.user_id)));
   let notified = 0;
   for (const membership of expiringSoon) {
-    if (!membership.user_id) continue;
+    if (!membership.user_id || disabledUsers.has(String(membership.user_id._id))) continue;
     const existing = await Notification.findOne({ user_id: membership.user_id._id, related_id: membership._id, related_type: 'membership_expiry' });
     if (existing) continue;
-    await Notification.create({
-      user_id: membership.user_id._id,
-      title: 'Membership expiring soon',
-      message: `Your ${membership.plan_name_snapshot} membership expires on ${new Date(membership.end_date).toLocaleDateString('en-IN')}. Renew now to keep training.`,
-      type: 'membership_expiry',
-      related_id: membership._id,
-      related_type: 'membership_expiry',
-    });
-    notified += 1;
+    try {
+      await Notification.create({
+        user_id: membership.user_id._id,
+        title: 'Membership expiring soon',
+        message: `Your ${membership.plan_name_snapshot} membership expires on ${new Date(membership.end_date).toLocaleDateString('en-IN')}. Renew now to keep training.`,
+        type: 'membership_expiry',
+        related_id: membership._id,
+        related_type: 'membership_expiry',
+      });
+      notified += 1;
+    } catch (error) {
+      // A scheduled run and the in-process worker can overlap. The unique
+      // reminder index makes the losing duplicate harmless.
+      if (error?.code !== 11000) throw error;
+    }
   }
   return { notified };
 }

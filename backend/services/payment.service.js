@@ -6,8 +6,11 @@ import Membership from '../models/membership.model.js';
 import Order from '../models/order.model.js';
 import Product from '../models/product.model.js';
 import InventoryMovement from '../models/inventoryMovement.model.js';
+import Notification from '../models/notification.model.js';
+import AppSettings from '../models/appSetting.model.js';
 import { ApiError } from '../utils/errors.utils.js';
 import { allocateMembershipAdvance } from './membership.service.js';
+import { calculateMembershipBalance } from '../utils/membershipBilling.utils.js';
 
 function gateway() {
   if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) throw new ApiError(503, 'Online payments are not configured');
@@ -46,7 +49,7 @@ export async function getAllPayments({ page = 1, limit = 10, status = 'all', typ
     ];
   }
   const [items, total, summary] = await Promise.all([
-    Payment.find(filter).populate({ path: 'user_id', select: 'full_name email' }).sort({ createdAt: -1, _id: -1 }).skip((safePage - 1) * safeLimit).limit(safeLimit),
+    Payment.find(filter).select('-razorpay_signature').populate({ path: 'user_id', select: 'full_name email' }).sort({ createdAt: -1, _id: -1 }).skip((safePage - 1) * safeLimit).limit(safeLimit),
     Payment.countDocuments(filter),
     Payment.aggregate([{ $group: {
       _id: null,
@@ -87,23 +90,13 @@ export async function createRazorpayOrder(userId, { orderId, membershipId }) {
       user_id: userId,
       $or: [{ membership_id: membership._id }, ...admissionFilter],
     }).select('membership_id amount allocated_amount payment_type status').lean();
-    const allocatedAdvance = membershipPayments
-      .filter((item) => item.payment_type === 'membership_advance'
-        && String(item.membership_id || '') === String(membership._id) && item.status === 'success')
-      .reduce((sum, item) => sum + Number(item.allocated_amount || 0), 0);
-    const advancePaid = membership.membership_type === 'renewal' ? 0 : Math.max(
-      Number(membership.advance_paid || 0),
-      allocatedAdvance,
-    );
-    const alreadyPaid = membershipPayments
-      .filter((item) => ['membership_full', 'membership_installment'].includes(item.payment_type) && item.status === 'success')
-      .reduce((sum, item) => sum + Number(item.amount || 0), 0);
-    amount = Math.max(0, Number((Number(membership.plan_price_snapshot || 0) - advancePaid - alreadyPaid).toFixed(2)));
+    const { advancePaid, amountReceived, amountDue } = calculateMembershipBalance(membership, membershipPayments);
+    amount = amountDue;
     if (amount <= 0) throw new ApiError(409, 'This membership is already fully paid.');
     membership.advance_paid = advancePaid;
     membership.amount_due = amount;
     await membership.save();
-    paymentType = alreadyPaid > 0 ? 'membership_installment' : 'membership_full';
+    paymentType = amountReceived > 0 ? 'membership_installment' : 'membership_full';
   }
   if (!Number.isFinite(amount) || amount <= 0) throw new ApiError(400, 'Invalid payment amount');
   const targetFilter = orderId ? { order_id: orderId } : { membership_id: membershipId };
@@ -160,7 +153,35 @@ export async function createRazorpayOrder(userId, { orderId, membershipId }) {
     }));
     throw new ApiError(502, 'Online payment is temporarily unavailable. Please try again shortly.');
   }
-  const payment = await Payment.create({ user_id: userId, order_id: orderId || null, membership_id: membershipId || null, amount, payment_type: paymentType, payment_method: 'online', status: 'pending', razorpay_order_id: razorpayOrder.id });
+  let payment;
+  try {
+    payment = await Payment.create({
+      user_id: userId,
+      order_id: orderId || null,
+      membership_id: membershipId || null,
+      amount,
+      payment_type: paymentType,
+      payment_method: 'online',
+      status: 'pending',
+      razorpay_order_id: razorpayOrder.id,
+    });
+  } catch (error) {
+    // A concurrent checkout may win the unique pending-payment index after
+    // this request has created its provider order. Reuse the winning attempt.
+    if (error?.code !== 11000) throw error;
+    const pendingPayment = await Payment.findOne({
+      user_id: userId,
+      ...targetFilter,
+      status: 'pending',
+      razorpay_order_id: { $ne: '' },
+    });
+    if (!pendingPayment) throw error;
+    const pendingGatewayOrder = await gateway().orders.fetch(pendingPayment.razorpay_order_id).catch(() => null);
+    if (!pendingGatewayOrder) {
+      throw new ApiError(409, 'An earlier payment request is being prepared. Refresh and try again shortly.');
+    }
+    return { payment: pendingPayment, keyId: process.env.RAZORPAY_KEY_ID, razorpayOrder: pendingGatewayOrder };
+  }
   return { payment, keyId: process.env.RAZORPAY_KEY_ID, razorpayOrder };
 }
 
@@ -221,20 +242,9 @@ async function finalizeSuccessfulPayment(paymentId, userId, razorpayPaymentId, s
       user_id: payment.user_id,
       $or: [{ membership_id: membership._id }, ...admissionFilter],
     }).select('membership_id amount allocated_amount payment_type status').session(session).lean();
-    const allocatedAdvance = membershipPayments
-      .filter((item) => item.payment_type === 'membership_advance'
-        && String(item.membership_id || '') === String(membership._id) && item.status === 'success')
-      .reduce((sum, item) => sum + Number(item.allocated_amount || 0), 0);
-    membership.advance_paid = membership.membership_type === 'renewal' ? 0 : Math.max(
-      Number(membership.advance_paid || 0),
-      allocatedAdvance,
-    );
-    const received = membershipPayments
-      .filter((item) => ['membership_full', 'membership_installment'].includes(item.payment_type) && item.status === 'success')
-      .reduce((sum, item) => sum + Number(item.amount || 0), 0);
-    membership.amount_due = Math.max(0, Number((
-      Number(membership.plan_price_snapshot || 0) - membership.advance_paid - received
-    ).toFixed(2)));
+    const balance = calculateMembershipBalance(membership, membershipPayments);
+    membership.advance_paid = balance.advancePaid;
+    membership.amount_due = balance.amountDue;
 
     if (membership.amount_due === 0) {
       await allocateMembershipAdvance(payment.user_id, membership, session);
@@ -251,7 +261,44 @@ async function finalizeSuccessfulPayment(paymentId, userId, razorpayPaymentId, s
       membership.status = 'pending';
     }
     await membership.save({ session });
+
+    if (membership.payment_status === 'paid') {
+      const preferences = await AppSettings.findOne({ user_id: payment.user_id })
+        .select('notify_membership')
+        .session(session)
+        .lean();
+      if (preferences?.notify_membership !== false) {
+        await Notification.create([{
+          user_id: payment.user_id,
+          title: membership.status === 'scheduled' ? 'Membership scheduled' : 'Membership activated',
+          message: membership.status === 'scheduled'
+            ? 'Your membership payment is complete. Your membership will activate on its scheduled start date.'
+            : 'Your membership payment is complete. Your membership is now active.',
+          type: 'membership',
+          related_id: membership._id,
+          related_type: 'membership',
+        }], { session });
+      }
+    }
   }
+  if (payment.membership_id || reservedOrder) {
+    const preferences = await AppSettings.findOne({ user_id: payment.user_id })
+      .select('notify_orders notify_payments')
+      .session(session)
+      .lean();
+
+    if (preferences?.notify_payments !== false) {
+      await Notification.create([{
+        user_id: payment.user_id,
+        title: 'Payment received',
+        message: `Your payment of ₹${Number(payment.amount).toLocaleString('en-IN')} has been received successfully.`,
+        type: 'payment',
+        related_id: payment._id,
+        related_type: 'payment',
+      }], { session });
+    }
+  }
+
   if (reservedOrder) {
     const order = reservedOrder;
 
@@ -280,6 +327,21 @@ async function finalizeSuccessfulPayment(paymentId, userId, razorpayPaymentId, s
     order.inventory_status = 'committed';
     order.status = 'processing';
     await order.save({ session });
+
+    const preferences = await AppSettings.findOne({ user_id: payment.user_id })
+      .select('notify_orders')
+      .session(session)
+      .lean();
+    if (preferences?.notify_orders !== false) {
+      await Notification.create([{
+        user_id: payment.user_id,
+        title: 'Order is processing',
+        message: `Payment confirmed. Your order ${order.order_number} is now being processed.`,
+        type: 'order',
+        related_id: order._id,
+        related_type: 'order_status',
+      }], { session });
+    }
   }
   return payment;
 }
@@ -313,7 +375,19 @@ export async function handleRazorpayWebhook(rawBody, signature, eventPayload) {
   const payment = await Payment.findOne({ razorpay_order_id: entity.order_id });
   if (!payment) return { received: true, processed: false };
   if (event === 'payment.failed') {
-    if (payment.status === 'pending') { payment.status = 'failed'; payment.razorpay_payment_id = entity.id; payment.reference_note = entity.error_description || payment.reference_note; await payment.save(); }
+    // A delayed failure webhook must never overwrite a concurrently captured payment.
+    // The status predicate makes this transition atomic; a later captured event can
+    // still reconcile a failed payment through finalizeSuccessfulPayment.
+    await Payment.updateOne(
+      { _id: payment._id, status: 'pending' },
+      {
+        $set: {
+          status: 'failed',
+          razorpay_payment_id: entity.id,
+          ...(entity.error_description ? { reference_note: String(entity.error_description).slice(0, 1000) } : {}),
+        },
+      },
+    );
     return { received: true, processed: true };
   }
   if (entity.currency !== 'INR' || Number(entity.amount) !== Math.round(payment.amount * 100)) throw new ApiError(400, 'Webhook payment amount mismatch');

@@ -6,6 +6,7 @@ import GymAdmission from '../models/gymAdmission.model.js';
 import User from '../models/user.model.js';
 import Notification from '../models/notification.model.js';
 import { ApiError } from '../utils/errors.utils.js';
+import { calculateMembershipBalance } from '../utils/membershipBilling.utils.js';
 
 function nextStartDate(membership) {
   const today = new Date();
@@ -38,27 +39,7 @@ export async function getMembershipsByUserId(userId) {
       || (payment.payment_type === 'membership_advance'
         && String(payment.gym_admission_id || '') === String(membership.gym_admission_id || ''))
     );
-    const allocatedAdvance = related
-      .filter((payment) => payment.payment_type === 'membership_advance'
-        && String(payment.membership_id || '') === String(membership._id)
-        && payment.status === 'success')
-      .reduce((sum, payment) => sum + Number(payment.allocated_amount || 0), 0);
-    // The membership stores its advance allocation at creation. Only use
-    // advances explicitly allocated to this membership as a ledger fallback.
-    const advancePaid = membership.membership_type === 'renewal' ? 0 : Math.max(
-      Number(membership.advance_paid || 0),
-      allocatedAdvance,
-    );
-    const received = related
-      .filter((payment) => ['membership_full', 'membership_installment'].includes(payment.payment_type)
-        && payment.status === 'success')
-      .reduce((sum, payment) => sum + Number(payment.amount || 0), 0);
-    const amountDue = Math.max(0, Number((
-      Number(membership.plan_price_snapshot || 0) - advancePaid - received
-    ).toFixed(2)));
-    const paymentStatus = membership.payment_status === 'refunded' || related.some((payment) => payment.status === 'refunded')
-      ? 'refunded'
-      : amountDue === 0 ? 'paid' : 'pending';
+    const { advancePaid, amountDue, paymentStatus } = calculateMembershipBalance(membership, related);
 
     return {
       ...membership,
@@ -161,24 +142,7 @@ export async function getAllMemberships({
       || (payment.payment_type === 'membership_advance'
         && String(payment.gym_admission_id || '') === String(item.gym_admission_id || ''))
     );
-    const allocatedAdvance = relatedPayments
-      .filter((payment) => payment.payment_type === 'membership_advance'
-        && String(payment.membership_id || '') === String(item._id))
-      .reduce((sum, payment) => sum + Number(payment.allocated_amount || 0), 0);
-    const advancePaid = item.membership_type === 'renewal' ? 0 : Math.max(
-      Number(item.advance_paid || 0),
-      allocatedAdvance,
-    );
-    const membershipPayments = relatedPayments.filter((payment) =>
-      payment.payment_type !== 'membership_advance' && payment.status === 'success'
-    );
-    const amountReceived = membershipPayments.reduce((sum, payment) => sum + Number(payment.amount || 0), 0);
-    const amountDue = Math.max(0, Number((
-      Number(item.plan_price_snapshot || 0) - advancePaid - amountReceived
-    ).toFixed(2)));
-    const paymentStatus = item.payment_status === 'refunded' || relatedPayments.some((payment) => payment.status === 'refunded')
-      ? 'refunded'
-      : amountDue === 0 ? 'paid' : 'pending';
+    const { advancePaid, amountDue, paymentStatus } = calculateMembershipBalance(item, relatedPayments);
 
     return {
       ...item,
@@ -226,25 +190,11 @@ export async function getMembershipDetails(membershipId) {
   // Keep the membership balance tied to real successful payment records.
   // Admission advances are shown in the history but counted only up to the
   // amount reserved for this membership, preventing double counting.
-  const allocatedAdvance = payments
-    .filter((payment) => payment.payment_type === 'membership_advance'
-      && (String(payment.membership_id || '') === String(membership._id)))
-    .reduce((sum, payment) => sum + Number(payment.allocated_amount || 0), 0);
-  const advancePaid = membership.membership_type === 'renewal' ? 0 : Math.max(
-    Number(membership.advance_paid || 0),
-    allocatedAdvance,
-  );
-  const membershipPayments = payments.filter((payment) =>
-    payment.payment_type !== 'membership_advance' && payment.status === 'success'
-  );
-  const amountReceived = membershipPayments.reduce((sum, payment) => sum + Number(payment.amount || 0), 0);
-  const calculatedDue = Math.max(0, Number((
-    Number(membership.plan_price_snapshot || 0) - advancePaid - amountReceived
-  ).toFixed(2)));
-  const hasRefund = membership.payment_status === 'refunded' || payments.some((payment) => payment.status === 'refunded');
-  const calculatedPaymentStatus = hasRefund
-    ? 'refunded'
-    : calculatedDue === 0 ? 'paid' : 'pending';
+  const {
+    advancePaid,
+    amountDue: calculatedDue,
+    paymentStatus: calculatedPaymentStatus,
+  } = calculateMembershipBalance(membership, payments);
 
   return {
     ...membership,
@@ -445,6 +395,9 @@ export async function payAdvance() {
 export async function renewMembership(userId, membershipId) {
   const oldMembership = await Membership.findOne({ _id: membershipId, user_id: userId });
   if (!oldMembership) throw new ApiError(404, 'Membership not found');
+  if (oldMembership.status === 'scheduled') {
+    throw new ApiError(409, 'This renewal is already scheduled. You can renew again after it becomes active and completes.');
+  }
   const plan = await MembershipPlan.findOne({ _id: oldMembership.plan_id, is_active: true });
   if (!plan) throw new ApiError(404, 'Original plan not found');
   const admission = await GymAdmission.findOne({ user_id: userId, status: 'active' });
