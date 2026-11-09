@@ -395,6 +395,9 @@ export async function payAdvance() {
 export async function renewMembership(userId, membershipId) {
   const oldMembership = await Membership.findOne({ _id: membershipId, user_id: userId });
   if (!oldMembership) throw new ApiError(404, 'Membership not found');
+  if (oldMembership.status === 'scheduled') {
+    throw new ApiError(409, 'This renewal is already scheduled. You can renew again after it becomes active and completes.');
+  }
   const plan = await MembershipPlan.findOne({ _id: oldMembership.plan_id, is_active: true });
   if (!plan) throw new ApiError(404, 'Original plan not found');
   const admission = await GymAdmission.findOne({ user_id: userId, status: 'active' });
