@@ -10,6 +10,7 @@ import Notification from '../models/notification.model.js';
 import AppSettings from '../models/appSetting.model.js';
 import { ApiError } from '../utils/errors.utils.js';
 import { allocateMembershipAdvance } from './membership.service.js';
+import { calculateMembershipBalance } from '../utils/membershipBilling.utils.js';
 
 function gateway() {
   if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) throw new ApiError(503, 'Online payments are not configured');
@@ -89,18 +90,8 @@ export async function createRazorpayOrder(userId, { orderId, membershipId }) {
       user_id: userId,
       $or: [{ membership_id: membership._id }, ...admissionFilter],
     }).select('membership_id amount allocated_amount payment_type status').lean();
-    const allocatedAdvance = membershipPayments
-      .filter((item) => item.payment_type === 'membership_advance'
-        && String(item.membership_id || '') === String(membership._id) && item.status === 'success')
-      .reduce((sum, item) => sum + Number(item.allocated_amount || 0), 0);
-    const advancePaid = membership.membership_type === 'renewal' ? 0 : Math.max(
-      Number(membership.advance_paid || 0),
-      allocatedAdvance,
-    );
-    const alreadyPaid = membershipPayments
-      .filter((item) => ['membership_full', 'membership_installment'].includes(item.payment_type) && item.status === 'success')
-      .reduce((sum, item) => sum + Number(item.amount || 0), 0);
-    amount = Math.max(0, Number((Number(membership.plan_price_snapshot || 0) - advancePaid - alreadyPaid).toFixed(2)));
+    const { advancePaid, amountDue } = calculateMembershipBalance(membership, membershipPayments);
+    amount = amountDue;
     if (amount <= 0) throw new ApiError(409, 'This membership is already fully paid.');
     membership.advance_paid = advancePaid;
     membership.amount_due = amount;
@@ -251,20 +242,9 @@ async function finalizeSuccessfulPayment(paymentId, userId, razorpayPaymentId, s
       user_id: payment.user_id,
       $or: [{ membership_id: membership._id }, ...admissionFilter],
     }).select('membership_id amount allocated_amount payment_type status').session(session).lean();
-    const allocatedAdvance = membershipPayments
-      .filter((item) => item.payment_type === 'membership_advance'
-        && String(item.membership_id || '') === String(membership._id) && item.status === 'success')
-      .reduce((sum, item) => sum + Number(item.allocated_amount || 0), 0);
-    membership.advance_paid = membership.membership_type === 'renewal' ? 0 : Math.max(
-      Number(membership.advance_paid || 0),
-      allocatedAdvance,
-    );
-    const received = membershipPayments
-      .filter((item) => ['membership_full', 'membership_installment'].includes(item.payment_type) && item.status === 'success')
-      .reduce((sum, item) => sum + Number(item.amount || 0), 0);
-    membership.amount_due = Math.max(0, Number((
-      Number(membership.plan_price_snapshot || 0) - membership.advance_paid - received
-    ).toFixed(2)));
+    const balance = calculateMembershipBalance(membership, membershipPayments);
+    membership.advance_paid = balance.advancePaid;
+    membership.amount_due = balance.amountDue;
 
     if (membership.amount_due === 0) {
       await allocateMembershipAdvance(payment.user_id, membership, session);
