@@ -325,24 +325,59 @@ export async function deleteProduct(id) {
 
 export async function adjustStock(id, data, performedBy) {
   const quantity = Number(data.quantity);
-  if (!Number.isFinite(quantity) || !Number.isInteger(quantity) || quantity === 0) throw new ApiError(400, 'Stock adjustment must be a non-zero whole number');
+  if (!Number.isFinite(quantity) || !Number.isInteger(quantity) || quantity === 0) {
+    throw new ApiError(400, 'Stock adjustment must be a non-zero whole number');
+  }
+
   const reason = String(data.reason || '').trim();
   if (!reason) throw new ApiError(400, 'A reason is required for every stock adjustment');
-  const product = await Product.findOne({ _id: id, is_deleted: { $ne: true } });
-  if (!product) throw new ApiError(404, 'Supplement not found');
-  const before = product.stock_quantity;
-  const after = before + quantity;
-  if (after < product.reserved_quantity) throw new ApiError(409, 'Cannot reduce stock below the quantity reserved for orders');
-  if (after < 0) throw new ApiError(409, 'Stock cannot become negative');
-  product.stock_quantity = after;
-  await product.save();
-  await InventoryMovement.create({
-    product_id: product._id, movement_type: quantity > 0 ? 'stock_in' : 'stock_out',
-    quantity, stock_before: before, stock_after: after,
-    reserved_before: product.reserved_quantity, reserved_after: product.reserved_quantity,
-    reason, performed_by: performedBy || null,
-  });
-  return product;
+
+  const session = await Product.startSession();
+  let updatedProduct;
+  try {
+    await session.withTransaction(async () => {
+      const beforeProduct = await Product.findOneAndUpdate(
+        {
+          _id: id,
+          is_deleted: { $ne: true },
+          $expr: {
+            $gte: [
+              { $add: ['$stock_quantity', quantity] },
+              '$reserved_quantity',
+            ],
+          },
+        },
+        { $inc: { stock_quantity: quantity } },
+        { new: false, session },
+      );
+
+      if (!beforeProduct) {
+        const exists = await Product.exists({ _id: id, is_deleted: { $ne: true } }).session(session);
+        if (!exists) throw new ApiError(404, 'Supplement not found');
+        throw new ApiError(409, 'Stock cannot be reduced below reserved quantity or zero');
+      }
+
+      const stockBefore = beforeProduct.stock_quantity;
+      const stockAfter = stockBefore + quantity;
+      await InventoryMovement.create([{
+        product_id: beforeProduct._id,
+        movement_type: quantity > 0 ? 'stock_in' : 'stock_out',
+        quantity,
+        stock_before: stockBefore,
+        stock_after: stockAfter,
+        reserved_before: beforeProduct.reserved_quantity,
+        reserved_after: beforeProduct.reserved_quantity,
+        reason,
+        performed_by: performedBy || null,
+      }], { session });
+
+      updatedProduct = await Product.findById(id).session(session);
+    });
+
+    return updatedProduct;
+  } finally {
+    await session.endSession();
+  }
 }
 
 export async function getStockHistory(id) {
