@@ -64,7 +64,7 @@ export default function Contact() {
                 <div>
                   <p className="text-sm font-semibold text-ink-900 dark:text-white">Phone</p>
                   {phone
-                    ? <a className="mt-1 block text-sm text-brand-600 hover:underline dark:text-brand-400" href={`tel:${phone.replace(/[^+\\d]/g, '')}`}>{phone}</a>
+                    ? <a className="mt-1 block text-sm text-brand-600 hover:underline dark:text-brand-400" href={`tel:${phone.replace(/[^+\d]/g, '')}`}>{phone}</a>
                     : <p className="mt-1 text-sm text-surface-500">{loading ? 'Loading phone…' : 'Phone number not added yet'}</p>}
                 </div>
               </div>
@@ -93,7 +93,7 @@ export default function Contact() {
               The online message form is not connected to a message-delivery service, so it has been removed rather than showing a false success message. Please use the verified phone number or email address listed here.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
-              {phone && <a href={`tel:${phone.replace(/[^+\\d]/g, '')}`} className="inline-flex items-center justify-center rounded-xl bg-brand-600 px-5 py-3 text-sm font-semibold text-white hover:bg-brand-700">Call Heaven Gym</a>}
+              {phone && <a href={`tel:${phone.replace(/[^+\d]/g, '')}`} className="inline-flex items-center justify-center rounded-xl bg-brand-600 px-5 py-3 text-sm font-semibold text-white hover:bg-brand-700">Call Heaven Gym</a>}
               {email && <a href={`mailto:${email}`} className="inline-flex items-center justify-center rounded-xl border border-surface-300 px-5 py-3 text-sm font-semibold text-ink-800 hover:bg-surface-50 dark:border-surface-700 dark:text-white dark:hover:bg-surface-800">Email Heaven Gym</a>}
               {!loading && !phone && !email && <p className="text-sm text-surface-500">The gym administrator needs to add a phone number or email in Admin Settings.</p>}
             </div>
