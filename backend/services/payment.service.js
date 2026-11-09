@@ -395,7 +395,19 @@ export async function handleRazorpayWebhook(rawBody, signature, eventPayload) {
   const payment = await Payment.findOne({ razorpay_order_id: entity.order_id });
   if (!payment) return { received: true, processed: false };
   if (event === 'payment.failed') {
-    if (payment.status === 'pending') { payment.status = 'failed'; payment.razorpay_payment_id = entity.id; payment.reference_note = entity.error_description || payment.reference_note; await payment.save(); }
+    // A delayed failure webhook must never overwrite a concurrently captured payment.
+    // The status predicate makes this transition atomic; a later captured event can
+    // still reconcile a failed payment through finalizeSuccessfulPayment.
+    await Payment.updateOne(
+      { _id: payment._id, status: 'pending' },
+      {
+        $set: {
+          status: 'failed',
+          razorpay_payment_id: entity.id,
+          ...(entity.error_description ? { reference_note: String(entity.error_description).slice(0, 1000) } : {}),
+        },
+      },
+    );
     return { received: true, processed: true };
   }
   if (entity.currency !== 'INR' || Number(entity.amount) !== Math.round(payment.amount * 100)) throw new ApiError(400, 'Webhook payment amount mismatch');
