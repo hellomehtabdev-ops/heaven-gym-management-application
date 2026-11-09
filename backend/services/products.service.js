@@ -255,26 +255,42 @@ export async function createProduct(data, image) {
     const category = await ProductCategory.findOne({ _id: data.category_id, is_active: true });
     if (!category) throw new ApiError(400, 'Category not found or inactive');
   }
-  const product = await Product.create({
-    ...values,
-    sku,
-    category_id: data.category_id || null,
-    slug: `${slugify(values.name)}-${sku.toLowerCase()}`,
-    description: String(data.description || '').trim(),
-    net_quantity: String(data.net_quantity || '').trim(),
-    expiry_date: data.expiry_date || null,
-    image_url: image?.secure_url || '',
-    image_public_id: image?.public_id || '',
-    images: image ? [{ url: image.secure_url, public_id: image.public_id, alt_text: values.name, is_primary: true }] : [],
-    is_active: data.is_active !== false && data.is_active !== 'false',
-  });
-  if (values.stock_quantity > 0) {
-    await InventoryMovement.create({
-      product_id: product._id, movement_type: 'opening_stock', quantity: values.stock_quantity,
-      stock_before: 0, stock_after: values.stock_quantity, reason: 'Opening stock',
+  const session = await mongoose.startSession();
+  let createdProduct;
+  try {
+    await session.withTransaction(async () => {
+      const [product] = await Product.create([{
+        ...values,
+        sku,
+        category_id: data.category_id || null,
+        slug: slugify(values.name) + '-' + sku.toLowerCase(),
+        description: String(data.description || '').trim(),
+        net_quantity: String(data.net_quantity || '').trim(),
+        expiry_date: data.expiry_date || null,
+        image_url: image?.secure_url || '',
+        image_public_id: image?.public_id || '',
+        images: image ? [{ url: image.secure_url, public_id: image.public_id, alt_text: values.name, is_primary: true }] : [],
+        is_active: data.is_active !== false && data.is_active !== 'false',
+      }], { session });
+
+      if (values.stock_quantity > 0) {
+        await InventoryMovement.create([{
+          product_id: product._id,
+          movement_type: 'opening_stock',
+          quantity: values.stock_quantity,
+          stock_before: 0,
+          stock_after: values.stock_quantity,
+          reserved_before: 0,
+          reserved_after: 0,
+          reason: 'Opening stock',
+        }], { session });
+      }
+      createdProduct = product;
     });
+    return cleanProduct(createdProduct);
+  } finally {
+    await session.endSession();
   }
-  return cleanProduct(product);
 }
 
 export async function updateProduct(id, data, image) {
