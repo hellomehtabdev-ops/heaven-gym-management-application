@@ -39,7 +39,7 @@ export async function getMembershipsByUserId(userId) {
       || (payment.payment_type === 'membership_advance'
         && String(payment.gym_admission_id || '') === String(membership.gym_admission_id || ''))
     );
-    const { advancePaid, amountReceived, amountDue, paymentStatus } = calculateMembershipBalance(membership, related);
+    const { advancePaid, amountDue, paymentStatus } = calculateMembershipBalance(membership, related);
 
     return {
       ...membership,
@@ -142,7 +142,7 @@ export async function getAllMemberships({
       || (payment.payment_type === 'membership_advance'
         && String(payment.gym_admission_id || '') === String(item.gym_admission_id || ''))
     );
-    const { advancePaid, amountReceived, amountDue, paymentStatus } = calculateMembershipBalance(item, relatedPayments);
+    const { advancePaid, amountDue, paymentStatus } = calculateMembershipBalance(item, relatedPayments);
 
     return {
       ...item,
