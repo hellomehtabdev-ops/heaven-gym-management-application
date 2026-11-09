@@ -6,6 +6,8 @@ import Membership from '../models/membership.model.js';
 import Order from '../models/order.model.js';
 import Product from '../models/product.model.js';
 import InventoryMovement from '../models/inventoryMovement.model.js';
+import Notification from '../models/notification.model.js';
+import AppSettings from '../models/appSetting.model.js';
 import { ApiError } from '../utils/errors.utils.js';
 import { allocateMembershipAdvance } from './membership.service.js';
 
@@ -280,6 +282,24 @@ async function finalizeSuccessfulPayment(paymentId, userId, razorpayPaymentId, s
     }
     await membership.save({ session });
   }
+  if (payment.membership_id || reservedOrder) {
+    const preferences = await AppSettings.findOne({ user_id: payment.user_id })
+      .select('notify_membership notify_orders notify_payments')
+      .session(session)
+      .lean();
+
+    if (preferences?.notify_payments !== false) {
+      await Notification.create([{
+        user_id: payment.user_id,
+        title: 'Payment received',
+        message: `Your payment of ₹${Number(payment.amount).toLocaleString('en-IN')} has been received successfully.`,
+        type: 'payment',
+        related_id: payment._id,
+        related_type: 'payment',
+      }], { session });
+    }
+  }
+
   if (reservedOrder) {
     const order = reservedOrder;
 
@@ -308,6 +328,21 @@ async function finalizeSuccessfulPayment(paymentId, userId, razorpayPaymentId, s
     order.inventory_status = 'committed';
     order.status = 'processing';
     await order.save({ session });
+
+    const preferences = await AppSettings.findOne({ user_id: payment.user_id })
+      .select('notify_orders')
+      .session(session)
+      .lean();
+    if (preferences?.notify_orders !== false) {
+      await Notification.create([{
+        user_id: payment.user_id,
+        title: 'Order is processing',
+        message: `Payment confirmed. Your order ${order.order_number} is now being processed.`,
+        type: 'order',
+        related_id: order._id,
+        related_type: 'order_status',
+      }], { session });
+    }
   }
   return payment;
 }
