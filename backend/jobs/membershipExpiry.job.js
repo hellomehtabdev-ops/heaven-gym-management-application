@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import Membership from '../models/membership.model.js';
 import Notification from '../models/notification.model.js';
+import AppSettings from '../models/appSetting.model.js';
 import { releaseExpiredOrderReservations } from '../services/order.service.js';
 
 export async function activateScheduledMemberships() {
@@ -23,9 +24,12 @@ export async function sendExpiryReminders() {
   const now = new Date();
   const twoDaysFromNow = new Date(now.getTime() + 2 * 24 * 60 * 60 * 1000);
   const expiringSoon = await Membership.find({ status: 'active', end_date: { $gte: now, $lte: twoDaysFromNow } }).populate({ path: 'user_id', select: 'full_name' });
+  const userIds = expiringSoon.filter((membership) => membership.user_id).map((membership) => membership.user_id._id);
+  const settings = await AppSettings.find({ user_id: { $in: userIds } }).select('user_id notify_membership').lean();
+  const disabledUsers = new Set(settings.filter((item) => item.notify_membership === false).map((item) => String(item.user_id)));
   let notified = 0;
   for (const membership of expiringSoon) {
-    if (!membership.user_id) continue;
+    if (!membership.user_id || disabledUsers.has(String(membership.user_id._id))) continue;
     const existing = await Notification.findOne({ user_id: membership.user_id._id, related_id: membership._id, related_type: 'membership_expiry' });
     if (existing) continue;
     await Notification.create({
