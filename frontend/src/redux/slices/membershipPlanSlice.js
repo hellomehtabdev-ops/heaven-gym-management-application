@@ -3,8 +3,8 @@ import { membershipPlanService } from '@/services/membershipPlanService';
 
 const errorMessage = (error, fallback) => error.response?.data?.error || fallback;
 
-export const fetchMembershipPlans = createAsyncThunk('membershipPlans/fetchAll', async (_, { rejectWithValue }) => {
-  try { return await membershipPlanService.getAll(); } catch (error) { return rejectWithValue(errorMessage(error, 'Failed to fetch membership plans')); }
+export const fetchMembershipPlans = createAsyncThunk('membershipPlans/fetchAll', async ({ includeInactive = false } = {}, { rejectWithValue }) => {
+  try { return await membershipPlanService.getAll(includeInactive); } catch (error) { return rejectWithValue(errorMessage(error, 'Failed to fetch membership plans')); }
 });
 
 export const createMembershipPlan = createAsyncThunk('membershipPlans/create', async (data, { rejectWithValue }) => {
