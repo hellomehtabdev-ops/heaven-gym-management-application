@@ -13,8 +13,11 @@ export async function activateScheduledMemberships() {
 }
 
 export async function expireMemberships() {
+  const now = new Date();
+  // Scheduled renewals must not remain stuck as "scheduled" if the worker
+  // was offline when their membership period ended.
   const result = await Membership.updateMany(
-    { status: 'active', end_date: { $lt: new Date() } },
+    { status: { $in: ['active', 'scheduled'] }, end_date: { $lte: now } },
     { $set: { status: 'expired' } }
   );
   return { expired: result.modifiedCount || 0 };
