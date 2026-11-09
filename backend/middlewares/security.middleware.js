@@ -1,16 +1,20 @@
 const SAFE_METHODS = new Set(['GET', 'HEAD', 'OPTIONS']);
+const DEFAULT_ALLOWED_ORIGINS = [
+  'https://heaven-gym-management-frontend.vercel.app',
+  'http://localhost:5173',
+];
 
 function allowedOrigins() {
-  return String(process.env.CLIENT_URL || 'http://localhost:5173')
+  return String(process.env.CLIENT_URL || DEFAULT_ALLOWED_ORIGINS.join(','))
     .split(',')
-    .map((value) => value.trim())
+    .map((value) => value.trim().replace(/\/$/, ''))
     .filter(Boolean);
 }
 
 export function originProtection(req, res, next) {
   if (SAFE_METHODS.has(req.method)) return next();
 
-  const origin = req.get('origin');
+  const origin = req.get('origin')?.replace(/\/$/, '');
   if (origin && !allowedOrigins().includes(origin)) {
     return res.status(403).json({ error: 'Request origin is not allowed' });
   }
