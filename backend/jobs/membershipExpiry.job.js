@@ -32,15 +32,21 @@ export async function sendExpiryReminders() {
     if (!membership.user_id || disabledUsers.has(String(membership.user_id._id))) continue;
     const existing = await Notification.findOne({ user_id: membership.user_id._id, related_id: membership._id, related_type: 'membership_expiry' });
     if (existing) continue;
-    await Notification.create({
-      user_id: membership.user_id._id,
-      title: 'Membership expiring soon',
-      message: `Your ${membership.plan_name_snapshot} membership expires on ${new Date(membership.end_date).toLocaleDateString('en-IN')}. Renew now to keep training.`,
-      type: 'membership_expiry',
-      related_id: membership._id,
-      related_type: 'membership_expiry',
-    });
-    notified += 1;
+    try {
+      await Notification.create({
+        user_id: membership.user_id._id,
+        title: 'Membership expiring soon',
+        message: `Your ${membership.plan_name_snapshot} membership expires on ${new Date(membership.end_date).toLocaleDateString('en-IN')}. Renew now to keep training.`,
+        type: 'membership_expiry',
+        related_id: membership._id,
+        related_type: 'membership_expiry',
+      });
+      notified += 1;
+    } catch (error) {
+      // A scheduled run and the in-process worker can overlap. The unique
+      // reminder index makes the losing duplicate harmless.
+      if (error?.code !== 11000) throw error;
+    }
   }
   return { notified };
 }
