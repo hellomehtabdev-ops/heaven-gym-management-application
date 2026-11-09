@@ -50,7 +50,7 @@ export async function getAdminStats() {
     Payment.aggregate([{ $match: { status: 'success', payment_date: { $gte: monthStart } } }, { $group: { _id: null, total: { $sum: '$amount' } } }]),
     OfflineSale.aggregate([{ $match: { createdAt: { $gte: monthStart } } }, { $group: { _id: null, total: { $sum: '$total_amount' } } }]),
     Membership.find({ status: 'active', end_date: { $gte: now, $lte: twoDaysFromNow } }).populate({ path: 'user_id', select: 'full_name email' }).sort({ end_date: 1 }).limit(5).lean(),
-    Product.find({ is_active: true, is_deleted: { $ne: true }, $expr: { $lte: [{ $subtract: ['$stock_quantity', '$reserved_quantity'] }, '$low_stock_threshold'] } }).select('name stock_quantity reserved_quantity low_stock_threshold').sort({ stock_quantity: 1 }).limit(5).lean(),
+    Product.find({ is_active: true, is_deleted: { $ne: true }, $expr: { $lte: [{ $subtract: [{ $ifNull: ['$stock_quantity', 0] }, { $ifNull: ['$reserved_quantity', 0] }] }, { $ifNull: ['$low_stock_threshold', 5] }] } }).select('name stock_quantity reserved_quantity low_stock_threshold').sort({ stock_quantity: 1 }).limit(5).lean(),
     Order.find().populate({ path: 'user_id', select: 'full_name email' }).sort({ createdAt: -1 }).limit(5).lean(),
     Payment.find().select('-razorpay_signature').populate({ path: 'user_id', select: 'full_name email' }).sort({ createdAt: -1 }).limit(8).lean(),
   ]);
