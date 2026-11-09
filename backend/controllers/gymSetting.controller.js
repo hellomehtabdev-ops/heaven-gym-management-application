@@ -45,13 +45,24 @@ function validateAndNormalizeSettings(body = {}) {
 
 export const getGymSettings = async (req, res, next) => {
   try {
-    let settings = await GymSettings.findOne();
+    let settings = await GymSettings.findOne().select('gym_name contact_phone contact_email address').lean();
 
     if (!settings) {
-      settings = await GymSettings.create({});
+      const created = await GymSettings.create({});
+      settings = {
+        gym_name: created.gym_name,
+        contact_phone: created.contact_phone,
+        contact_email: created.contact_email,
+        address: created.address,
+      };
     }
 
-    res.json(settings);
+    res.json({
+      gym_name: settings.gym_name || 'Heaven Gym',
+      contact_phone: settings.contact_phone || '',
+      contact_email: settings.contact_email || '',
+      address: settings.address || '',
+    });
   } catch (error) {
     next(error);
   }
