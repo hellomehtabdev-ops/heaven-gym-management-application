@@ -61,7 +61,12 @@ export async function getAdminStats() {
   const monthRevenue = (monthRevenueAgg[0]?.total || 0) + (monthOfflineRevenueAgg[0]?.total || 0);
   return {
     stats: { totalUsers, totalAdmitted, notAdmitted: Math.max(0, totalUsers - totalAdmitted), activeMemberships, expiredMemberships, totalOrders, pendingOrders, totalProducts, gymRevenue, storeRevenue, totalRevenue: gymRevenue + storeRevenue, todayRevenue, monthRevenue },
-    expiringMemberships,\n    lowStockProducts: lowStockProducts.map((product) => ({\n      ...product,\n      available_quantity: Math.max(0, Number(product.stock_quantity || 0) - Number(product.reserved_quantity || 0)),\n    })),\n    recentOrders, recentPayments,
+    expiringMemberships,
+    lowStockProducts: lowStockProducts.map((product) => ({
+      ...product,
+      available_quantity: Math.max(0, Number(product.stock_quantity || 0) - Number(product.reserved_quantity || 0)),
+    })),
+    recentOrders, recentPayments,
   };
 }
 
