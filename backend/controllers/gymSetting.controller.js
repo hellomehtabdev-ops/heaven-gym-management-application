@@ -26,7 +26,7 @@ function validateAndNormalizeSettings(body = {}) {
       const maxLength = field === 'address' ? 500 : field === 'contact_email' ? 254 : 120;
       if (normalized.length > maxLength) throw new ApiError(400, `${field} is too long`);
       if (field === 'gym_name' && !normalized) throw new ApiError(400, 'Gym name is required');
-      if (field === 'contact_email' && normalized && !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(normalized)) {
+      if (field === 'contact_email' && normalized && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalized)) {
         throw new ApiError(400, 'Enter a valid contact email');
       }
       update[field] = normalized;
@@ -34,7 +34,9 @@ function validateAndNormalizeSettings(body = {}) {
     }
 
     const number = Number(value);
-    if (!Number.isFinite(number) || number < 0) throw new ApiError(400, `Invalid ${field}`);
+    if (!Number.isFinite(number) || number < 0 || (field === 'low_stock_threshold' && !Number.isInteger(number))) {
+      throw new ApiError(400, `Invalid ${field}`);
+    }
     update[field] = number;
   }
 
