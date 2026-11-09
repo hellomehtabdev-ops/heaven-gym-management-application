@@ -90,13 +90,13 @@ export async function createRazorpayOrder(userId, { orderId, membershipId }) {
       user_id: userId,
       $or: [{ membership_id: membership._id }, ...admissionFilter],
     }).select('membership_id amount allocated_amount payment_type status').lean();
-    const { advancePaid, amountDue } = calculateMembershipBalance(membership, membershipPayments);
+    const { advancePaid, amountReceived, amountDue } = calculateMembershipBalance(membership, membershipPayments);
     amount = amountDue;
     if (amount <= 0) throw new ApiError(409, 'This membership is already fully paid.');
     membership.advance_paid = advancePaid;
     membership.amount_due = amount;
     await membership.save();
-    paymentType = alreadyPaid > 0 ? 'membership_installment' : 'membership_full';
+    paymentType = amountReceived > 0 ? 'membership_installment' : 'membership_full';
   }
   if (!Number.isFinite(amount) || amount <= 0) throw new ApiError(400, 'Invalid payment amount');
   const targetFilter = orderId ? { order_id: orderId } : { membership_id: membershipId };
