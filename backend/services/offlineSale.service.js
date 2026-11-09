@@ -31,77 +31,70 @@ export async function createOfflineSale({ items, customerName = '', customerPhon
     quantities.set(productId, (quantities.get(productId) || 0) + quantity);
   }
 
-  const decremented = [];
-  let sale;
+  const session = await mongoose.startSession();
+  let createdSale;
   try {
-    const saleItems = [];
-    let totalAmount = 0;
+    await session.withTransaction(async () => {
+      const saleItems = [];
+      const movements = [];
+      let totalAmount = 0;
 
-    for (const [productId, quantity] of quantities) {
-      const product = await Product.findOneAndUpdate(
-        {
-          _id: productId,
-          is_active: true,
-          is_deleted: { $ne: true },
-          $expr: { $gte: [{ $subtract: ['$stock_quantity', '$reserved_quantity'] }, quantity] },
-        },
-        { $inc: { stock_quantity: -quantity } },
-        { new: false },
-      );
-      if (!product) throw new ApiError(409, 'A selected supplement is unavailable or has insufficient stock. Refresh the store and try again.');
+      for (const [productId, quantity] of quantities) {
+        const product = await Product.findOneAndUpdate(
+          {
+            _id: productId,
+            is_active: true,
+            is_deleted: { $ne: true },
+            $expr: { $gte: [{ $subtract: ['$stock_quantity', '$reserved_quantity'] }, quantity] },
+          },
+          { $inc: { stock_quantity: -quantity } },
+          { new: false, session },
+        );
+        if (!product) throw new ApiError(409, 'A selected supplement is unavailable or has insufficient stock. Refresh the store and try again.');
 
-      decremented.push({
-        productId,
-        quantity,
-        stockBefore: product.stock_quantity,
-        reservedQuantity: product.reserved_quantity,
-      });
-      const subtotal = Number(product.price) * quantity;
-      totalAmount += subtotal;
-      saleItems.push({
-        product_id: product._id,
-        product_name_snapshot: product.name,
-        product_sku_snapshot: product.sku || '',
-        product_price_snapshot: product.price,
-        quantity,
-        subtotal,
-      });
-    }
+        const subtotal = Number(product.price) * quantity;
+        totalAmount += subtotal;
+        saleItems.push({
+          product_id: product._id,
+          product_name_snapshot: product.name,
+          product_sku_snapshot: product.sku || '',
+          product_price_snapshot: product.price,
+          quantity,
+          subtotal,
+        });
+        movements.push({
+          product_id: product._id,
+          movement_type: 'offline_sale',
+          quantity: -quantity,
+          stock_before: product.stock_quantity,
+          stock_after: product.stock_quantity - quantity,
+          reserved_before: product.reserved_quantity,
+          reserved_after: product.reserved_quantity,
+          reason: 'Offline counter sale',
+          performed_by: performedBy || null,
+        });
+      }
 
-    sale = await OfflineSale.create({
-      bill_number: createBillNumber(),
-      customer_name: String(customerName).trim().slice(0, 120),
-      customer_phone: String(customerPhone).trim().slice(0, 20),
-      payment_method: paymentMethod,
-      items: saleItems,
-      total_amount: totalAmount,
-      sold_by: performedBy || null,
+      const [sale] = await OfflineSale.create([{
+        bill_number: createBillNumber(),
+        customer_name: String(customerName).trim().slice(0, 120),
+        customer_phone: String(customerPhone).trim().slice(0, 20),
+        payment_method: paymentMethod,
+        items: saleItems,
+        total_amount: totalAmount,
+        sold_by: performedBy || null,
+      }], { session });
+
+      for (const movement of movements) {
+        movement.reason = `Offline counter sale ${sale.bill_number}`;
+        movement.reference_id = sale._id;
+      }
+      await InventoryMovement.insertMany(movements, { session });
+      createdSale = sale;
     });
 
-    for (const item of decremented) {
-      await InventoryMovement.create({
-        product_id: item.productId,
-        movement_type: 'offline_sale',
-        quantity: -item.quantity,
-        stock_before: item.stockBefore,
-        stock_after: item.stockBefore - item.quantity,
-        reserved_before: item.reservedQuantity,
-        reserved_after: item.reservedQuantity,
-        reason: `Offline counter sale ${sale.bill_number}`,
-        reference_id: sale._id,
-        performed_by: performedBy || null,
-      });
-    }
-
-    return sale;
-  } catch (error) {
-    if (sale?._id) {
-      await InventoryMovement.deleteMany({ reference_id: sale._id }).catch(() => {});
-      await OfflineSale.deleteOne({ _id: sale._id }).catch(() => {});
-    }
-    await Promise.all(decremented.map(({ productId, quantity }) =>
-      Product.updateOne({ _id: productId }, { $inc: { stock_quantity: quantity } }).catch(() => null)
-    ));
-    throw error;
+    return createdSale;
+  } finally {
+    await session.endSession();
   }
 }
