@@ -24,6 +24,9 @@ export const payAdvance = async (req, res, next) => {
 export const renewMembership = async (req, res, next) => {
   try { res.status(201).json(await membershipService.renewMembership(req.user._id, req.params.id)); } catch (err) { next(err); }
 };
+export const cancelPendingMembership = async (req, res, next) => {
+  try { res.json(await membershipService.cancelPendingMembership(req.user._id, req.params.id)); } catch (err) { next(err); }
+};
 export const getMembershipDetails = async (req, res, next) => {
   try { res.json(await membershipService.getMembershipDetails(req.params.id)); } catch (err) { next(err); }
 };

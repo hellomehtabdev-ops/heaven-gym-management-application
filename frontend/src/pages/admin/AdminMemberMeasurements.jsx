@@ -124,7 +124,7 @@ export default function AdminMemberMeasurements() {
         <div className="flex flex-wrap items-center gap-3">
           <AdminAvatar name={member.full_name} src={member.avatar_url} className="h-14 w-14 rounded-2xl text-xl" />
           <div className="min-w-0 flex-1"><h2 className="font-display text-lg font-bold text-ink-950 dark:text-white">{member.full_name || 'Unnamed member'}</h2><p className="break-all text-sm text-surface-500">{member.email || '—'}</p><p className="mt-1 text-xs text-surface-500">{member.phone || 'No phone'} · {member.member_id || 'No member ID'}</p></div>
-          <Badge color={member.admission_status === 'active' ? 'success' : 'secondary'}>{member.admission_status || 'Admitted'}</Badge>
+          <Badge tone={member.admission_status === 'active' ? 'success' : 'neutral'}>{member.admission_status || 'Admitted'}</Badge>
         </div>
         <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3"><div className="rounded-xl bg-surface-50 p-3 dark:bg-surface-800/70"><p className="text-xs text-surface-500">Admission date</p><p className="mt-1 text-sm font-semibold text-ink-900 dark:text-white">{formatDate(member.admission_date)}</p></div><div className="rounded-xl bg-surface-50 p-3 dark:bg-surface-800/70"><p className="text-xs text-surface-500">Total records</p><p className="mt-1 text-sm font-semibold text-ink-900 dark:text-white">{records.length}</p></div><div className="rounded-xl bg-surface-50 p-3 dark:bg-surface-800/70"><p className="text-xs text-surface-500">Months tracked</p><p className="mt-1 text-sm font-semibold text-ink-900 dark:text-white">{groups.length}</p></div></div>
       </Card>

@@ -94,7 +94,7 @@ function MemberProfileDrawer({ member, overview, loading, error, onClose }) {
   if (!member) return null;
   const user = overview?.user || member;
   const phone = String(user.phone || '').replace(/[^0-9+]/g, '');
-  const normalizedPhone = phone.replace(/^\\+/, '').replace(/^0/, '');
+  const normalizedPhone = phone.replace(/^\+/, '').replace(/^0/, '');
   const whatsappNumber = normalizedPhone.length === 10 ? `91${normalizedPhone}` : normalizedPhone;
   const whatsappText = encodeURIComponent(`Hello ${user.full_name || 'there'}, this is Heaven Gym. We are contacting you regarding your gym account.`);
   const money = (value) => formatCurrency(Number(value || 0));

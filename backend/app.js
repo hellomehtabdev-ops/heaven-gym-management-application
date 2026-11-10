@@ -111,6 +111,7 @@ app.use('/api/auth/register', registrationLimiter);
 app.use('/api/auth/verify-email', verificationLimiter);
 app.use('/api/auth/resend-verification-otp', verificationLimiter);
 app.use('/api/auth/forgot-password', passwordResetLimiter);
+app.use('/api/auth/verify-password-reset-otp', passwordResetLimiter);
 app.use('/api/auth/reset-password', passwordResetLimiter);
 app.use('/api/auth', authLimiter, authRoutes);
 app.use('/api/users', userRoutes);

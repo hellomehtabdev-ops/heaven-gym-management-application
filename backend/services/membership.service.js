@@ -12,7 +12,6 @@ function nextStartDate(membership) {
   const today = new Date();
   const end = membership?.end_date ? new Date(membership.end_date) : null;
   if ((membership?.status === 'active' || membership?.status === 'scheduled') && end && end >= today) {
-    end.setDate(end.getDate() + 1);
     return end;
   }
   return today;
@@ -91,12 +90,13 @@ export async function getAllMemberships({
   }
 
   if (search.trim()) {
+    const safeSearch = search.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     const users = await User.find({
       role: 'user',
       $or: [
-        { full_name: { $regex: search.trim(), $options: 'i' } },
-        { email: { $regex: search.trim(), $options: 'i' } },
-        { phone: { $regex: search.trim(), $options: 'i' } },
+        { full_name: { $regex: safeSearch, $options: 'i' } },
+        { email: { $regex: safeSearch, $options: 'i' } },
+        { phone: { $regex: safeSearch, $options: 'i' } },
       ],
     }).select('_id').lean();
     filter.user_id = { $in: users.map((user) => user._id) };
@@ -419,5 +419,34 @@ export async function renewMembership(userId, membershipId) {
     membershipType: 'renewal',
     parentMembershipId: oldMembership._id,
   });
+}
+
+export async function cancelPendingMembership(userId, membershipId) {
+  if (!mongoose.isValidObjectId(membershipId)) {
+    throw new ApiError(400, 'Invalid membership ID');
+  }
+
+  const membership = await Membership.findOne({
+    _id: membershipId,
+    user_id: userId,
+    status: 'pending',
+    payment_status: 'pending',
+  });
+
+  if (!membership) {
+    throw new ApiError(404, 'Pending membership not found or already processed');
+  }
+
+  // Cancel the membership record so the user can choose another plan
+  membership.status = 'cancelled';
+  await membership.save();
+
+  // Mark any associated pending payment attempt as failed
+  await Payment.updateMany(
+    { user_id: userId, membership_id: membership._id, status: 'pending' },
+    { $set: { status: 'failed', reference_note: 'Pending membership cancelled by user' } },
+  );
+
+  return { message: 'Pending membership cancelled successfully', membershipId: membership._id };
 }
 

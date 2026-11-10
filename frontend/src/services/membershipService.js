@@ -9,4 +9,5 @@ export const membershipService = {
   purchase: (planId) => api.post('/memberships/purchase', { planId }).then((r) => r.data),
   payAdvance: (membershipId) => api.post('/memberships/advance', { membershipId }).then((r) => r.data),
   renew: (id) => api.post(`/memberships/${id}/renew`).then((r) => r.data),
+  cancelPending: (id) => api.post(`/memberships/${id}/cancel`).then((r) => r.data),
 };

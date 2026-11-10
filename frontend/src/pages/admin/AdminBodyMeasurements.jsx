@@ -75,7 +75,7 @@ export default function AdminBodyMeasurements() {
                   <div className="min-w-0 flex-1">
                     <div className="flex items-start justify-between gap-2">
                       <p className="truncate font-semibold text-ink-950 dark:text-white">{member.full_name || 'Unnamed member'}</p>
-                      <Badge color={member.admission_status === 'active' ? 'success' : 'secondary'}>{member.admission_status || 'Admitted'}</Badge>
+                      <Badge tone={member.admission_status === 'active' ? 'success' : 'neutral'}>{member.admission_status || 'Admitted'}</Badge>
                     </div>
                     <p className="mt-1 break-all text-xs text-surface-500">{member.email || 'Email unavailable'}</p>
                     <p className="mt-1 text-xs text-surface-500">{member.phone || 'Phone unavailable'}</p>

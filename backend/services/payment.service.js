@@ -304,7 +304,7 @@ async function finalizeSuccessfulPayment(paymentId, userId, razorpayPaymentId, s
 
     for (const item of order.order_items) {
       const product = await Product.findOneAndUpdate(
-        { _id: item.product_id, is_active: true, stock_quantity: { $gte: item.quantity }, reserved_quantity: { $gte: item.quantity } },
+        { _id: item.product_id, stock_quantity: { $gte: item.quantity }, reserved_quantity: { $gte: item.quantity } },
         { $inc: { stock_quantity: -item.quantity, reserved_quantity: -item.quantity } },
         { new: false, session },
       );

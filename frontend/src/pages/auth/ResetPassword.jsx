@@ -18,7 +18,7 @@ export default function ResetPassword() {
   async function handleSubmit(e) {
     e.preventDefault();
     if (!token) return setError('This password reset link is invalid.');
-    if (password.length < 8) return setError('Password must be at least 8 characters.');
+    if (password.length < 12) return setError('Password must be at least 12 characters.');
     if (password !== confirmPassword) return setError('Passwords do not match.');
     setLoading(true); setError('');
     try {
@@ -26,7 +26,7 @@ export default function ResetPassword() {
       setDone(true);
       setTimeout(() => navigate('/login', { replace: true }), 1200);
     } catch (err) {
-      setError(err?.message || 'Unable to reset password. The link may have expired.');
+      setError(err.response?.data?.error || err?.message || 'Unable to reset password. The link may have expired.');
     } finally { setLoading(false); }
   }
 
@@ -43,11 +43,11 @@ export default function ResetPassword() {
           ) : (
             <>
               <h1 className="font-display text-2xl font-bold text-ink-950 dark:text-white">Create a new password</h1>
-              <p className="mt-2 text-sm text-surface-500">Choose a strong password with at least 8 characters.</p>
+              <p className="mt-2 text-sm text-surface-500">Choose a strong password with at least 12 characters.</p>
               {error && <div className="mt-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600 dark:border-red-500/20 dark:bg-red-500/10 dark:text-red-400">{error}</div>}
               <form onSubmit={handleSubmit} className="mt-7 space-y-5">
-                <Input label="New password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} minLength={8} required />
-                <Input label="Confirm password" type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} minLength={8} required />
+                <Input label="New password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} minLength={12} required />
+                <Input label="Confirm password" type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} minLength={12} required />
                 <Button type="submit" loading={loading} className="w-full" size="lg">Reset password</Button>
               </form>
               <Link to="/login" className="mt-6 flex items-center justify-center gap-1 text-sm font-medium text-brand-600"><ArrowLeft size={15} /> Back to login</Link>

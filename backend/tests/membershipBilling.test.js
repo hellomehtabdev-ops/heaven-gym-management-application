@@ -91,3 +91,10 @@ test('rounds fractional currency balances to two decimal places', () => {
   );
   assert.equal(result.amountDue, 666.66);
 });
+
+test('sanitizes special regex characters safely for user searches', () => {
+  const unescaped = 'john.doe+gym[test](plan)';
+  const sanitized = unescaped.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  assert.equal(sanitized, 'john\\.doe\\+gym\\[test\\]\\(plan\\)');
+  assert.doesNotThrow(() => new RegExp(sanitized, 'i'));
+});
