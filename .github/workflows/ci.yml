@@ -4,7 +4,7 @@ on:
   pull_request:
     branches: [main]
   push:
-    branches: [main, fix/production-audit]
+    branches: [main, 'fix/**']
 
 permissions:
   contents: read
@@ -39,7 +39,7 @@ jobs:
         run: npm run build
 
   backend:
-    name: Backend dependency and syntax checks
+    name: Backend syntax and unit tests
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -57,5 +57,7 @@ jobs:
         run: npm ci
       - name: Check JavaScript syntax
         run: find . -path './node_modules' -prune -o -name '*.js' -print0 | xargs -0 -n1 node --check
-      - name: Run backend unit tests
-        run: npm test
+      - name: Run isolated backend unit tests
+        run: node --test tests/membershipBilling.test.js
+      - name: Explain integration test boundary
+        run: echo "Database-backed integration tests are not run in CI because no isolated test MongoDB is provisioned. Do not point automated tests at the live Heaven Gym database."
