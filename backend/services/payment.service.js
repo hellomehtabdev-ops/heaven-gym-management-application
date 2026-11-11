@@ -220,6 +220,32 @@ async function finalizeSuccessfulPayment(paymentId, userId, razorpayPaymentId, s
     }
   }
 
+  let membership = null;
+  if (payment.membership_id) {
+    membership = await Membership.findOne({
+      _id: payment.membership_id,
+      user_id: payment.user_id,
+      status: { $in: ['pending', 'active'] },
+      payment_status: 'pending',
+    }).session(session);
+
+    // A member may cancel while Razorpay checkout is still open. If capture
+    // arrives afterwards, preserve the captured money for admin reconciliation
+    // instead of throwing and rolling back the gateway payment record.
+    if (!membership) {
+      payment.status = 'reconciliation_required';
+      if (razorpayPaymentId) {
+        payment.razorpay_payment_id = razorpayPaymentId;
+        payment.transaction_id = razorpayPaymentId;
+      }
+      if (signature) payment.razorpay_signature = signature;
+      payment.payment_date = new Date();
+      payment.reference_note = 'Payment captured after pending membership was cancelled or changed. Verify the Razorpay transaction and arrange a refund or manual resolution; do not activate the cancelled membership.';
+      await payment.save({ session });
+      return payment;
+    }
+  }
+
   payment.status = 'success';
   if (razorpayPaymentId) { payment.razorpay_payment_id = razorpayPaymentId; payment.transaction_id = razorpayPaymentId; }
   if (signature) payment.razorpay_signature = signature;
@@ -227,13 +253,6 @@ async function finalizeSuccessfulPayment(paymentId, userId, razorpayPaymentId, s
   await payment.save({ session });
 
   if (payment.membership_id) {
-    const membership = await Membership.findOne({
-      _id: payment.membership_id,
-      user_id: payment.user_id,
-      status: { $in: ['pending', 'active'] },
-      payment_status: 'pending',
-    }).session(session);
-    if (!membership) throw new ApiError(409, 'Pending membership not found');
 
     const admissionFilter = membership.gym_admission_id
       ? [{ gym_admission_id: membership.gym_admission_id, payment_type: 'membership_advance' }]
@@ -408,8 +427,8 @@ export async function confirmReconciliationRefund(paymentId, refundId) {
   if (!payment) throw new ApiError(404, 'Payment not found');
   if (payment.status === 'refunded' && payment.razorpay_refund_id === refundId.trim()) return payment;
   if (payment.status !== 'reconciliation_required' || payment.payment_method !== 'online'
-    || !payment.order_id || !payment.razorpay_payment_id) {
-    throw new ApiError(409, 'Only captured online order payments requiring reconciliation can be resolved as refunded');
+    || (!payment.order_id && !payment.membership_id) || !payment.razorpay_payment_id) {
+    throw new ApiError(409, 'Only captured online order or membership payments requiring reconciliation can be resolved as refunded');
   }
 
   let refund;
@@ -441,7 +460,8 @@ export async function confirmReconciliationRefund(paymentId, refundId) {
       }
       if (current.status !== 'reconciliation_required'
         || current.razorpay_payment_id !== refund.payment_id
-        || String(current.order_id) !== String(payment.order_id)) {
+        || String(current.order_id || '') !== String(payment.order_id || '')
+        || String(current.membership_id || '') !== String(payment.membership_id || '')) {
         throw new ApiError(409, 'Payment changed while the refund was being verified. Refresh and review it again.');
       }
 
@@ -451,11 +471,13 @@ export async function confirmReconciliationRefund(paymentId, refundId) {
       current.reference_note = `Full refund verified in Razorpay (${refund.id}).`;
       await current.save({ session });
 
-      await Order.updateOne(
-        { _id: current.order_id, payment_id: { $in: [null, current._id] } },
-        { $set: { payment_status: 'refunded', payment_id: current._id } },
-        { session },
-      );
+      if (current.order_id) {
+        await Order.updateOne(
+          { _id: current.order_id, payment_id: { $in: [null, current._id] } },
+          { $set: { payment_status: 'refunded', payment_id: current._id } },
+          { session },
+        );
+      }
       resolvedPayment = current;
     });
     return resolvedPayment;
