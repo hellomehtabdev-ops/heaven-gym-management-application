@@ -1,105 +1,378 @@
-import { Check, HelpCircle, Crown, Dumbbell, Sparkles, Tag, Zap, ArrowRight } from 'lucide-react';
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
+import {
+  Check,
+  HelpCircle,
+  Crown,
+  Dumbbell,
+  Sparkles,
+  Tag,
+  Zap,
+  ArrowRight,
+  ShieldCheck,
+  ChevronDown,
+  Clock,
+  Award,
+} from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import Button from '@/components/ui/Button';
-import SectionHeading from '@/components/ui/SectionHeading';
+import ScrollReveal from '@/components/public/ScrollReveal';
+import SectionDivider from '@/components/public/SectionDivider';
 import { fetchMembershipPlans } from '@/redux/slices/membershipPlanSlice';
 import { formatCurrency } from '@/utils/formatters';
+
+const MEMBERSHIP_FAQS = [
+  {
+    q: 'What is included with my Heaven Gym membership?',
+    a: 'Every active membership provides unlimited entry to all training zones during operating hours (5:00 AM – 10:00 PM daily). This includes access to free weights, power racks, cardio deck, functional turf, and locker facilities.',
+  },
+  {
+    q: 'Can I freeze or pause my membership if I travel?',
+    a: 'Yes. Members on multi-month or annual plans can request a temporary membership freeze for medical reasons or official travel by speaking directly with reception administration.',
+  },
+  {
+    q: 'Do you offer an introductory equipment orientation?',
+    a: 'Absolutely. Every new member receives a complimentary facility walkthrough and machine orientation session with one of our certified floor coaches to ensure safe, confident usage.',
+  },
+  {
+    q: 'Are personal training sessions included or separate?',
+    a: 'Standard memberships include full floor access and general trainer guidance. Dedicated 1-on-1 private coaching packages can be arranged directly through our certified coaching staff.',
+  },
+  {
+    q: 'How do I complete my registration and admission?',
+    a: 'Click "Choose Plan" or "Join Now" to create your member profile. You can finalize your admission and activate your gym access card seamlessly online or at gym reception.',
+  },
+];
 
 export default function Membership() {
   const dispatch = useDispatch();
   const plans = useSelector((state) => state.membershipPlans.items);
+  const loading = useSelector((state) => state.membershipPlans.loading);
 
-  useEffect(() => { dispatch(fetchMembershipPlans()); }, [dispatch]);
+  const [openFaq, setOpenFaq] = useState(null);
+
+  useEffect(() => {
+    dispatch(fetchMembershipPlans());
+  }, [dispatch]);
+
+  const toggleFaq = (idx) => {
+    setOpenFaq(openFaq === idx ? null : idx);
+  };
 
   return (
-    <div>
-      <section className="relative overflow-hidden bg-ink-950 pb-16 pt-32 text-white sm:pb-20 sm:pt-36">
-        <div className="pointer-events-none absolute -right-20 top-10 h-72 w-72 rounded-full bg-brand-500/15 blur-3xl" />
-        <div className="relative mx-auto max-w-7xl px-5 lg:px-8">
-          <p className="inline-flex items-center gap-2 rounded-full border border-brand-400/30 bg-brand-400/10 px-3 py-1.5 text-[11px] font-bold uppercase tracking-[.16em] text-brand-300"><Dumbbell size={13} /> Heaven Gym memberships</p>
-          <h1 className="mt-5 max-w-3xl font-display text-4xl font-extrabold leading-[1.08] tracking-tight sm:text-6xl">Choose your plan.<br /><span className="text-brand-400">Own your progress.</span></h1>
-          <p className="mt-5 max-w-xl text-base leading-7 text-surface-300 sm:text-lg">Straightforward membership options, clear benefits and no confusing surprises. Find the plan that fits your training routine.</p>
+    <div className="bg-[#070709] text-white selection:bg-brand-500 selection:text-white">
+      {/* =========================================================================
+          MEMBERSHIP HERO
+          ========================================================================= */}
+      <section className="relative overflow-hidden pt-36 pb-20 lg:pt-44 lg:pb-28">
+        <div className="absolute inset-0 z-0">
+          <img
+            src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=1920&q=80"
+            alt="Heaven Gym Membership Plans"
+            className="h-full w-full object-cover filter brightness-[0.25] contrast-125"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#070709] via-[#070709]/80 to-transparent" />
+          <div className="absolute -top-24 right-1/4 h-80 w-80 rounded-full bg-brand-600/20 blur-[130px] pointer-events-none" />
+        </div>
+
+        <div className="relative z-10 mx-auto max-w-7xl px-5 lg:px-8">
+          <ScrollReveal animation="fade-down">
+            <span className="inline-flex items-center gap-2 rounded-full border border-brand-500/30 bg-brand-500/10 px-3.5 py-1.5 text-xs font-mono font-bold uppercase tracking-[0.2em] text-brand-400 backdrop-blur-md">
+              <Dumbbell size={13} /> Transparent Pricing &bull; No Surprises
+            </span>
+          </ScrollReveal>
+
+          <ScrollReveal animation="fade-up" delay={150}>
+            <h1 className="mt-6 max-w-3xl font-display text-4xl sm:text-6xl font-black tracking-[-0.03em] leading-tight">
+              CHOOSE YOUR PLAN. <br />
+              <span className="public-text-crimson-gradient">OWN YOUR PROGRESS.</span>
+            </h1>
+          </ScrollReveal>
+
+          <ScrollReveal animation="fade-up" delay={250}>
+            <p className="mt-6 max-w-xl text-base sm:text-lg text-surface-300 leading-relaxed">
+              Straightforward membership options built around your fitness objectives. Clean pricing, full zone access, and zero hidden complexity.
+            </p>
+          </ScrollReveal>
+
+          {/* Quick trust metrics */}
+          <ScrollReveal animation="fade-up" delay={350}>
+            <div className="mt-10 flex flex-wrap gap-6 text-xs text-surface-400 font-mono">
+              <span className="flex items-center gap-2">
+                <ShieldCheck size={16} className="text-emerald-400" /> Official Gym Access
+              </span>
+              <span className="flex items-center gap-2">
+                <Clock size={16} className="text-brand-400" /> Open 7 Days / Week
+              </span>
+              <span className="flex items-center gap-2">
+                <Award size={16} className="text-amber-400" /> Calibrated Equipment
+              </span>
+            </div>
+          </ScrollReveal>
         </div>
       </section>
 
-      <section className="bg-surface-50 py-12 dark:bg-surface-950 sm:py-16">
+      <SectionDivider variant="dark" />
+
+      {/* =========================================================================
+          MEMBERSHIP PLANS GRID (LIVE DATA)
+          ========================================================================= */}
+      <section className="py-16 sm:py-24">
         <div className="mx-auto max-w-7xl px-5 lg:px-8">
-          <SectionHeading eyebrow="Find your fit" title="Memberships built for your goals" description="Compare every plan and see exactly what's included before you join." />
-          {plans.length > 0 ? (
-            <div className="mt-9 grid items-stretch gap-4 sm:grid-cols-2 xl:grid-cols-3">
-              {plans.map((plan) => {
-                const premium = /premium|elite|pro|gold|platinum|vip/i.test(plan.name || '');
+          <ScrollReveal animation="fade-up">
+            <div className="text-center max-w-2xl mx-auto mb-14">
+              <p className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-brand-500">
+                Official Plans
+              </p>
+              <h2 className="mt-2 font-display text-3xl sm:text-4xl font-black text-white">
+                MEMBERSHIPS FOR EVERY GOAL.
+              </h2>
+              <p className="mt-3 text-sm text-surface-400">
+                Select your level of commitment and unlock access to all training floors.
+              </p>
+            </div>
+          </ScrollReveal>
+
+          {plans && plans.length > 0 ? (
+            <div className="grid items-stretch gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {plans.map((plan, index) => {
+                const premium = /premium|elite|pro|gold|platinum|vip|year|annual/i.test(plan.name || '');
                 const offer = Boolean(plan.is_offer);
                 const price = Number(plan.price || 0);
                 const originalPrice = Number(plan.original_price || 0);
                 const duration = Math.max(1, Number(plan.duration_days || 30));
                 const discount = offer && originalPrice > price ? Math.round((1 - price / originalPrice) * 100) : 0;
-                const palette = offer
-                  ? { card: 'border-amber-300 shadow-amber-900/5', strip: 'from-amber-400 via-orange-500 to-rose-500', icon: 'bg-amber-100 text-amber-700', panel: 'bg-amber-50 border-amber-100', badge: 'bg-amber-100 text-amber-800', button: 'primary', label: 'OFFER PLAN' }
-                  : premium
-                    ? { card: 'border-violet-300 shadow-violet-900/10', strip: 'from-violet-500 via-indigo-500 to-blue-500', icon: 'bg-violet-100 text-violet-700', panel: 'bg-violet-50 border-violet-100', badge: 'bg-violet-100 text-violet-800', button: 'primary', label: 'PREMIUM' }
-                    : { card: 'border-sky-200 shadow-sky-900/5', strip: 'from-sky-400 via-cyan-500 to-teal-400', icon: 'bg-sky-100 text-sky-700', panel: 'bg-sky-50 border-sky-100', badge: 'bg-sky-100 text-sky-800', button: 'secondary', label: 'STANDARD' };
+
                 const PlanIcon = offer ? Sparkles : premium ? Crown : Dumbbell;
 
                 return (
-                  <article key={plan.id} className={`group relative flex min-w-0 flex-col overflow-hidden rounded-2xl border bg-white shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl dark:border-surface-700 dark:bg-surface-900 ${palette.card}`}>
-                    <div className={`h-1.5 bg-gradient-to-r ${palette.strip}`} />
-                    <div className="flex flex-1 flex-col p-5 sm:p-6">
-                      <div className="flex items-start justify-between gap-3">
-                        <div className={`flex h-12 w-12 items-center justify-center rounded-2xl ${palette.icon}`}><PlanIcon size={23} /></div>
-                        <span className={`rounded-full px-3 py-1.5 text-[10px] font-extrabold tracking-wider ${palette.badge}`}>{palette.label}</span>
-                      </div>
-                      <h3 className="mt-5 break-words font-display text-2xl font-extrabold tracking-tight text-ink-950 dark:text-white">{plan.name}</h3>
-                      <p className="mt-1 text-sm font-medium text-surface-500 dark:text-surface-400"><Zap size={13} className="mr-1 inline" /> {duration} days of gym access</p>
+                  <ScrollReveal key={plan.id} animation="fade-up" delay={index * 90}>
+                    <article
+                      className={`group relative flex h-full flex-col justify-between overflow-hidden rounded-3xl border bg-gradient-to-b from-white/[0.04] to-transparent p-7 lg:p-8 transition-all duration-300 hover:-translate-y-1.5 shadow-xl ${
+                        offer
+                          ? 'border-amber-500/40 hover:border-amber-400 hover:shadow-amber-500/10'
+                          : premium
+                          ? 'border-brand-500/50 hover:border-brand-400 hover:shadow-brand-500/15'
+                          : 'border-white/10 hover:border-white/30'
+                      }`}
+                    >
+                      {/* Top strip accent */}
+                      <div
+                        className={`absolute top-0 inset-x-0 h-1.5 ${
+                          offer
+                            ? 'bg-gradient-to-r from-amber-400 via-orange-500 to-rose-500'
+                            : premium
+                            ? 'bg-gradient-to-r from-red-600 via-brand-500 to-red-400'
+                            : 'bg-gradient-to-r from-white/20 via-surface-400 to-white/10'
+                        }`}
+                      />
 
-                      <div className={`mt-5 rounded-xl border p-4 ${palette.panel} dark:border-white/10 dark:bg-white/[0.03]`}>
-                        <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
-                          {discount > 0 && <span className="text-sm text-surface-400 line-through">{formatCurrency(originalPrice)}</span>}
-                          <span className="font-display text-3xl font-extrabold tracking-tight text-ink-950 dark:text-white">{formatCurrency(price)}</span>
-                          {discount > 0 && <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-bold text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300">{discount}% OFF</span>}
+                      <div>
+                        {/* Header badge & icon */}
+                        <div className="flex items-center justify-between gap-3">
+                          <div
+                            className={`flex h-12 w-12 items-center justify-center rounded-2xl border ${
+                              offer
+                                ? 'bg-amber-500/15 border-amber-500/30 text-amber-400'
+                                : premium
+                                ? 'bg-brand-500/15 border-brand-500/30 text-brand-400'
+                                : 'bg-white/5 border-white/10 text-white'
+                            }`}
+                          >
+                            <PlanIcon size={22} />
+                          </div>
+
+                          <span
+                            className={`rounded-full px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-wider ${
+                              offer
+                                ? 'bg-amber-400/15 text-amber-300 border border-amber-400/30'
+                                : premium
+                                ? 'bg-brand-500/20 text-brand-300 border border-brand-500/40'
+                                : 'bg-white/10 text-surface-300 border border-white/10'
+                            }`}
+                          >
+                            {offer ? 'Special Offer' : premium ? 'Most Popular' : 'Essential'}
+                          </span>
                         </div>
-                        <p className="mt-1 text-xs text-surface-500 dark:text-surface-400">Just {formatCurrency(price / duration)} per day</p>
-                        {plan.offer_label && <p className="mt-2 text-xs font-bold text-amber-700 dark:text-amber-300"><Tag size={12} className="mr-1 inline" />{plan.offer_label}</p>}
-                      </div>
 
-                      <p className="mt-4 min-h-12 text-sm leading-6 text-surface-600 dark:text-surface-300">{plan.description || 'A focused membership option to support your fitness journey.'}</p>
+                        {/* Plan Name & Duration */}
+                        <h3 className="mt-6 font-display text-2xl font-bold tracking-tight text-white">
+                          {plan.name}
+                        </h3>
+                        <p className="mt-1 flex items-center gap-1.5 text-xs font-mono text-surface-400">
+                          <Zap size={13} className="text-brand-400" />
+                          <span>{duration} Days Full Facility Access</span>
+                        </p>
 
-                      <div className="mt-5 flex-1 border-t border-surface-100 pt-4 dark:border-surface-800">
-                        <div className="mb-3 flex items-center justify-between">
-                          <p className="text-xs font-extrabold uppercase tracking-wider text-surface-500 dark:text-surface-400">Included benefits</p>
-                          <span className="text-[11px] font-semibold text-surface-400">{(plan.features || []).length} features</span>
+                        {/* Pricing Panel */}
+                        <div className="mt-6 rounded-2xl border border-white/10 bg-black/40 p-5">
+                          <div className="flex flex-wrap items-baseline gap-2">
+                            {discount > 0 && (
+                              <span className="text-sm text-surface-400 line-through">
+                                {formatCurrency(originalPrice)}
+                              </span>
+                            )}
+                            <span className="font-display text-3xl sm:text-4xl font-black text-white">
+                              {formatCurrency(price)}
+                            </span>
+                            {discount > 0 && (
+                              <span className="rounded-full bg-emerald-500/15 border border-emerald-500/30 px-2 py-0.5 text-[10px] font-bold text-emerald-400">
+                                {discount}% OFF
+                              </span>
+                            )}
+                          </div>
+
+                          <p className="mt-1.5 text-xs font-mono text-surface-400">
+                            Effective rate: ~{formatCurrency(price / duration)} per day
+                          </p>
+
+                          {plan.offer_label && (
+                            <p className="mt-2 flex items-center gap-1 text-xs font-semibold text-amber-400">
+                              <Tag size={12} /> {plan.offer_label}
+                            </p>
+                          )}
                         </div>
-                        {(plan.features || []).length > 0 ? (
-                          <ul className="space-y-3">
-                            {plan.features.map((feature, index) => <li key={index} className="flex items-start gap-2.5 text-sm leading-5 text-surface-700 dark:text-surface-300"><span className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full ${palette.icon}`}><Check size={12} strokeWidth={3} /></span><span className="min-w-0 break-words">{feature}</span></li>)}
-                          </ul>
-                        ) : <p className="text-sm text-surface-400">Benefits will be updated soon.</p>}
+
+                        {/* Description */}
+                        {plan.description && (
+                          <p className="mt-4 text-xs leading-relaxed text-surface-300">
+                            {plan.description}
+                          </p>
+                        )}
+
+                        {/* Features List */}
+                        <div className="mt-6 border-t border-white/10 pt-5">
+                          <p className="font-mono text-[11px] font-bold uppercase tracking-wider text-surface-400 mb-3">
+                            Included Privileges
+                          </p>
+
+                          {(plan.features || []).length > 0 ? (
+                            <ul className="space-y-2.5">
+                              {plan.features.map((feature, fIdx) => (
+                                <li
+                                  key={fIdx}
+                                  className="flex items-start gap-2.5 text-xs text-surface-300 leading-normal"
+                                >
+                                  <span className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-brand-500/20 text-brand-400">
+                                    <Check size={11} strokeWidth={3} />
+                                  </span>
+                                  <span>{feature}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          ) : (
+                            <p className="text-xs text-surface-400 italic">
+                              Full access to all standard workout zones and locker amenities.
+                            </p>
+                          )}
+                        </div>
                       </div>
 
-                      <Link to="/register" className="mt-6 block">
-                        <Button variant={palette.button} className="w-full">Choose this plan <ArrowRight size={16} /></Button>
-                      </Link>
-                      <p className="mt-2 text-center text-[11px] text-surface-400">Clear pricing · Gym membership access</p>
-                    </div>
-                  </article>
+                      {/* Join Action Link */}
+                      <div className="mt-8 pt-4 border-t border-white/5">
+                        <Link to="/register" className="block">
+                          <Button
+                            className={`w-full font-bold uppercase tracking-wider text-xs py-3.5 shadow-lg ${
+                              offer || premium
+                                ? 'bg-brand-600 hover:bg-brand-500 text-white shadow-brand-600/30 border border-brand-400/25'
+                                : 'bg-white/10 hover:bg-white/20 text-white border border-white/15'
+                            }`}
+                          >
+                            Choose This Plan <ArrowRight size={15} className="ml-1.5" />
+                          </Button>
+                        </Link>
+                        <p className="mt-2 text-center font-mono text-[10px] text-surface-400">
+                          Secure registration &bull; Instant portal activation
+                        </p>
+                      </div>
+                    </article>
+                  </ScrollReveal>
                 );
               })}
             </div>
+          ) : loading ? (
+            <div className="py-20 text-center">
+              <div className="h-8 w-8 animate-spin rounded-full border-2 border-brand-500 border-t-transparent mx-auto mb-4" />
+              <p className="text-sm text-surface-400 font-mono">Loading live membership plans...</p>
+            </div>
           ) : (
-            <div className="mt-10 rounded-2xl border border-surface-200 bg-white p-8 text-center dark:border-surface-800 dark:bg-surface-900">
-              <Dumbbell className="mx-auto text-brand-500" size={30} />
-              <p className="mt-3 font-semibold text-ink-950 dark:text-white">Membership plans will be available soon.</p>
-              <p className="mt-1 text-sm text-surface-500">Please check back shortly.</p>
+            <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-12 text-center max-w-lg mx-auto">
+              <Dumbbell className="mx-auto text-brand-500 mb-3" size={36} />
+              <h3 className="font-display text-lg font-bold text-white">Membership Plans Syncing</h3>
+              <p className="mt-2 text-xs text-surface-400 leading-relaxed">
+                Plans are being refreshed in the club database. Please check back shortly or speak with gym reception directly.
+              </p>
             </div>
           )}
+        </div>
+      </section>
 
-          <div className="mt-10 rounded-2xl border border-surface-200 bg-white p-5 dark:border-surface-800 dark:bg-surface-900 sm:p-6">
-            <div className="flex items-start gap-3">
-              <HelpCircle className="mt-0.5 shrink-0 text-brand-600" />
-              <div><p className="font-semibold text-ink-900 dark:text-white">Need help choosing?</p><p className="mt-1 text-sm leading-6 text-surface-600 dark:text-surface-400">Our team can help you understand the membership options and choose one that matches your training routine.</p></div>
+      {/* =========================================================================
+          MEMBERSHIP FAQS
+          ========================================================================= */}
+      <section className="py-20 bg-ink-950/70 border-t border-white/5">
+        <div className="mx-auto max-w-4xl px-5 lg:px-8">
+          <ScrollReveal animation="fade-up">
+            <div className="text-center mb-12">
+              <p className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-brand-500">
+                Frequently Answered
+              </p>
+              <h2 className="mt-2 font-display text-3xl sm:text-4xl font-black text-white">
+                MEMBERSHIP QUESTIONS.
+              </h2>
             </div>
+          </ScrollReveal>
+
+          <div className="space-y-4">
+            {MEMBERSHIP_FAQS.map((faq, idx) => (
+              <ScrollReveal key={idx} animation="fade-up" delay={idx * 60}>
+                <div className="rounded-2xl border border-white/10 bg-white/[0.02] overflow-hidden transition hover:border-brand-500/40">
+                  <button
+                    type="button"
+                    onClick={() => toggleFaq(idx)}
+                    className="w-full flex items-center justify-between p-5 sm:p-6 text-left focus:outline-none"
+                  >
+                    <span className="font-display text-base font-bold text-white pr-4">
+                      {faq.q}
+                    </span>
+                    <span
+                      className={`h-7 w-7 rounded-full bg-white/5 flex items-center justify-center shrink-0 text-brand-400 transition-transform duration-200 ${
+                        openFaq === idx ? 'rotate-180 bg-brand-500 text-white' : ''
+                      }`}
+                    >
+                      <ChevronDown size={16} />
+                    </span>
+                  </button>
+
+                  {openFaq === idx && (
+                    <div className="px-5 pb-6 sm:px-6 pt-1 text-sm text-surface-300 leading-relaxed border-t border-white/5">
+                      {faq.a}
+                    </div>
+                  )}
+                </div>
+              </ScrollReveal>
+            ))}
+          </div>
+
+          {/* Need help box */}
+          <div className="mt-12 rounded-2xl border border-white/10 bg-gradient-to-r from-brand-950/30 to-black p-6 sm:p-8 flex flex-col sm:flex-row items-center justify-between gap-6">
+            <div className="flex items-center gap-4">
+              <div className="h-12 w-12 rounded-xl bg-brand-500/10 border border-brand-500/30 flex items-center justify-center text-brand-400 shrink-0">
+                <HelpCircle size={24} />
+              </div>
+              <div>
+                <h4 className="font-display text-base font-bold text-white">Still have questions?</h4>
+                <p className="mt-1 text-xs text-surface-400">
+                  Our front-desk team is ready to guide you to the perfect training plan.
+                </p>
+              </div>
+            </div>
+
+            <Link to="/contact">
+              <Button variant="outline" className="border-white/20 text-white hover:border-brand-500 text-xs font-bold uppercase tracking-wider shrink-0">
+                Contact Reception
+              </Button>
+            </Link>
           </div>
         </div>
       </section>

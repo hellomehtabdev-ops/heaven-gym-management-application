@@ -1,6 +1,448 @@
-import { ArrowRight, Check, Dumbbell, Heart, Target, Users } from 'lucide-react';
+import { useState } from 'react';
+import {
+  ArrowRight,
+  Check,
+  Dumbbell,
+  Heart,
+  Target,
+  Users,
+  Shield,
+  Award,
+  Flame,
+  Compass,
+  Sparkles,
+  Zap,
+} from 'lucide-react';
 import { Link } from 'react-router-dom';
 import Button from '@/components/ui/Button';
-import SectionHeading from '@/components/ui/SectionHeading';
+import ScrollReveal from '@/components/public/ScrollReveal';
+import ImageLightbox from '@/components/public/ImageLightbox';
+import SectionDivider from '@/components/public/SectionDivider';
 
-export default function About() { return <div><section className="bg-ink-950 pb-20 pt-36 text-white"><div className="mx-auto max-w-7xl px-5 lg:px-8"><p className="text-xs font-bold uppercase tracking-[.18em] text-brand-400">About Heaven Gym</p><h1 className="mt-5 max-w-3xl font-display text-5xl font-bold tracking-[-.04em] sm:text-6xl">Built for people who<br /><span className="text-brand-400">keep showing up.</span></h1><p className="mt-7 max-w-2xl text-lg leading-8 text-surface-300">Heaven Gym is a place for focused training, honest effort, and progress you can feel. We keep the experience simple so you can focus on doing the work.</p></div></section><section className="py-20"><div className="mx-auto grid max-w-7xl gap-14 px-5 lg:grid-cols-[.9fr_1.1fr] lg:items-center lg:px-8"><div className="rounded-[2rem] bg-brand-100 p-10 dark:bg-brand-900/20"><Dumbbell className="text-brand-600" size={58} strokeWidth={1.5} /><p className="mt-12 font-display text-4xl font-bold leading-tight text-ink-950 dark:text-white">The best version of you is built one session at a time.</p></div><div><SectionHeading eyebrow="Our approach" title="Less distraction. More intention." description="We believe the right environment changes how you train. That means quality equipment, considered spaces, and a culture that respects every person doing the work." /><div className="mt-9 grid gap-5 sm:grid-cols-3">{[[Target, 'Train with purpose'], [Heart, 'Take care of your body'], [Users, 'Grow together']].map(([Icon, text]) => <div key={text}><Icon className="text-brand-600" size={22} /><p className="mt-3 text-sm font-semibold text-ink-900 dark:text-white">{text}</p></div>)}</div><Link to="/membership" className="mt-10 inline-block"><Button>Find your membership <ArrowRight size={16} /></Button></Link></div></div></section><section className="bg-surface-100 py-20 dark:bg-surface-900"><div className="mx-auto max-w-7xl px-5 lg:px-8"><SectionHeading eyebrow="The standard" title="What you can expect." /><div className="mt-10 grid gap-4 md:grid-cols-2">{['Well-maintained strength and cardio equipment', 'Clean, considered training and recovery areas', 'Early opening and late closing hours', 'A community that respects your focus', 'Simple membership with no hidden complexity', 'People who are here to make progress'].map((item) => <div key={item} className="flex items-center gap-3 rounded-xl bg-white p-4 dark:bg-surface-950"><span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-brand-100 text-brand-700 dark:bg-brand-500/10 dark:text-brand-400"><Check size={15} /></span><span className="text-sm text-surface-700 dark:text-surface-300">{item}</span></div>)}</div></div></section></div>; }
+const ENVIRONMENT_IMAGES = [
+  {
+    id: 1,
+    title: 'Main Strength Floor',
+    description: 'Generous spacing between power racks and platforms for uninterrupted focus.',
+    src: 'https://images.unsplash.com/photo-1540497077202-7c8a3999166f?auto=format&fit=crop&w=1000&q=80',
+  },
+  {
+    id: 2,
+    title: 'Precision Free Weights',
+    description: 'Dual racks with full urethane dumbbell progression and adjustable commercial benches.',
+    src: 'https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?auto=format&fit=crop&w=1000&q=80',
+  },
+  {
+    id: 3,
+    title: 'Functional Performance Bay',
+    description: 'Indoor turf designed for sprint mechanics, sled pushing, and metabolic intervals.',
+    src: 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=1000&q=80',
+  },
+];
+
+const BRAND_VALUES = [
+  {
+    icon: Target,
+    title: 'Deliberate Intention',
+    text: 'Every training session has a clear objective. We eliminate mindless workouts in favor of structured progression.',
+  },
+  {
+    icon: Shield,
+    title: 'Structural Safety & Form',
+    text: 'Ego lifting has no home here. We prioritize clean movement patterns and joint health for lifetime capability.',
+  },
+  {
+    icon: Flame,
+    title: 'Uncompromised Consistency',
+    text: 'Progress is not made in a single heroic day; it is forged across months of disciplined attendance.',
+  },
+  {
+    icon: Users,
+    title: 'Mutual Respect',
+    text: 'Whether lifting 20kg or 200kg, every member who shows up with earnest effort commands equal respect.',
+  },
+];
+
+export default function About() {
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [currentIdx, setCurrentIdx] = useState(0);
+
+  const openLightbox = (index) => {
+    setCurrentIdx(index);
+    setLightboxOpen(true);
+  };
+
+  return (
+    <div className="bg-[#070709] text-white selection:bg-brand-500 selection:text-white">
+      {/* 1. CINEMATIC ABOUT HERO */}
+      <section className="relative overflow-hidden pt-36 pb-24 lg:pt-44 lg:pb-32">
+        <div className="absolute inset-0 z-0">
+          <img
+            src="https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&w=1920&q=80"
+            alt="Heaven Gym Architecture & Philosophy"
+            className="h-full w-full object-cover filter brightness-[0.3] contrast-125"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#070709] via-[#070709]/75 to-transparent" />
+          <div className="absolute -top-32 right-1/4 h-96 w-96 rounded-full bg-brand-600/20 blur-[130px] pointer-events-none" />
+        </div>
+
+        <div className="relative z-10 mx-auto max-w-7xl px-5 lg:px-8">
+          <ScrollReveal animation="fade-down">
+            <span className="inline-flex items-center gap-2 rounded-full border border-brand-500/30 bg-brand-500/10 px-3.5 py-1.5 text-xs font-mono font-bold uppercase tracking-[0.2em] text-brand-400 backdrop-blur-md">
+              <Sparkles size={13} /> The Heaven Standard
+            </span>
+          </ScrollReveal>
+
+          <ScrollReveal animation="fade-up" delay={150}>
+            <h1 className="mt-6 max-w-3xl font-display text-4xl sm:text-6xl lg:text-7xl font-black tracking-[-0.03em] leading-tight">
+              BUILT FOR PEOPLE WHO <br />
+              <span className="public-text-crimson-gradient">KEEP SHOWING UP.</span>
+            </h1>
+          </ScrollReveal>
+
+          <ScrollReveal animation="fade-up" delay={250}>
+            <p className="mt-6 max-w-2xl text-base sm:text-lg text-surface-300 leading-relaxed">
+              Heaven Gym was created as a serious haven for physical transformation. We stripped away the gimmicks, noise, and distractions to engineer a space where effort leads to measurable progress.
+            </p>
+          </ScrollReveal>
+        </div>
+      </section>
+
+      <SectionDivider variant="dark" />
+
+      {/* 2. INTRODUCTION & 3. BRAND PHILOSOPHY */}
+      <section className="py-20 lg:py-28">
+        <div className="mx-auto max-w-7xl px-5 lg:px-8">
+          <div className="grid gap-14 lg:grid-cols-2 items-center">
+            <ScrollReveal animation="fade-right">
+              <div>
+                <p className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-brand-500">
+                  Our Purpose
+                </p>
+                <h2 className="mt-2 font-display text-3xl sm:text-4xl lg:text-5xl font-black text-white leading-tight">
+                  LESS DISTRACTION. <br />
+                  <span className="public-text-silver-gradient">MORE INTENTION.</span>
+                </h2>
+                <p className="mt-6 text-sm sm:text-base text-surface-300 leading-relaxed">
+                  We believe the quality of your physical environment determines the quality of your training session. When you step inside Heaven Gym, the tone is established immediately: organized weights, uncrowded stations, and an atmosphere centered on hard work.
+                </p>
+                <p className="mt-4 text-sm sm:text-base text-surface-300 leading-relaxed">
+                  We cater to individuals who view fitness not as a temporary chore, but as an enduring discipline that builds character, energy, and physical capability.
+                </p>
+
+                <div className="mt-8 flex items-center gap-4">
+                  <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4 text-center min-w-[120px]">
+                    <p className="font-display text-2xl font-bold text-brand-400">5:00 AM</p>
+                    <p className="text-[11px] text-surface-400 uppercase tracking-wider font-mono">Daily Doors Open</p>
+                  </div>
+                  <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4 text-center min-w-[120px]">
+                    <p className="font-display text-2xl font-bold text-white">Zero</p>
+                    <p className="text-[11px] text-surface-400 uppercase tracking-wider font-mono">Compromise</p>
+                  </div>
+                </div>
+              </div>
+            </ScrollReveal>
+
+            <ScrollReveal animation="fade-left">
+              <div className="relative overflow-hidden rounded-3xl border border-white/10 shadow-2xl bg-gradient-to-br from-brand-950/40 to-ink-950 p-8 sm:p-12">
+                <div className="h-12 w-12 rounded-2xl bg-brand-500/10 border border-brand-500/30 flex items-center justify-center text-brand-400 mb-8">
+                  <Dumbbell size={24} />
+                </div>
+                <blockquote className="font-display text-2xl sm:text-3xl font-bold text-white leading-snug">
+                  &ldquo;The best version of you isn&rsquo;t found in sudden breakthroughs. It is built one disciplined session at a time.&rdquo;
+                </blockquote>
+                <p className="mt-6 font-mono text-xs text-brand-400 uppercase tracking-widest">
+                  &mdash; The Heaven Gym Philosophy
+                </p>
+              </div>
+            </ScrollReveal>
+          </div>
+        </div>
+      </section>
+
+      {/* 4. MISSION & VISION */}
+      <section className="py-20 bg-ink-950/70 border-y border-white/5">
+        <div className="mx-auto max-w-7xl px-5 lg:px-8">
+          <ScrollReveal animation="fade-up">
+            <div className="text-center max-w-2xl mx-auto mb-14">
+              <p className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-brand-500">
+                Direction & Intent
+              </p>
+              <h2 className="mt-2 font-display text-3xl sm:text-4xl font-black text-white">
+                MISSION & VISION.
+              </h2>
+            </div>
+          </ScrollReveal>
+
+          <div className="grid gap-8 md:grid-cols-2 max-w-4xl mx-auto">
+            <ScrollReveal animation="fade-right">
+              <div className="rounded-3xl border border-white/10 bg-white/[0.02] p-8 h-full">
+                <div className="flex items-center gap-3 text-brand-400 mb-4 font-mono text-xs font-bold uppercase tracking-wider">
+                  <Compass size={18} /> Our Mission
+                </div>
+                <h3 className="font-display text-xl font-bold text-white mb-3">
+                  Empowering Real Transformation
+                </h3>
+                <p className="text-sm text-surface-300 leading-relaxed">
+                  To provide an uncompromising training environment equipped with professional strength equipment, certified coaching expertise, and a community standard that turns effort into compounding physical resilience.
+                </p>
+              </div>
+            </ScrollReveal>
+
+            <ScrollReveal animation="fade-left">
+              <div className="rounded-3xl border border-white/10 bg-white/[0.02] p-8 h-full">
+                <div className="flex items-center gap-3 text-brand-400 mb-4 font-mono text-xs font-bold uppercase tracking-wider">
+                  <Award size={18} /> Our Vision
+                </div>
+                <h3 className="font-display text-xl font-bold text-white mb-3">
+                  A Benchmark for Athletic Fitness
+                </h3>
+                <p className="text-sm text-surface-300 leading-relaxed">
+                  To establish Heaven Gym as the benchmark fitness club where discipline is celebrated, technique is respected, and members discover the true bounds of their physical capability.
+                </p>
+              </div>
+            </ScrollReveal>
+          </div>
+        </div>
+      </section>
+
+      {/* 5. TRAINING PHILOSOPHY & 6. GYM ENVIRONMENT */}
+      <section className="py-20 lg:py-28">
+        <div className="mx-auto max-w-7xl px-5 lg:px-8">
+          <ScrollReveal animation="fade-up">
+            <div className="max-w-2xl">
+              <p className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-brand-500">
+                Lifting Fundamentals
+              </p>
+              <h2 className="mt-2 font-display text-3xl sm:text-4xl font-black text-white">
+                HOW WE TRAIN.
+              </h2>
+              <p className="mt-3 text-sm sm:text-base text-surface-400">
+                Our approach is rooted in sports science and the universal laws of physical adaptation:
+              </p>
+            </div>
+          </ScrollReveal>
+
+          <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {[
+              {
+                title: 'Progressive Resistance',
+                desc: 'Deliberately increasing load, repetitions, or time-under-tension across weeks to force muscular and neurological adaptation.',
+              },
+              {
+                title: 'Joint Centric Mechanics',
+                desc: 'Selecting exercises that align with your individual skeletal structure and joint angles to protect connective tissue.',
+              },
+              {
+                title: 'Metabolic Conditioning',
+                desc: 'Building work capacity through structured sprint work, sled pushes, and interval pacing to strengthen the cardiovascular engine.',
+              },
+              {
+                title: 'Central Nervous Recovery',
+                desc: 'Balancing intense sessions with adequate sleep, hydration, and active recovery to avoid overtraining and plateaus.',
+              },
+              {
+                title: 'Nutritional Support',
+                desc: 'Fueling sessions with quality protein and wholesome energy sources to optimize lean mass retention and repair.',
+              },
+              {
+                title: 'Lifelong Longevity',
+                desc: 'Training not just for temporary vanity, but for bone density, metabolic health, and physical capability for decades.',
+              },
+            ].map((item, idx) => (
+              <ScrollReveal key={item.title} animation="fade-up" delay={idx * 60}>
+                <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-6 hover:border-brand-500/40 transition duration-300">
+                  <div className="h-2 w-8 bg-brand-500 rounded-full mb-4" />
+                  <h3 className="font-display text-base font-bold text-white mb-2">{item.title}</h3>
+                  <p className="text-xs text-surface-400 leading-relaxed">{item.desc}</p>
+                </div>
+              </ScrollReveal>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 7. FACILITIES SHOWCASE (INLINE PREVIEW) */}
+      <section className="py-20 bg-ink-950/80 border-y border-white/5">
+        <div className="mx-auto max-w-7xl px-5 lg:px-8">
+          <ScrollReveal animation="fade-up">
+            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-10">
+              <div>
+                <p className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-brand-500">
+                  Spaces & Zones
+                </p>
+                <h2 className="mt-2 font-display text-3xl sm:text-4xl font-black text-white">
+                  THE TRAINING GROUNDS.
+                </h2>
+              </div>
+              <span className="text-xs font-mono text-surface-400 uppercase tracking-wider">
+                Click to expand view
+              </span>
+            </div>
+          </ScrollReveal>
+
+          <div className="grid gap-6 md:grid-cols-3">
+            {ENVIRONMENT_IMAGES.map((img, idx) => (
+              <ScrollReveal key={img.id} animation="fade-up" delay={idx * 90}>
+                <div
+                  onClick={() => openLightbox(idx)}
+                  className="group cursor-pointer overflow-hidden rounded-2xl border border-white/10 bg-white/[0.02] transition hover:border-brand-500/50"
+                >
+                  <div className="aspect-[16/11] overflow-hidden bg-black/40">
+                    <img
+                      src={img.src}
+                      alt={img.title}
+                      loading="lazy"
+                      className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-108"
+                    />
+                  </div>
+                  <div className="p-5">
+                    <h3 className="font-display text-base font-bold text-white group-hover:text-brand-400 transition-colors">
+                      {img.title}
+                    </h3>
+                    <p className="mt-1 text-xs text-surface-400 leading-relaxed">
+                      {img.description}
+                    </p>
+                  </div>
+                </div>
+              </ScrollReveal>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 8. COACHING APPROACH & 9. FITNESS COMMUNITY */}
+      <section className="py-20 lg:py-28">
+        <div className="mx-auto max-w-7xl px-5 lg:px-8">
+          <div className="grid gap-12 lg:grid-cols-2 items-center">
+            <ScrollReveal animation="fade-right">
+              <div className="relative aspect-[4/3] rounded-3xl overflow-hidden border border-white/10 shadow-2xl">
+                <img
+                  src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?auto=format&fit=crop&w=1000&q=80"
+                  alt="Coaching in Action at Heaven Gym"
+                  loading="lazy"
+                  className="h-full w-full object-cover filter contrast-110"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+                <div className="absolute bottom-6 left-6 right-6">
+                  <span className="text-[10px] font-mono uppercase tracking-wider text-brand-400 font-bold">
+                    1-on-1 Guidance
+                  </span>
+                  <p className="font-display text-lg font-bold text-white">
+                    Certified Mentorship on Every Lift
+                  </p>
+                </div>
+              </div>
+            </ScrollReveal>
+
+            <ScrollReveal animation="fade-left">
+              <div>
+                <p className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-brand-500">
+                  Culture & Community
+                </p>
+                <h2 className="mt-2 font-display text-3xl sm:text-4xl font-black text-white leading-tight">
+                  A COMMUNITY OF FOCUS.
+                </h2>
+                <p className="mt-6 text-sm sm:text-base text-surface-300 leading-relaxed">
+                  Heaven Gym is home to doctors, engineers, students, competitive lifters, and busy parents who all share one common thread: when the gym timer starts, they put their heads down and do the work.
+                </p>
+                <p className="mt-4 text-sm sm:text-base text-surface-300 leading-relaxed">
+                  Our coaches don&rsquo;t stand on sidelines shouting empty motivational slogans. They check your stance, refine your elbow path, ensure your safety, and hold you accountable to your personal best.
+                </p>
+
+                <div className="mt-8 space-y-3">
+                  {[
+                    'Zero intimidation — beginners receive proper guidance',
+                    'Calibrated plates and strict re-racking etiquette',
+                    'Clean, well-ventilated training floors daily',
+                  ].map((pt) => (
+                    <div key={pt} className="flex items-center gap-3 text-sm text-surface-200">
+                      <span className="flex h-5 w-5 items-center justify-center rounded-full bg-brand-500/20 text-brand-400">
+                        <Check size={12} strokeWidth={3} />
+                      </span>
+                      <span>{pt}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </ScrollReveal>
+          </div>
+        </div>
+      </section>
+
+      {/* 10. BRAND VALUES */}
+      <section className="py-20 bg-ink-950/80 border-y border-white/5">
+        <div className="mx-auto max-w-7xl px-5 lg:px-8">
+          <ScrollReveal animation="fade-up">
+            <div className="text-center max-w-2xl mx-auto mb-14">
+              <p className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-brand-500">
+                Core Pillars
+              </p>
+              <h2 className="mt-2 font-display text-3xl sm:text-4xl font-black text-white">
+                THE PRINCIPLES WE STAND FOR.
+              </h2>
+            </div>
+          </ScrollReveal>
+
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {BRAND_VALUES.map((val, idx) => {
+              const Icon = val.icon;
+              return (
+                <ScrollReveal key={val.title} animation="fade-up" delay={idx * 80}>
+                  <div className="h-full rounded-2xl border border-white/10 bg-white/[0.02] p-6 hover:border-brand-500 transition duration-300">
+                    <div className="h-11 w-11 rounded-xl bg-brand-500/10 border border-brand-500/25 flex items-center justify-center text-brand-400 mb-5">
+                      <Icon size={20} />
+                    </div>
+                    <h3 className="font-display text-base font-bold text-white mb-2">{val.title}</h3>
+                    <p className="text-xs text-surface-400 leading-relaxed">{val.text}</p>
+                  </div>
+                </ScrollReveal>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* 11. JOIN HEAVEN GYM CTA */}
+      <section className="py-24 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-t from-brand-950/30 via-transparent to-transparent pointer-events-none" />
+        <div className="relative z-10 mx-auto max-w-4xl px-5 text-center lg:px-8">
+          <ScrollReveal animation="fade-up">
+            <span className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-brand-500">
+              Start Today
+            </span>
+            <h2 className="mt-4 font-display text-4xl sm:text-5xl font-black text-white">
+              EXPERIENCE THE STANDARD IN PERSON.
+            </h2>
+            <p className="mt-4 text-base text-surface-300 max-w-xl mx-auto">
+              Choose an access plan that fits your schedule, or come in to inspect the facility firsthand.
+            </p>
+
+            <div className="mt-8 flex flex-wrap justify-center gap-4">
+              <Link to="/membership">
+                <Button size="lg" className="bg-brand-600 hover:bg-brand-500 text-white font-bold uppercase tracking-wider text-xs px-8 py-4 shadow-xl shadow-brand-600/30">
+                  Explore Membership Plans <ArrowRight size={16} className="ml-1.5" />
+                </Button>
+              </Link>
+              <Link to="/contact">
+                <Button variant="outline" size="lg" className="border-white/20 text-white hover:border-brand-500 text-xs font-bold uppercase tracking-wider px-8 py-4">
+                  Visit The Gym
+                </Button>
+              </Link>
+            </div>
+          </ScrollReveal>
+        </div>
+      </section>
+
+      {/* Lightbox for Environment Images */}
+      <ImageLightbox
+        isOpen={lightboxOpen}
+        images={ENVIRONMENT_IMAGES}
+        currentIndex={currentIdx}
+        onClose={() => setLightboxOpen(false)}
+        onNext={() => setCurrentIdx((prev) => (prev + 1) % ENVIRONMENT_IMAGES.length)}
+        onPrev={() => setCurrentIdx((prev) => (prev - 1 + ENVIRONMENT_IMAGES.length) % ENVIRONMENT_IMAGES.length)}
+      />
+    </div>
+  );
+}

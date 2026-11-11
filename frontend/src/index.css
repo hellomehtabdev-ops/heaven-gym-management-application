@@ -434,3 +434,78 @@ button, input, select, textarea { font: inherit; }
 @media (prefers-reduced-motion: reduce) {
   .animate-banner-change { animation: none !important; }
 }
+
+/* ==========================================================================
+   HEAVEN GYM — PUBLIC WEBSITE DESIGN SYSTEM (SCOPED)
+   Strictly isolated to public pages. Does NOT affect Admin/User dashboards.
+   ========================================================================== */
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.animate-fadeIn {
+  animation: fadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes hg-pulse-glow {
+  0%, 100% {
+    opacity: 0.35;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.65;
+    transform: scale(1.04);
+  }
+}
+.public-pulse-glow {
+  animation: hg-pulse-glow 6s ease-in-out infinite;
+}
+
+/* Public Hero Cinematic Backdrop */
+.public-hero-ambient {
+  background: radial-gradient(circle at 75% 25%, rgba(220, 38, 38, 0.22) 0%, transparent 55%),
+              radial-gradient(circle at 20% 75%, rgba(185, 28, 28, 0.15) 0%, transparent 45%),
+              linear-gradient(180deg, #050507 0%, #0c0c0e 100%);
+}
+
+/* Grid overlay for athletic tech precision */
+.public-grid-overlay {
+  background-size: 48px 48px;
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+}
+
+/* Premium Glass Cards for Public Presentation */
+.public-glass-card {
+  background: rgba(18, 18, 22, 0.75);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.public-glass-card:hover {
+  border-color: rgba(220, 38, 38, 0.35);
+  box-shadow: 0 16px 36px -10px rgba(0, 0, 0, 0.5), 0 0 20px -5px rgba(220, 38, 38, 0.15);
+}
+
+/* Red metallic highlight gradient text */
+.public-text-silver-gradient {
+  background: linear-gradient(180deg, #ffffff 30%, #94a3b8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.public-text-crimson-gradient {
+  background: linear-gradient(135deg, #f87171 0%, #dc2626 50%, #991b1b 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .public-pulse-glow,
+  .animate-fadeIn {
+    animation: none !important;
+  }
+}
+
