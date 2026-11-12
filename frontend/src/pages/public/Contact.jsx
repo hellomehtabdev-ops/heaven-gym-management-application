@@ -141,7 +141,7 @@ export default function Contact() {
                     <h3 className="font-display text-base font-bold text-white">Phone Inquiries</h3>
                     <p className="mt-2 text-xs leading-relaxed text-surface-300">
                       {loading ? (
-                        <span className="animate-pulse text-surface-500">Loading verified phone...</span>
+                        <span className="animate-pulse text-surface-500">Loading contact phone...</span>
                       ) : phone ? (
                         <a href={`tel:${cleanPhone}`} className="text-white hover:text-brand-400 font-mono font-semibold transition">
                           {phone}
@@ -163,7 +163,7 @@ export default function Contact() {
                     <h3 className="font-display text-base font-bold text-white">Email Communications</h3>
                     <p className="mt-2 text-xs leading-relaxed text-surface-300">
                       {loading ? (
-                        <span className="animate-pulse text-surface-500">Loading verified email...</span>
+                        <span className="animate-pulse text-surface-500">Loading contact email...</span>
                       ) : email ? (
                         <a href={`mailto:${email}`} className="text-white hover:text-brand-400 font-mono transition break-all">
                           {email}
