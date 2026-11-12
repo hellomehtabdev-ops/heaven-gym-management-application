@@ -96,7 +96,7 @@ export default function Contact() {
             <ScrollReveal animation="fade-right">
               <div>
                 <p className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-brand-500">
-                  Verified Details
+                  Gym Contact Details
                 </p>
                 <h2 className="mt-2 font-display text-3xl sm:text-4xl font-black text-white">
                   VISIT & CONNECT.
@@ -206,7 +206,7 @@ export default function Contact() {
                 </h3>
 
                 <p className="mt-3 text-xs leading-relaxed text-surface-300">
-                  To ensure 100% genuine response and avoid lost web forms, our desk communicates directly via phone call, email, or verified instant message.
+                  Choose a contact method below to reach the gym team. WhatsApp opens a chat with the contact number configured by gym administration.
                 </p>
 
                 <div className="mt-8 space-y-3.5">
