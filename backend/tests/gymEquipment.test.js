@@ -80,15 +80,19 @@ test('public equipment detail uses a safe projection and returns 404 for unpubli
     };
   });
 
-  let error;
+  let statusCode;
+  let response;
   await getPublicEquipmentBySlug(
     { params: { slug: 'hidden-bench' } },
-    { json: () => {} },
-    (caught) => { error = caught; }
+    {
+      status(code) { statusCode = code; return this; },
+      json(data) { response = data; return this; },
+    },
+    (caught) => { throw caught; }
   );
 
   assert.deepEqual(capturedFilter, { slug: 'hidden-bench', is_published: true });
   assert.ok(!capturedProjection.includes('public_id'));
-  assert.equal(error.statusCode, 404);
-  assert.match(error.message, /not found/i);
+  assert.equal(statusCode, 404);
+  assert.match(response.error, /not found/i);
 });
