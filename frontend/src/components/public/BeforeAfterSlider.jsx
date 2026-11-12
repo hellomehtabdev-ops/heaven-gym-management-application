@@ -64,12 +64,14 @@ export default function BeforeAfterSlider({
       window.addEventListener('mouseup', handlePointerUp);
       window.addEventListener('touchmove', handleTouchMove);
       window.addEventListener('touchend', handlePointerUp);
+      window.addEventListener('touchcancel', handlePointerUp);
     }
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mouseup', handlePointerUp);
       window.removeEventListener('touchmove', handleTouchMove);
       window.removeEventListener('touchend', handlePointerUp);
+      window.removeEventListener('touchcancel', handlePointerUp);
     };
   }, [isDragging, handleMouseMove, handlePointerUp, handleTouchMove]);
 
@@ -100,14 +102,14 @@ export default function BeforeAfterSlider({
         setIsDragging(true);
         handleMove(e.touches[0].clientX);
       }}
-      className={`group relative select-none overflow-hidden rounded-3xl border border-white/15 bg-black shadow-2xl cursor-ew-resize focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 ${aspectRatio} ${className}`}
+      className={`group relative select-none touch-pan-y overflow-hidden rounded-3xl border border-white/15 bg-black shadow-2xl cursor-ew-resize focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 ${aspectRatio} ${className}`}
     >
       {/* ==============================================================
           LAYER 1: "AFTER" (Background Full Image)
           ============================================================== */}
       <img
         src={afterImage}
-        alt="After Transformation Result at Heaven Gym"
+        alt="After transformation result"
         loading="lazy"
         className="absolute inset-0 h-full w-full object-cover object-center pointer-events-none filter contrast-105"
       />
@@ -131,7 +133,7 @@ export default function BeforeAfterSlider({
       >
         <img
           src={beforeImage}
-          alt="Before Transformation Baseline at Heaven Gym"
+          alt="Before transformation baseline"
           loading="lazy"
           className="absolute inset-0 h-full w-full object-cover object-center pointer-events-none filter brightness-95 contrast-100"
         />
