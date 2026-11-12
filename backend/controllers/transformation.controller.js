@@ -8,23 +8,25 @@ const PUBLIC_PROJECTION = '_id title category description duration achievement s
 
 export async function listPublicTransformations(req, res, next) {
   try {
-    const { category, limit = 20 } = req.query;
+    const { category, page = 1, limit = 12 } = req.query;
     const filter = { is_published: true };
     if (category && category !== 'all') {
       filter.category = category;
     }
-    const safeLimit = Math.min(50, Math.max(1, Number(limit) || 20));
+    const safePage = Math.max(1, Math.floor(Number(page) || 1));
+    const safeLimit = Math.min(50, Math.max(1, Math.floor(Number(limit) || 12)));
     const [rows, total, categories] = await Promise.all([
       Transformation.find(filter)
         .select(PUBLIC_PROJECTION)
         .sort({ order: 1, createdAt: -1 })
+        .skip((safePage - 1) * safeLimit)
         .limit(safeLimit)
         .lean(),
       Transformation.countDocuments(filter),
       Transformation.distinct('category', { is_published: true }),
     ]);
 
-    res.json({ rows, total, categories });
+    res.json({ rows, total, page: safePage, pages: Math.ceil(total / safeLimit), categories });
   } catch (error) {
     next(error);
   }
