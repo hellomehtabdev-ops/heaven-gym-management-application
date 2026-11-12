@@ -6,7 +6,6 @@ import {
   Filter,
   ShieldCheck,
   Sparkles,
-  ArrowRight,
   SlidersHorizontal,
   Clock,
   X,
