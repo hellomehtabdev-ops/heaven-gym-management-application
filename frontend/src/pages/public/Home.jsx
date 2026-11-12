@@ -286,13 +286,13 @@ export default function Home() {
                   </span>
                 </h2>
                 <p className="mt-5 text-sm sm:text-base text-surface-300 leading-relaxed">
-                  Every machine at Heaven Gym is calibrated to match natural musculoskeletal resistance curves. We reject clunky, awkward levers in favor of smooth Kevlar belt drives, converging chest presses, and multi-angle footplates that protect joints under maximum load.
+                  Explore strength and resistance machines designed for a variety of training movements. Contact the team for the current equipment list and available features.
                 </p>
 
                 <div className="mt-8 grid gap-4 sm:grid-cols-2">
                   {[
                     'Converging Biomechanical Arcs',
-                    'Zero-Friction Kevlar Cables',
+                    'Cable-based resistance options, where available',
                     'Micro-Load 1.25kg Adjustments',
                     'Anatomical Ergonomic Cushioning',
                   ].map((feat) => (
@@ -390,7 +390,7 @@ export default function Home() {
       </section>
 
       {/* =========================================================================
-          SECTION 06 — CERTIFIED TRAINERS
+          SECTION 06 — TRAINING SUPPORT
           ========================================================================= */}
       <section className="relative py-24 sm:py-32 bg-[#08090d] border-t border-white/10">
         <div className="mx-auto max-w-7xl px-5 lg:px-8">
@@ -400,10 +400,10 @@ export default function Home() {
                 Floor Leadership
               </span>
               <h2 className="mt-3 font-display text-2xl sm:text-4xl lg:text-5xl font-black text-white break-words">
-                CERTIFIED MASTER COACHES.
+                TRAINING GUIDANCE.
               </h2>
               <p className="mt-4 text-sm sm:text-base text-surface-300">
-                No gimmicks or random shouting. Our coaching team holds accredited certifications in human biomechanics, periodized programming, and injury prevention.
+                Ask the Heaven Gym team about available coaching support, trainer experience and session options.
               </p>
             </div>
           </ScrollReveal>
@@ -415,21 +415,21 @@ export default function Home() {
                 role: 'Senior Floor Coach',
                 spec: 'Barbell Form, Powerlifting & Progressive Overload',
                 img: 'https://images.unsplash.com/photo-1567013127542-490d757e51fc?auto=format&fit=crop&w=800&q=80',
-                alt: 'Certified strength and barbell technique coach',
+                alt: 'Strength training and barbell technique',
               },
               {
                 title: 'Mobility & Conditioning Specialist',
                 role: 'Athletic Movement Coach',
                 spec: 'Joint Mobility, Posture & Injury Prevention',
                 img: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?auto=format&fit=crop&w=800&q=80',
-                alt: 'Certified mobility and functional athletic movement coach',
+                alt: 'Mobility and functional movement training',
               },
               {
                 title: 'Functional Performance Coach',
                 role: 'High-Work Capacity Coach',
                 spec: 'Metabolic Conditioning, Turf Drills & Endurance',
                 img: 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&w=800&q=80',
-                alt: 'Certified functional fitness and endurance conditioning coach',
+                alt: 'Functional fitness and endurance training',
               },
             ].map((trainer) => (
               <div key={trainer.title} className="coach-card h-full">
@@ -1336,7 +1336,7 @@ export default function Home() {
                 </span>
               </h2>
               <p className="mt-4 text-sm sm:text-base text-surface-300 leading-relaxed">
-                Looking to start or develop a gym facility? We provide practical turnkey guidance — from commercial equipment procurement and floor layouts to coach training frameworks and operational software.
+                Interested in a gym partnership? Contact the team to discuss whether collaboration opportunities are available and what support may be offered.
               </p>
 
               <div className="mt-8 flex flex-wrap items-center gap-4">
@@ -1424,7 +1424,7 @@ export default function Home() {
                 BECOME A HEAVEN GYM FRANCHISE PARTNER.
               </h3>
               <p className="mt-2 text-xs sm:text-sm text-surface-300">
-                Explore franchise territory availability in major metro and tier-1 hubs across India. Complete turnkey support provided.
+                Contact Heaven Gym to discuss partnership availability, location requirements and possible support.
               </p>
             </div>
 
