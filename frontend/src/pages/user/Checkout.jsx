@@ -168,7 +168,7 @@ export default function Checkout() {
         <Card>
           <h3 className="mb-4 font-display text-lg font-semibold text-ink-950 dark:text-white">Choose your store experience</h3>
           <div className="mb-5 grid gap-3 sm:grid-cols-2">
-            <button type="button" onClick={() => setFulfillmentMethod("store_pickup")} className={"rounded-xl border p-4 text-left " + (fulfillmentMethod === "store_pickup" ? "border-brand-500 bg-brand-50 dark:bg-brand-500/10" : "border-surface-200 dark:border-surface-700")}><span className="block text-sm font-semibold">Offline Store</span><span className="mt-1 block text-xs text-surface-500">Order online and get it delivered to your address.</span></button>
+            <button type="button" onClick={() => setFulfillmentMethod("store_pickup")} className={"rounded-xl border p-4 text-left " + (fulfillmentMethod === "store_pickup" ? "border-brand-500 bg-brand-50 dark:bg-brand-500/10" : "border-surface-200 dark:border-surface-700")}><span className="block text-sm font-semibold">Offline Store</span><span className="mt-1 block text-xs text-surface-500">Pay online and collect your order from the gym/store.</span></button>
             <button type="button" onClick={() => setFulfillmentMethod("admin_delivery")} className={"rounded-xl border p-4 text-left " + (fulfillmentMethod === "admin_delivery" ? "border-brand-500 bg-brand-50 dark:bg-brand-500/10" : "border-surface-200 dark:border-surface-700")}><span className="block text-sm font-semibold">Online Store</span><span className="mt-1 block text-xs text-surface-500">Place your order online for home delivery.</span></button>
           </div>
           <h3 className="mb-4 font-display text-lg font-semibold text-ink-950 dark:text-white">Customer Details</h3>
