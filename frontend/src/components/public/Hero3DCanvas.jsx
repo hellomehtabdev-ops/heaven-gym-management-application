@@ -1,5 +1,5 @@
 import React, { useRef, useMemo, useState, useEffect, Suspense } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
+import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Sparkles } from '@react-three/drei';
 import * as THREE from 'three';
 
@@ -20,6 +20,39 @@ function isWebGLSupported() {
 }
 
 /**
+ * Responsive Camera Framer
+ * 
+ * Mathematically calculates the camera's Z distance to guarantee that the
+ * entire Olympic Weight Plate (diameter 3.28) is 100% visible with a generous
+ * safe margin on all sides, regardless of viewport dimensions, canvas aspect
+ * ratio, rotation angle, or floating levitation.
+ */
+function CameraFramer({ isMobile }) {
+  const { camera, size } = useThree();
+
+  useEffect(() => {
+    const aspect = Math.max(0.1, size.width / Math.max(1, size.height));
+    const fov = 40;
+    const vFovRad = (fov * Math.PI) / 180;
+    const tanHalf = Math.tan(vFovRad / 2);
+    const plateDiameter = 3.28;
+    // Generous safe margin ensuring complete visibility across all animation states
+    const safeMargin = isMobile ? 0.95 : 0.90;
+    const requiredSpace = plateDiameter + safeMargin;
+
+    // Formula ensures BOTH visible height and visible width >= requiredSpace
+    const minAspectFactor = Math.min(1.0, aspect);
+    const targetZ = requiredSpace / (2 * tanHalf * minAspectFactor);
+
+    camera.fov = fov;
+    camera.position.set(0, 0, targetZ);
+    camera.updateProjectionMatrix();
+  }, [camera, size.width, size.height, isMobile]);
+
+  return null;
+}
+
+/**
  * 3D Sculpted Olympic Barbell Weight Plate
  * 
  * Features authentic commercial gym geometry:
@@ -37,11 +70,11 @@ function OlympicWeightPlate({ isMobile = false }) {
   // Create real Olympic plate geometries with through-holes
   const { webGeom, rimGeom, hubGeom, collarGeom, goldRingGeom } = useMemo(() => {
     const curveSegments = isMobile ? 24 : 36;
-    const outerR = 1.95;
-    const rimInnerR = 1.66;
-    const centerR = 0.28; // Standard 50.4mm bore radius
-    const hubOuterR = 0.54;
-    const gripRadius = 1.14;
+    const outerR = 1.62;
+    const rimInnerR = 1.38;
+    const centerR = 0.23; // Standard Olympic bore radius
+    const hubOuterR = 0.45;
+    const gripRadius = 0.94;
 
     // 1. Recessed Web with Center Hole and 3 Ergonomic Grip Openings
     const webShape = new THREE.Shape();
@@ -55,8 +88,8 @@ function OlympicWeightPlate({ isMobile = false }) {
       const angle = (i * 2 * Math.PI) / 3 + Math.PI / 6;
       const cx = Math.cos(angle) * gripRadius;
       const cy = Math.sin(angle) * gripRadius;
-      const w = 0.56;
-      const h = 0.24;
+      const w = 0.46;
+      const h = 0.20;
 
       const grip = new THREE.Path();
       const rot = angle + Math.PI / 2;
@@ -76,10 +109,10 @@ function OlympicWeightPlate({ isMobile = false }) {
     }
 
     const web = new THREE.ExtrudeGeometry(webShape, {
-      depth: 0.12,
+      depth: 0.10,
       bevelEnabled: true,
-      bevelThickness: 0.02,
-      bevelSize: 0.02,
+      bevelThickness: 0.018,
+      bevelSize: 0.016,
       bevelSegments: 2,
       curveSegments,
     });
@@ -93,10 +126,10 @@ function OlympicWeightPlate({ isMobile = false }) {
     rimShape.holes.push(rimHole);
 
     const rim = new THREE.ExtrudeGeometry(rimShape, {
-      depth: 0.22,
+      depth: 0.18,
       bevelEnabled: true,
-      bevelThickness: 0.025,
-      bevelSize: 0.02,
+      bevelThickness: 0.02,
+      bevelSize: 0.016,
       bevelSegments: 2,
       curveSegments,
     });
@@ -110,10 +143,10 @@ function OlympicWeightPlate({ isMobile = false }) {
     hubShape.holes.push(hubHole);
 
     const hub = new THREE.ExtrudeGeometry(hubShape, {
-      depth: 0.22,
+      depth: 0.18,
       bevelEnabled: true,
-      bevelThickness: 0.02,
-      bevelSize: 0.015,
+      bevelThickness: 0.016,
+      bevelSize: 0.012,
       bevelSegments: 2,
       curveSegments,
     });
@@ -121,16 +154,16 @@ function OlympicWeightPlate({ isMobile = false }) {
 
     // 4. Stainless Steel Inner Collar Ring
     const collarShape = new THREE.Shape();
-    collarShape.absarc(0, 0, centerR + 0.08, 0, Math.PI * 2, false);
+    collarShape.absarc(0, 0, centerR + 0.065, 0, Math.PI * 2, false);
     const collarHole = new THREE.Path();
     collarHole.absarc(0, 0, centerR, 0, Math.PI * 2, true);
     collarShape.holes.push(collarHole);
 
     const collar = new THREE.ExtrudeGeometry(collarShape, {
-      depth: 0.24,
+      depth: 0.20,
       bevelEnabled: true,
-      bevelThickness: 0.015,
-      bevelSize: 0.01,
+      bevelThickness: 0.012,
+      bevelSize: 0.008,
       bevelSegments: 2,
       curveSegments,
     });
@@ -138,13 +171,13 @@ function OlympicWeightPlate({ isMobile = false }) {
 
     // 5. Subtle Gold Accent Inlay
     const goldRingShape = new THREE.Shape();
-    goldRingShape.absarc(0, 0, rimInnerR + 0.01, 0, Math.PI * 2, false);
+    goldRingShape.absarc(0, 0, rimInnerR + 0.008, 0, Math.PI * 2, false);
     const goldHole = new THREE.Path();
-    goldHole.absarc(0, 0, rimInnerR - 0.02, 0, Math.PI * 2, true);
+    goldHole.absarc(0, 0, rimInnerR - 0.016, 0, Math.PI * 2, true);
     goldRingShape.holes.push(goldHole);
 
     const goldRing = new THREE.ExtrudeGeometry(goldRingShape, {
-      depth: 0.14,
+      depth: 0.11,
       bevelEnabled: false,
       curveSegments,
     });
@@ -197,20 +230,21 @@ function OlympicWeightPlate({ isMobile = false }) {
 
     if (plateGroupRef.current) {
       // 3/4 isometric perspective base orientation
-      const baseRotY = -0.32;
-      const baseRotX = 0.26;
-      const baseRotZ = 0.03;
+      const baseRotY = -0.30;
+      const baseRotX = 0.24;
+      const baseRotZ = 0.02;
 
-      // Slow, majestic floating levitation and subtle drift
+      // Restrained, ultra-smooth floating oscillation
+      // Keeps the plate strictly inside safe bounds at all times
       const targetRotY =
         baseRotY +
-        Math.sin(t * 0.45) * 0.12 +
-        (!isMobile && state.pointer ? state.pointer.x * 0.15 : 0);
+        Math.sin(t * 0.4) * 0.07 +
+        (!isMobile && state.pointer ? state.pointer.x * 0.08 : 0);
 
       const targetRotX =
         baseRotX +
-        Math.cos(t * 0.35) * 0.05 -
-        (!isMobile && state.pointer ? state.pointer.y * 0.1 : 0);
+        Math.cos(t * 0.3) * 0.035 -
+        (!isMobile && state.pointer ? state.pointer.y * 0.05 : 0);
 
       plateGroupRef.current.rotation.y = THREE.MathUtils.lerp(
         plateGroupRef.current.rotation.y,
@@ -222,9 +256,10 @@ function OlympicWeightPlate({ isMobile = false }) {
         targetRotX,
         0.05
       );
-      plateGroupRef.current.rotation.z = baseRotZ + Math.sin(t * 0.3) * 0.02;
+      plateGroupRef.current.rotation.z = baseRotZ + Math.sin(t * 0.25) * 0.012;
 
-      plateGroupRef.current.position.y = Math.sin(t * 0.6) * 0.07;
+      // Smooth floating levitation (height amplitude 0.04)
+      plateGroupRef.current.position.y = Math.sin(t * 0.5) * 0.04;
     }
   });
 
@@ -271,19 +306,19 @@ function AtmosphericEmbers({ isMobile = false }) {
  */
 function FallbackCanvas() {
   return (
-    <div className="absolute inset-0 flex items-center justify-center p-4">
-      <div className="relative h-60 w-60 sm:h-72 sm:w-72 rounded-full border-4 border-[#2d323f] bg-gradient-to-tr from-[#161820] to-[#252936] shadow-2xl flex items-center justify-center">
+    <div className="absolute inset-0 flex items-center justify-center p-6">
+      <div className="relative h-56 w-56 sm:h-64 sm:w-64 rounded-full border-4 border-[#2d323f] bg-gradient-to-tr from-[#161820] to-[#252936] shadow-2xl flex items-center justify-center">
         {/* Outer Gold Accent Rim */}
-        <div className="absolute inset-2.5 rounded-full border border-amber-500/30" />
+        <div className="absolute inset-2 rounded-full border border-amber-500/30" />
         
         {/* 3 Grip Opening Representations */}
-        <div className="absolute top-5 h-5 w-16 rounded-full bg-[#050608] border border-white/10" />
-        <div className="absolute bottom-9 left-6 h-5 w-16 -rotate-60 rounded-full bg-[#050608] border border-white/10" />
-        <div className="absolute bottom-9 right-6 h-5 w-16 rotate-60 rounded-full bg-[#050608] border border-white/10" />
+        <div className="absolute top-4 h-4 w-14 rounded-full bg-[#050608] border border-white/10" />
+        <div className="absolute bottom-8 left-5 h-4 w-14 -rotate-60 rounded-full bg-[#050608] border border-white/10" />
+        <div className="absolute bottom-8 right-5 h-4 w-14 rotate-60 rounded-full bg-[#050608] border border-white/10" />
 
         {/* Center Collar & Bore Hole */}
-        <div className="relative h-20 w-20 rounded-full border-2 border-surface-300 bg-gradient-to-b from-surface-200 to-surface-400 flex items-center justify-center shadow-lg">
-          <div className="h-9 w-9 rounded-full bg-[#050608] border border-white/20 shadow-inner" />
+        <div className="relative h-18 w-18 rounded-full border-2 border-surface-300 bg-gradient-to-b from-surface-200 to-surface-400 flex items-center justify-center shadow-lg">
+          <div className="h-8 w-8 rounded-full bg-[#050608] border border-white/20 shadow-inner" />
         </div>
       </div>
     </div>
@@ -335,11 +370,11 @@ export default function Hero3DCanvas({ className = '' }) {
   }
 
   return (
-    <div className={`relative h-full w-full pointer-events-none select-none ${className}`}>
+    <div className={`relative h-full w-full max-w-full pointer-events-none select-none ${className}`}>
       <ErrorBoundary>
         <Suspense fallback={<FallbackCanvas />}>
           <Canvas
-            camera={{ position: [0, 0, isMobile ? 6.2 : 5.4], fov: 42 }}
+            camera={{ position: [0, 0, isMobile ? 6.4 : 5.8], fov: 40 }}
             dpr={isMobile ? [1, 1.25] : [1, 1.75]}
             gl={{
               antialias: !isMobile,
@@ -347,8 +382,11 @@ export default function Hero3DCanvas({ className = '' }) {
               alpha: true,
               depth: true,
             }}
-            className="h-full w-full pointer-events-none"
+            className="h-full w-full max-w-full max-h-full pointer-events-none"
           >
+            {/* Dynamic camera framing guaranteeing complete visibility at all aspect ratios */}
+            <CameraFramer isMobile={isMobile} />
+
             {/* Ambient Lighting for base visibility */}
             <ambientLight intensity={0.9} />
 
