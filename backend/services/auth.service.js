@@ -151,12 +151,22 @@ export async function verifyEmailOtp({ email, otp }) {
   return { message: 'Email verified successfully. Please log in.' };
 }
 
+export async function getLoginPasswordError(user, password) {
+  if (typeof password !== 'string') return 'Invalid email or password';
+
+  const passwordMatches = await bcrypt.compare(password, user?.password || DUMMY_PASSWORD_HASH);
+  if (!user) return 'Invalid email or password';
+  if (!passwordMatches) return 'Incorrect password. Please try again.';
+  return null;
+}
+
 export async function loginUser({ email, password }, metadata) {
   const normalizedEmail = normalizeEmail(email);
-  if (!normalizedEmail || typeof password !== 'string') throw new ApiError(401, 'Invalid credentials');
+  if (!normalizedEmail || typeof password !== 'string') throw new ApiError(401, 'Invalid email or password');
+
   const user = await User.findOne({ email: normalizedEmail }).select('+password');
-  const passwordMatches = await bcrypt.compare(password, user?.password || DUMMY_PASSWORD_HASH);
-  if (!user || !passwordMatches) throw new ApiError(401, 'Invalid credentials');
+  const passwordError = await getLoginPasswordError(user, password);
+  if (passwordError) throw new ApiError(401, passwordError);
   if (!user.email_verified) throw new ApiError(403, 'Please verify your email before logging in');
   return createSession(user, metadata);
 }
