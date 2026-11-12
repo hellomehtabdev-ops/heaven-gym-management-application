@@ -10,7 +10,7 @@ import { fetchAllOrders, updateOrderStatus } from '@/redux/slices/orderSlice';
 import { formatCurrency, formatDate } from '@/utils/formatters';
 
 const ORDER_STATUSES = ['pending', 'processing', 'ready_for_pickup', 'out_for_delivery', 'collected', 'delivered', 'cancelled', 'confirmed', 'shipped'];
-const STATUS_LABELS = { pending: 'Pending payment', processing: 'Processing', ready_for_pickup: 'Ready for pickup', out_for_delivery: 'Out for delivery', collected: 'Collected', delivered: 'Delivered', cancelled: 'Cancelled', confirmed: 'Confirmed (legacy)', shipped: 'Shipped (legacy)' };
+const STATUS_LABELS = { pending: 'Pending payment', processing: 'Processing', ready_for_pickup: 'Ready for collection', out_for_delivery: 'Out for delivery', collected: 'Collected', delivered: 'Delivered', cancelled: 'Cancelled', confirmed: 'Confirmed (legacy)', shipped: 'Shipped (legacy)' };
 
 export default function AdminOrders() {
   const dispatch = useDispatch();
@@ -91,7 +91,7 @@ export default function AdminOrders() {
                 {adminItems.map((o) => (
                   <tr key={o.id} className="border-b border-surface-100 last:border-0 dark:border-surface-800">
                     <td data-label="Order" className="px-5 py-4 font-medium text-ink-900 dark:text-white">{o.order_number}</td>
-                    <td data-label="Customer" className="px-5 py-4 text-surface-600 dark:text-surface-300">{o.customer_name || o.user_id?.full_name || '—'}<div className="text-xs text-surface-500">{o.fulfillment_method === 'store_pickup' ? 'Store pickup' : 'Admin delivery'}</div></td>
+                    <td data-label="Customer" className="px-5 py-4 text-surface-600 dark:text-surface-300">{o.customer_name || o.user_id?.full_name || '—'}<div className="text-xs text-surface-500">{o.fulfillment_method === 'store_pickup' ? 'Offline Store' : 'Online Store'}</div></td>
                     <td data-label="Date" className="px-5 py-4 text-surface-500">{formatDate(o.created_at)}</td>
                     <td data-label="Amount" className="px-5 py-4 font-semibold">{formatCurrency(o.total_amount)}</td>
                     <td data-label="Payment" className="px-5 py-4"><Badge tone={o.payment_status === 'success' ? 'success' : 'warning'}>{o.payment_status}</Badge></td>
@@ -132,7 +132,7 @@ export default function AdminOrders() {
               <div className="rounded-xl bg-surface-50 p-4 dark:bg-surface-800">
                 <p className="text-sm font-medium text-ink-900 dark:text-white">{selectedOrder.user_id?.full_name || '—'}</p>
                 <p className="text-xs text-surface-500">{selectedOrder.user_id?.email || ''}</p>
-                <p className="mt-2 text-xs text-surface-500">Phone: {selectedOrder.customer_phone || '—'}</p><p className="mt-1 text-xs text-surface-500">{selectedOrder.fulfillment_method === 'store_pickup' ? 'Store Pickup' : 'Delivery Address: ' + (selectedOrder.shipping_address || 'No address')}</p>
+                <p className="mt-2 text-xs text-surface-500">Phone: {selectedOrder.customer_phone || '—'}</p><p className="mt-1 text-xs text-surface-500">{selectedOrder.fulfillment_method === 'store_pickup' ? 'Offline Store' : 'Online Store delivery address: ' + (selectedOrder.shipping_address || 'No address')}</p>
               </div>
 
               <div>
