@@ -3,7 +3,8 @@ import { Link } from 'react-router-dom';
 import { ArrowRight, Dumbbell, Search, ShieldCheck, Truck, Wrench } from 'lucide-react';
 import { gymEquipmentService } from '@/services/gymEquipmentService';
 
-const money = (value) => value == null ? 'Request a quote' : new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(value);\nconst discount = (item) => item.compare_at_price > item.price && item.price >= 0 ? Math.round(((item.compare_at_price - item.price) / item.compare_at_price) * 100) : 0;
+const money = (value) => value == null ? 'Request a quote' : new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(value);
+const discount = (item) => item.compare_at_price > item.price && item.price >= 0 ? Math.round(((item.compare_at_price - item.price) / item.compare_at_price) * 100) : 0;
 
 export default function GymEquipment() {
   const [data, setData] = useState({ rows: [], categories: [] });
