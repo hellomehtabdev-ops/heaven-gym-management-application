@@ -20,11 +20,30 @@ const allowedTransitions = {
   shipped: ['delivered'],
 };
 
-export async function getOrdersByUserId(userId) {
+const ACTIVE_ORDER_STATUSES = ['pending', 'processing', 'ready_for_pickup', 'out_for_delivery', 'confirmed', 'shipped'];
+const COMPLETED_ORDER_STATUSES = ['collected', 'delivered'];
+const ORDER_HISTORY_BUCKETS = { active: ACTIVE_ORDER_STATUSES, completed: COMPLETED_ORDER_STATUSES, cancelled: ['cancelled'] };
+function buildOrderFilter({ search = '', status = 'all', bucket = 'all' } = {}) {
+  const filter = {};
+  if (bucket !== 'all' && ORDER_HISTORY_BUCKETS[bucket]) filter.status = { $in: ORDER_HISTORY_BUCKETS[bucket] };
+  else if (status && status !== 'all') filter.status = status;
+  const safeSearch = String(search).trim().replace(/[.*+?^${}()|[\]\\]/g, '\\export async function getOrdersByUserId(userId) {
   return Order.find({ user_id: userId }).sort({ createdAt: -1 });
 }
 export async function getAllOrders({ search = '', status = 'all', page = 1, limit = 10 } = {}) {
-  const filter = {};
+  const filter = {};');
+  if (safeSearch) filter.$or = [{ order_number: { $regex: safeSearch, $options: 'i' } }, { customer_name: { $regex: safeSearch, $options: 'i' } }, { customer_phone: { $regex: safeSearch, $options: 'i' } }];
+  return filter;
+}
+export async function getOrdersByUserId(userId, { search = '', bucket = 'all', page = 1, limit = 10 } = {}) {
+  const filter = { user_id: userId, ...buildOrderFilter({ search, bucket }) };
+  const safePage = Math.max(1, Number(page) || 1);
+  const safeLimit = Math.min(50, Math.max(1, Number(limit) || 10));
+  const [rows, total] = await Promise.all([Order.find(filter).sort({ createdAt: -1, _id: -1 }).skip((safePage - 1) * safeLimit).limit(safeLimit).lean(), Order.countDocuments(filter)]);
+  return { rows: rows.map((order) => ({ ...order, id: String(order._id) })), total, page: safePage, pages: Math.max(1, Math.ceil(total / safeLimit)), limit: safeLimit };
+}
+export async function getAllOrders({ search = '', status = 'all', bucket = 'all', page = 1, limit = 10 } = {}) {
+  const filter = buildOrderFilter({ search, status, bucket });
   const safeSearch = String(search).trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   if (safeSearch) {
     filter.$or = [
