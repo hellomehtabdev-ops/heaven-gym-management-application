@@ -7,7 +7,7 @@ import Input from '@/components/ui/Input';
 import { gymSettingsService } from '@/services/settingsService';
 
 export default function AdminSettings() {
-  const [settings, setSettings] = useState({ gym_name: '', contact_phone: '', contact_email: '', address: '' });
+  const [settings, setSettings] = useState({ gym_name: '', contact_phone: '', contact_email: '', address: '', opening_hours: '', instagram_url: '', facebook_url: '', youtube_url: '' });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -49,6 +49,20 @@ export default function AdminSettings() {
             <Input label="Contact Email" value={settings.contact_email || ''} onChange={(e) => update('contact_email', e.target.value)} placeholder="email@gym.com" />
           </div>
           <Input label="Address" value={settings.address || ''} onChange={(e) => update('address', e.target.value)} placeholder="Gym address" />
+          <Input label="Opening Hours" value={settings.opening_hours || ''} onChange={(e) => update('opening_hours', e.target.value)} placeholder="e.g. Monday – Sunday: 5:00 AM – 10:00 PM" />
+          <p className="text-xs text-surface-500">Leave blank to show that visitors should contact the gym for current hours.</p>
+        </div>
+      </Card>
+
+      <Card>
+        <div className="mb-5 flex items-center gap-2">
+          <Building size={20} className="text-brand-600" />
+          <h3 className="font-display text-lg font-semibold text-ink-950 dark:text-white">Social Profiles</h3>
+        </div>
+        <div className="space-y-4">
+          <Input label="Instagram URL" value={settings.instagram_url || ''} onChange={(e) => update('instagram_url', e.target.value)} placeholder="https://www.instagram.com/your-profile" />
+          <Input label="Facebook URL" value={settings.facebook_url || ''} onChange={(e) => update('facebook_url', e.target.value)} placeholder="https://www.facebook.com/your-page" />
+          <Input label="YouTube URL" value={settings.youtube_url || ''} onChange={(e) => update('youtube_url', e.target.value)} placeholder="https://www.youtube.com/@your-channel" />
         </div>
       </Card>
 
