@@ -15,6 +15,7 @@ import Button from '@/components/ui/Button';
 import ScrollReveal from '@/components/public/ScrollReveal';
 import SectionDivider from '@/components/public/SectionDivider';
 import api from '@/services/apiClient';
+import { getWhatsAppNumber } from '@/utils/phone';
 
 export default function Contact() {
   const [settings, setSettings] = useState(null);
@@ -43,7 +44,7 @@ export default function Contact() {
   const email = settings?.contact_email?.trim() || '';
   const address = settings?.address?.trim() || '';
   const cleanPhone = phone.replace(/[^+\d]/g, '');
-  const digitsOnly = phone.replace(/[^0-9]/g, '');
+  const internationalNumber = getWhatsAppNumber(phone);
 
   return (
     <div className="bg-[#070709] text-white selection:bg-brand-500 selection:text-white min-h-screen">
@@ -223,7 +224,7 @@ export default function Contact() {
 
                   {phone && (
                     <a
-                      href={`https://wa.me/${digitsOnly}`}
+                      href={`https://wa.me/${internationalNumber}`}
                       target="_blank"
                       rel="noreferrer"
                       className="flex items-center justify-between rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-6 py-4 font-mono text-xs font-bold uppercase tracking-wider text-emerald-400 transition hover:bg-emerald-500/20"
