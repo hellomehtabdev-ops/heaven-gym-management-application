@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom';
 import { ArrowLeft, ArrowRight, CheckCircle2, Dumbbell, MessageCircle, ShieldCheck, Truck } from 'lucide-react';
 import { gymEquipmentService } from '@/services/gymEquipmentService';
 import { gymSettingsService } from '@/services/settingsService';
+import { getWhatsAppNumber } from '@/utils/phone';
 
 const money = (value) => value == null ? 'Request a quotation' : new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(value);
 const discount = (item) => item.compare_at_price > item.price && item.price >= 0 ? Math.round(((item.compare_at_price - item.price) / item.compare_at_price) * 100) : 0;
@@ -14,13 +15,19 @@ export default function GymEquipmentDetails() {
   const [selected, setSelected] = useState(0);
   const [error, setError] = useState('');
   useEffect(() => {
+    let active = true;
     setProduct(null); setSelected(0); setError('');
-    gymEquipmentService.getPublicBySlug(slug).then(setProduct).catch(() => setError('This equipment is unavailable or may have been unpublished.'));
-    gymSettingsService.get().then((settings) => setPhone(settings.contact_phone || '')).catch(() => setPhone(''));
+    gymEquipmentService.getPublicBySlug(slug)
+      .then((data) => { if (active) setProduct(data); })
+      .catch(() => { if (active) setError('This equipment is unavailable or may have been unpublished.'); });
+    gymSettingsService.get()
+      .then((settings) => { if (active) setPhone(settings.contact_phone || ''); })
+      .catch(() => { if (active) setPhone(''); });
+    return () => { active = false; };
   }, [slug]);
-  const whatsapp = phone.replace(/\D/g, '');
+  const whatsapp = getWhatsAppNumber(phone);
   const message = encodeURIComponent(`Hello Heaven Gym, I am interested in ${product?.name || 'gym equipment'}.${product?.sku ? ` Product code: ${product.sku}.` : ''} Please share details, availability and quotation.`);
-  const whatsappUrl = whatsapp ? `https://wa.me/${whatsapp.length === 10 ? '91' : ''}${whatsapp}?text=${message}` : '';
+  const whatsappUrl = whatsapp ? `https://wa.me/${whatsapp}?text=${message}` : '';
   if (error) return <div className="flex min-h-[70vh] flex-col items-center justify-center bg-[#08090c] px-5 text-center text-white"><Dumbbell size={36} className="text-red-500"/><h1 className="mt-5 text-2xl font-black">{error}</h1><Link to="/gym-equipment" className="mt-6 text-sm font-bold text-red-400">Back to equipment</Link></div>;
   if (!product) return <div className="min-h-[70vh] animate-pulse bg-[#08090c] pt-40"><div className="mx-auto h-80 max-w-6xl rounded-3xl bg-white/5"/></div>;
   const savings = discount(product);
