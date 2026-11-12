@@ -29,6 +29,7 @@ export default function PublicNavbar() {
     { label: 'About', path: '/about' },
     { label: 'Membership', path: '/membership' },
     { label: 'Store', path: '/store' },
+    { label: 'Gym Equipment', path: '/gym-equipment' },
     { label: 'Contact', path: '/contact' },
   ];
 
