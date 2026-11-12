@@ -329,7 +329,7 @@ export default function About() {
               <div className="relative aspect-[4/3] rounded-3xl overflow-hidden border border-white/10 shadow-2xl">
                 <img
                   src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?auto=format&fit=crop&w=1000&q=80"
-                  alt="Coaching in Action at Heaven Gym"
+                  alt="Personal training and fitness coaching"
                   loading="lazy"
                   className="h-full w-full object-cover filter contrast-110"
                 />
@@ -339,7 +339,7 @@ export default function About() {
                     1-on-1 Guidance
                   </span>
                   <p className="font-display text-lg font-bold text-white">
-                    Certified Mentorship on Every Lift
+                    Coaching Guidance
                   </p>
                 </div>
               </div>
