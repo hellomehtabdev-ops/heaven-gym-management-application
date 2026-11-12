@@ -222,7 +222,7 @@ export default function Contact() {
                     </a>
                   )}
 
-                  {phone && (
+                  {internationalNumber && (
                     <a
                       href={`https://wa.me/${internationalNumber}`}
                       target="_blank"
