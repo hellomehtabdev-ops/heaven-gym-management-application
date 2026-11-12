@@ -146,7 +146,7 @@ export async function updateOrderStatus(orderId, status) {
         .lean();
       if (preferences?.notify_orders !== false) {
         const statusLabels = {
-          ready_for_pickup: 'ready for pickup',
+          ready_for_pickup: 'ready for collection',
           out_for_delivery: 'out for delivery',
           collected: 'collected',
           delivered: 'delivered',
