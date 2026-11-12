@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { MessageCircle, X } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
 import api from '@/services/apiClient';
+import { getWhatsAppNumber } from '@/utils/phone';
 
 export default function WhatsAppButton() {
   const [phone, setPhone] = useState('');
@@ -24,9 +25,7 @@ export default function WhatsAppButton() {
     };
   }, []);
 
-  const normalizedPhone = phone.replace(/\D/g, '');
-  const internationalNumber =
-    normalizedPhone.length === 10 ? `91${normalizedPhone}` : normalizedPhone;
+  const internationalNumber = getWhatsAppNumber(phone);
 
   // Contextual pre-filled message based on active route
   const getContextualMessage = () => {
