@@ -8,7 +8,7 @@ const money = (value) => value == null ? 'Request a quote' : new Intl.NumberForm
 const discount = (item) => item.compare_at_price > item.price && item.price >= 0 ? Math.round(((item.compare_at_price - item.price) / item.compare_at_price) * 100) : 0;
 
 export default function GymEquipment() {
-  const [data, setData] = useState({ rows: [], categories: [] });
+  const [data, setData] = useState({ rows: [], total: 0, page: 1, pages: 0, categories: [] });
   const [search, setSearch] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [category, setCategory] = useState('all');
@@ -17,24 +17,24 @@ export default function GymEquipment() {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    const timer = setTimeout(() => setDebouncedSearch(search.trim()), 300);
+    const timer = setTimeout(() => { setDebouncedSearch(search.trim()); setPage(1); }, 300);
     return () => clearTimeout(timer);
   }, [search]);
 
   useEffect(() => {
     let active = true;
     setLoading(true);
-    gymEquipmentService.getPublic({ search: debouncedSearch, category }).then((result) => {
-      if (active) { setData(result); setError(''); setPage(1); }
+    gymEquipmentService.getPublic({ search: debouncedSearch, category, page, limit: PAGE_SIZE }).then((result) => {
+      if (active) { setData(result); setError(''); }
     }).catch(() => { if (active) setError('Equipment catalogue could not be loaded. Please try again.'); })
       .finally(() => { if (active) setLoading(false); });
     return () => { active = false; };
-  }, [debouncedSearch, category]);
+  }, [debouncedSearch, category, page]);
 
   const rows = useMemo(() => data.rows || [], [data.rows]);
-  const totalPages = Math.max(1, Math.ceil(rows.length / PAGE_SIZE));
-  const currentPage = Math.min(page, totalPages);
-  const visibleRows = useMemo(() => rows.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE), [rows, currentPage]);
+  const totalPages = Math.max(1, Number(data.pages) || 0);
+  const currentPage = Math.min(page, Math.max(1, totalPages));
+  const visibleRows = rows;
 
   return (
     <div className="min-h-screen bg-[#08090c] text-white">
@@ -69,9 +69,9 @@ export default function GymEquipment() {
           </div>
         </div>
         <div className="mb-6 flex flex-wrap gap-2">
-          {['all', ...(data.categories || [])].map((item)=><button key={item} onClick={()=>setCategory(item)} className={`rounded-full border px-3.5 py-2 text-[9px] font-black uppercase tracking-[.12em] transition sm:text-[10px] ${category===item?'border-red-500 bg-red-600 text-white':'border-white/10 bg-white/[.03] text-white/55 hover:border-white/30 hover:text-white'}`}>{item==='all'?'All equipment':item}</button>)}
+          {['all', ...(data.categories || [])].map((item)=><button key={item} onClick={()=>{setCategory(item);setPage(1);}} className={`rounded-full border px-3.5 py-2 text-[9px] font-black uppercase tracking-[.12em] transition sm:text-[10px] ${category===item?'border-red-500 bg-red-600 text-white':'border-white/10 bg-white/[.03] text-white/55 hover:border-white/30 hover:text-white'}`}>{item==='all'?'All equipment':item}</button>)}
         </div>
-        <div className="mb-4 flex items-center justify-between text-[11px] text-white/45"><span>{loading ? 'Finding equipment…' : `${rows.length} product${rows.length===1?'':'s'} found`}</span><span>{rows.length > 0 ? `Page ${currentPage} of ${totalPages}` : ''}</span></div>
+        <div className="mb-4 flex items-center justify-between text-[11px] text-white/45"><span>{loading ? 'Finding equipment…' : `${Number(data.total) || 0} product${Number(data.total)===1?'':'s'} found`}</span><span>{rows.length > 0 ? `Page ${currentPage} of ${totalPages}` : ''}</span></div>
         {error && <p className="rounded-xl border border-red-500/20 bg-red-500/10 p-4 text-sm text-red-200">{error}</p>}
         {loading ? <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">{Array.from({length:8},(_,n)=><div key={n} className="h-72 animate-pulse rounded-2xl bg-white/[.05] sm:h-80"/>)}</div> :
           visibleRows.length ? <>
