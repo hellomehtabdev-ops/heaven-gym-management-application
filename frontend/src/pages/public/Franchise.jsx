@@ -28,7 +28,7 @@ export default function Franchise() {
     phone: '',
     email: '',
     city: '',
-    investmentRange: '₹30L – ₹50L',
+    investmentRange: 'Not decided yet',
     gymExperience: 'Yes, looking to upgrade/expand',
     message: '',
   });
@@ -71,25 +71,25 @@ export default function Franchise() {
       icon: Building,
       title: 'Facility Layout & Architecture',
       description:
-        'Professional zoning plans engineered for high-throughput member flows, vibration-isolated deadlift bays, acoustic dampening, and luxury locker spaces.',
+        'Discuss possible floor layouts, equipment placement and member flow based on your property and business requirements.',
     },
     {
       icon: Dumbbell,
       title: 'Commercial Equipment Sourcing',
       description:
-        'Direct procurement access to certified biomechanically accurate plate-loaded machines, Olympic racks, and commercial cardio decks at commercial partner pricing.',
+        'Discuss equipment sourcing options, product specifications and supplier availability for your proposed facility.',
     },
     {
       icon: Users,
       title: 'Staff & Coach Training Curriculum',
       description:
-        'Comprehensive standard operating procedures (SOPs) for front-desk concierge, personal trainers, nutrition consultants, and daily maintenance crews.',
+        'Discuss staffing needs and possible training resources for reception, coaching and day-to-day gym operations.',
     },
     {
       icon: Briefcase,
       title: 'Integrated Gym Management System',
       description:
-        'Turnkey cloud software handling member subscriptions, Razorpay digital checkouts, attendance tracking, and supplement retail billing out of the box.',
+        'Explore the Heaven Gym management application for member subscriptions, payments, attendance and retail workflows. Available features depend on configuration and agreement.',
     },
   ];
 
@@ -130,10 +130,10 @@ export default function Franchise() {
               The Heaven Gym Advantage
             </p>
             <h2 className="mt-2 font-display text-3xl sm:text-4xl font-black text-white">
-              TURNKEY FITNESS INFRASTRUCTURE.
+              GYM SETUP & PARTNERSHIP DISCUSSIONS.
             </h2>
             <p className="mt-3 text-sm text-surface-400">
-              We provide practical operational blueprints developed through real facility ownership.
+              Explore possible support areas and discuss your requirements directly with the Heaven Gym team.
             </p>
           </div>
         </ScrollReveal>
@@ -330,6 +330,7 @@ export default function Franchise() {
                         onChange={(e) => setFormData({ ...formData, investmentRange: e.target.value })}
                         className="w-full rounded-xl border border-white/10 bg-[#0b0d14] px-3.5 py-2.5 text-sm outline-none focus:border-brand-500 text-white"
                       >
+                        <option value="Not decided yet">Not decided yet</option>
                         <option value="₹30L – ₹50L">₹30 Lakhs – ₹50 Lakhs</option>
                         <option value="₹50L – ₹1 Crore">₹50 Lakhs – ₹1 Crore</option>
                         <option value="₹1 Crore – ₹2.5 Crore">₹1 Crore – ₹2.5 Crore</option>
