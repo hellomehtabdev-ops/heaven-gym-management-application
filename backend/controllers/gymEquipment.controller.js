@@ -17,12 +17,16 @@ async function generateUniqueSku(category) {
 
 function normalizeBody(body = {}) {
   const price = body.price === '' || body.price == null ? null : Number(body.price);
-  if (price !== null && (!Number.isFinite(price) || price < 0)) throw new ApiError(400, 'Enter a valid product price');
+  const compareAtPrice = body.compare_at_price === '' || body.compare_at_price == null ? null : Number(body.compare_at_price);
+  if (price !== null && (!Number.isFinite(price) || price < 0)) throw new ApiError(400, 'Enter a valid selling price');
+  if (compareAtPrice !== null && (!Number.isFinite(compareAtPrice) || compareAtPrice < 0)) throw new ApiError(400, 'Enter a valid MRP');
+  if (price !== null && compareAtPrice !== null && compareAtPrice <= price) throw new ApiError(400, 'MRP must be higher than the selling price to show an offer');
   const name = String(body.name || '').trim();
   if (!name) throw new ApiError(400, 'Product name is required');
   return {
     name, brand: String(body.brand || '').trim(), category: String(body.category || 'Strength Equipment').trim(),
-    price, price_label: String(body.price_label || '').trim(),
+    price, compare_at_price: compareAtPrice, price_label: String(body.price_label || '').trim(),
+    offer_label: String(body.offer_label || '').trim(),
     description: String(body.description || '').trim(),
     availability: ['Available', 'Made to order', 'Enquire for availability'].includes(body.availability) ? body.availability : 'Available',
     is_featured: bool(body.is_featured), is_published: bool(body.is_published),
