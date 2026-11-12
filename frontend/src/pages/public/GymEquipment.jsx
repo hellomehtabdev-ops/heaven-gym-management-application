@@ -15,6 +15,7 @@ export default function GymEquipment() {
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [retryCount, setRetryCount] = useState(0);
 
   useEffect(() => {
     const timer = setTimeout(() => { setDebouncedSearch(search.trim()); setPage(1); }, 300);
@@ -29,7 +30,7 @@ export default function GymEquipment() {
     }).catch(() => { if (active) { setData({ rows: [], total: 0, page: 1, pages: 0, categories: [] }); setError('Equipment catalogue could not be loaded. Please try again.'); } })
       .finally(() => { if (active) setLoading(false); });
     return () => { active = false; };
-  }, [debouncedSearch, category, page]);
+  }, [debouncedSearch, category, page, retryCount]);
 
   const rows = useMemo(() => data.rows || [], [data.rows]);
   const totalPages = Math.max(1, Number(data.pages) || 0);
@@ -76,9 +77,8 @@ export default function GymEquipment() {
           {['all', ...(data.categories || [])].map((item)=><button key={item} onClick={()=>{setCategory(item);setPage(1);}} className={`rounded-full border px-3.5 py-2 text-[9px] font-black uppercase tracking-[.12em] transition sm:text-[10px] ${category===item?'border-red-500 bg-red-600 text-white':'border-white/10 bg-white/[.03] text-white/55 hover:border-white/30 hover:text-white'}`}>{item==='all'?'All equipment':item}</button>)}
         </div>
         <div className="mb-4 flex items-center justify-between text-[11px] text-white/45"><span>{loading ? 'Finding equipment…' : `${Number(data.total) || 0} product${Number(data.total)===1?'':'s'} found`}</span><span>{rows.length > 0 ? `Page ${currentPage} of ${totalPages}` : ''}</span></div>
-        {error && <p className="rounded-xl border border-red-500/20 bg-red-500/10 p-4 text-sm text-red-200">{error}</p>}
         {loading ? <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">{Array.from({length:8},(_,n)=><div key={n} className="h-72 animate-pulse rounded-2xl bg-white/[.05] sm:h-80"/>)}</div> :
-          visibleRows.length ? <>
+          error ? <div role="alert" className="rounded-2xl border border-red-500/20 bg-red-500/10 p-6 text-center text-sm text-red-200">{error}<button type="button" onClick={() => setRetryCount((count) => count + 1)} className="ml-3 rounded-lg border border-red-400/30 px-3 py-2 text-xs font-bold text-white hover:bg-red-500/20">Retry</button></div> : visibleRows.length ? <>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">{visibleRows.map((item)=><Link key={item._id} to={`/gym-equipment/${item.slug}`} className="group min-w-0 overflow-hidden rounded-2xl border border-white/10 bg-[#111216] transition duration-300 hover:-translate-y-1 hover:border-red-500/50 hover:shadow-[0_20px_45px_rgba(0,0,0,.32)]">
               <div className="relative flex aspect-[5/4] max-h-[250px] items-center justify-center overflow-hidden bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,.10),rgba(255,255,255,.015)_70%)] p-5 sm:p-6">{item.images?.[0]?.url ? <img src={item.images[0].url} alt={item.images[0].alt_text || item.name} loading="lazy" className="h-[72%] w-[72%] object-contain transition duration-500 group-hover:scale-[1.035]"/> : <Dumbbell size={58} className="text-white/15"/>}
                 {(item.is_featured || discount(item) > 0 || item.offer_label) && <div className="absolute left-3 top-3 flex flex-wrap gap-1.5">{item.is_featured && <span className="rounded-full border border-white/15 bg-black/75 px-2.5 py-1 text-[8px] font-black uppercase tracking-wider text-white">Featured</span>}{(discount(item) > 0 || item.offer_label) && <span className="rounded-full bg-red-600 px-2.5 py-1 text-[8px] font-black uppercase tracking-wider text-white">{item.offer_label || (discount(item) > 0 ? discount(item) + '% OFF' : 'Special offer')}</span>}</div>}
