@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import {
   Award,
+  ArrowLeft,
+  ArrowRight,
   Filter,
   ShieldCheck,
   Sparkles,
@@ -17,12 +19,18 @@ import ScrollReveal from '@/components/public/ScrollReveal';
 import Card3D from '@/components/public/Card3D';
 import { transformationService } from '@/services/transformationService';
 
+const PAGE_SIZE = 12;
+
 export default function Transformations() {
   const [transformations, setTransformations] = useState([]);
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [loading, setLoading] = useState(true);
   const [activeItem, setActiveItem] = useState(null);
+  const [page, setPage] = useState(1);
+  const [total, setTotal] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     let active = true;
@@ -31,18 +39,27 @@ export default function Transformations() {
     transformationService
       .getPublicTransformations({
         category: selectedCategory === 'all' ? undefined : selectedCategory,
-        limit: 30,
+        page,
+        limit: PAGE_SIZE,
       })
       .then((data) => {
         if (active) {
           setTransformations(data.rows || []);
+          setTotal(Number(data.total) || 0);
+          setTotalPages(Number(data.pages) || 0);
+          setError('');
           if (data.categories?.length) {
             setCategories(data.categories);
           }
         }
       })
       .catch(() => {
-        if (active) setTransformations([]);
+        if (active) {
+          setTransformations([]);
+          setTotal(0);
+          setTotalPages(0);
+          setError('Transformations could not be loaded. Please try again.');
+        }
       })
       .finally(() => {
         if (active) setLoading(false);
@@ -51,7 +68,12 @@ export default function Transformations() {
     return () => {
       active = false;
     };
-  }, [selectedCategory]);
+  }, [selectedCategory, page]);
+
+  const pageNumbers = Array.from(
+    { length: Math.min(totalPages, 5) },
+    (_, index) => Math.max(1, Math.min(page - 2, totalPages - 4)) + index
+  );
 
   return (
     <div className="bg-[#06070a] text-white min-h-screen pt-32 pb-24">
@@ -85,20 +107,20 @@ export default function Transformations() {
             <div className="mt-10 flex flex-wrap items-center justify-center gap-2">
               <button
                 type="button"
-                onClick={() => setSelectedCategory('all')}
+                onClick={() => { setSelectedCategory('all'); setPage(1); }}
                 className={`rounded-full px-5 py-2 text-xs font-mono font-bold uppercase tracking-wider transition-all ${
                   selectedCategory === 'all'
                     ? 'bg-brand-600 text-white shadow-lg shadow-brand-600/30'
                     : 'bg-white/5 text-surface-400 hover:bg-white/10 hover:text-white border border-white/10'
                 }`}
               >
-                All Milestones ({transformations.length})
+                All Milestones ({total})
               </button>
               {categories.map((cat) => (
                 <button
                   key={cat}
                   type="button"
-                  onClick={() => setSelectedCategory(cat)}
+                  onClick={() => { setSelectedCategory(cat); setPage(1); }}
                   className={`rounded-full px-5 py-2 text-xs font-mono font-bold uppercase tracking-wider transition-all ${
                     selectedCategory === cat
                       ? 'bg-brand-600 text-white shadow-lg shadow-brand-600/30'
@@ -114,7 +136,7 @@ export default function Transformations() {
       </section>
 
       {/* Main Grid */}
-      <section className="mx-auto max-w-7xl px-5 lg:px-8 py-16">
+      <section id="transformations-grid" className="mx-auto max-w-7xl px-5 lg:px-8 py-16">
         {loading ? (
           <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
             {[1, 2, 3, 4, 5, 6].map((idx) => (
@@ -128,6 +150,8 @@ export default function Transformations() {
               </div>
             ))}
           </div>
+        ) : error ? (
+          <div role="alert" className="rounded-2xl border border-red-500/25 bg-red-500/10 p-8 text-center text-sm text-red-200">{error}</div>
         ) : transformations.length > 0 ? (
           <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
             {transformations.map((item) => (
@@ -191,6 +215,22 @@ export default function Transformations() {
               </Card3D>
             ))}
           </div>
+          {totalPages > 1 && (
+            <nav aria-label="Transformation pagination" className="mt-10 flex flex-wrap items-center justify-center gap-2">
+              <button type="button" disabled={page === 1} onClick={() => { setPage((current) => Math.max(1, current - 1)); document.getElementById('transformations-grid')?.scrollIntoView({ behavior: 'smooth' }); }} className="inline-flex items-center gap-2 rounded-lg border border-white/10 px-3 py-2.5 text-xs font-bold text-surface-300 disabled:cursor-not-allowed disabled:opacity-30">
+                <ArrowLeft size={14} /> Previous
+              </button>
+              {pageNumbers.map((pageNumber) => (
+                <button key={pageNumber} type="button" onClick={() => { setPage(pageNumber); document.getElementById('transformations-grid')?.scrollIntoView({ behavior: 'smooth' }); }} aria-current={page === pageNumber ? 'page' : undefined} className={`h-9 min-w-9 rounded-lg border px-3 text-xs font-bold ${page === pageNumber ? 'border-brand-500 bg-brand-600 text-white' : 'border-white/10 text-surface-300 hover:border-white/30'}`}>
+                  {pageNumber}
+                </button>
+              ))}
+              <button type="button" disabled={page === totalPages} onClick={() => { setPage((current) => Math.min(totalPages, current + 1)); document.getElementById('transformations-grid')?.scrollIntoView({ behavior: 'smooth' }); }} className="inline-flex items-center gap-2 rounded-lg border border-white/10 px-3 py-2.5 text-xs font-bold text-surface-300 disabled:cursor-not-allowed disabled:opacity-30">
+                Next <ArrowRight size={14} />
+              </button>
+              <span className="ml-2 text-[11px] text-surface-500">Page {page} of {totalPages} · {total} results</span>
+            </nav>
+          )}
         ) : (
           <div className="rounded-3xl border border-dashed border-white/15 bg-white/[0.01] p-16 text-center max-w-xl mx-auto">
             <Award className="mx-auto text-amber-400" size={36} />
