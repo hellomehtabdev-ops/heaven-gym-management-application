@@ -54,7 +54,8 @@ button, input, select, textarea { font: inherit; }
 .dark .admin-shell{--admin-border:#252b36;color:#edf0f4;background:#0d1117}
 .admin-shell h1,.admin-shell h2,.admin-shell h3{letter-spacing:-.035em}
 .admin-shell h1{font-size:clamp(1.45rem,2vw,1.8rem);line-height:1.2}
-.admin-topbar{background:#11151c!important;border-color:#242a34!important;box-shadow:0 5px 22px rgba(16,24,40,.12)}
+.admin-topbar{background:rgba(255,255,255,.96)!important;border-color:#e4e7ec!important;box-shadow:0 5px 22px rgba(16,24,40,.07)}
+.dark .admin-topbar{background:rgba(8,9,12,.94)!important;border-color:#242a34!important;box-shadow:0 5px 22px rgba(0,0,0,.22)}
 .admin-sidebar{background:#fff!important;border-color:var(--admin-border)!important;box-shadow:8px 0 24px rgba(16,24,40,.025)}
 .dark .admin-sidebar{background:#11161e!important}
 .admin-nav a{min-height:42px;border:1px solid transparent;border-radius:10px;font-size:13px;letter-spacing:.005em}
@@ -424,6 +425,163 @@ button, input, select, textarea { font: inherit; }
   .admin-shell table.admin-mobile-cards tbody td::before { flex-basis: 72px; }
 }
 
+
+/* Desktop admin responsiveness: fit management tables to the available content width.
+   Mobile card/table behavior remains governed by the existing max-width media queries. */
+@media (min-width: 1024px) {
+  .admin-shell .admin-content .admin-table-scroll {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    overflow-x: hidden;
+  }
+
+  .admin-shell .admin-content .admin-table-scroll > .admin-data-table {
+    display: table;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    table-layout: fixed !important;
+  }
+
+  .admin-shell .admin-content .admin-data-table th,
+  .admin-shell .admin-content .admin-data-table td {
+    padding-left: clamp(7px, 0.85vw, 14px) !important;
+    padding-right: clamp(7px, 0.85vw, 14px) !important;
+    white-space: normal !important;
+    overflow-wrap: anywhere;
+    word-break: normal;
+    vertical-align: middle;
+  }
+
+  .admin-shell .admin-content .admin-data-table td > * {
+    max-width: 100%;
+  }
+
+  .admin-shell .admin-content .admin-data-table button {
+    max-width: 100%;
+    min-width: 0;
+    padding-left: 8px;
+    padding-right: 8px;
+    white-space: normal;
+    line-height: 1.25;
+  }
+
+  .admin-shell .admin-content .overflow-x-auto > table:not(.admin-data-table) {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    table-layout: fixed;
+  }
+}
+
+@media (min-width: 1024px) and (max-width: 1279px) {
+  .admin-content {
+    padding: 22px !important;
+  }
+
+  .admin-content > .space-y-6 {
+    gap: 20px;
+  }
+}
+
+/* Admin theme contrast pass: scoped to admin pages; keeps the shared shell and mobile layout intact. */
+.admin-shell {
+  color-scheme: light;
+}
+.dark .admin-shell {
+  color-scheme: dark;
+}
+
+/* Surfaces that use plain Tailwind background utilities inside admin pages. */
+.dark .admin-shell .admin-content .bg-white:not(button):not(input):not(select):not(option) {
+  background-color: #151c27 !important;
+}
+.dark .admin-shell .admin-content .bg-surface-50,
+.dark .admin-shell .admin-content .bg-gray-50,
+.dark .admin-shell .admin-content .bg-slate-50 {
+  background-color: #111923 !important;
+}
+.dark .admin-shell .admin-content .bg-surface-100,
+.dark .admin-shell .admin-content .bg-gray-100,
+.dark .admin-shell .admin-content .bg-slate-100 {
+  background-color: #202a38 !important;
+}
+.dark .admin-shell .admin-content .bg-surface-200,
+.dark .admin-shell .admin-content .bg-gray-200,
+.dark .admin-shell .admin-content .bg-slate-200 {
+  background-color: #2a3545 !important;
+}
+.dark .admin-shell .admin-content .border-surface-100,
+.dark .admin-shell .admin-content .border-surface-200,
+.dark .admin-shell .admin-content .border-gray-100,
+.dark .admin-shell .admin-content .border-gray-200,
+.dark .admin-shell .admin-content .border-slate-100,
+.dark .admin-shell .admin-content .border-slate-200 {
+  border-color: #303b4b !important;
+}
+
+/* Keep secondary labels, metadata, and headings readable in dark mode. */
+.dark .admin-shell .admin-content .text-gray-900,
+.dark .admin-shell .admin-content .text-slate-900,
+.dark .admin-shell .admin-content .text-surface-900,
+.dark .admin-shell .admin-content .text-ink-950,
+.dark .admin-shell .admin-content .text-ink-900 {
+  color: #f1f5f9 !important;
+}
+.dark .admin-shell .admin-content .text-gray-800,
+.dark .admin-shell .admin-content .text-gray-700,
+.dark .admin-shell .admin-content .text-slate-800,
+.dark .admin-shell .admin-content .text-slate-700,
+.dark .admin-shell .admin-content .text-surface-700,
+.dark .admin-shell .admin-content .text-surface-600 {
+  color: #d5deea !important;
+}
+.dark .admin-shell .admin-content .text-gray-600,
+.dark .admin-shell .admin-content .text-gray-500,
+.dark .admin-shell .admin-content .text-slate-600,
+.dark .admin-shell .admin-content .text-slate-500 {
+  color: #aeb9c8 !important;
+}
+
+/* Tables, chart controls, and admin list rows. */
+.dark .admin-shell .admin-content table thead th {
+  color: #cbd5e1 !important;
+}
+.dark .admin-shell .admin-content table tbody td {
+  color: #d5deea;
+}
+.dark .admin-shell .admin-content table tbody tr {
+  background-color: #151c27;
+}
+.dark .admin-shell .admin-content table tbody tr:hover {
+  background-color: #202a38;
+}
+.dark .admin-shell .admin-content .hover\\:bg-surface-100:hover,
+.dark .admin-shell .admin-content .hover\\:bg-gray-50:hover,
+.dark .admin-shell .admin-content .hover\\:bg-slate-50:hover {
+  background-color: #202a38 !important;
+}
+
+/* Native dropdown menus and form controls need their own dark palette. */
+.dark .admin-shell .admin-content select,
+.dark .admin-shell .admin-content select option {
+  color: #f1f5f9;
+  background-color: #101923;
+}
+.dark .admin-shell .admin-content input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+}
+.admin-shell .admin-content :is(input, select, textarea):focus-visible {
+  outline: 2px solid rgba(220, 38, 38, .35);
+  outline-offset: 1px;
+}
+
+/* Dashboard chart labels and summary text retain contrast in both themes. */
+.admin-shell .admin-content .text-surface-500 { color: #596579; }
+.dark .admin-shell .admin-content .text-surface-500 { color: #aeb9c8 !important; }
+.admin-shell .admin-content .text-surface-600 { color: #475467; }
+.dark .admin-shell .admin-content .text-surface-600 { color: #c2ccda !important; }
 
 /* Banner carousel: gentle cross-fade and subtle zoom between images. */
 @keyframes banner-change {
