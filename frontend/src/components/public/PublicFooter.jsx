@@ -46,33 +46,33 @@ export default function PublicFooter() {
             )}
 
             <div className="flex items-center gap-2.5 pt-2">
-              <a
-                href="https://instagram.com"
+              {gymSettings?.instagram_url && <a
+                href={gymSettings.instagram_url}
                 target="_blank"
                 rel="noreferrer"
                 aria-label="Follow Heaven Gym on Instagram"
                 className="flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-surface-300 transition duration-200 hover:border-brand-500 hover:bg-brand-600 hover:text-white"
               >
                 <Instagram size={17} />
-              </a>
-              <a
-                href="https://facebook.com"
+              </a>}
+              {gymSettings?.facebook_url && <a
+                href={gymSettings.facebook_url}
                 target="_blank"
                 rel="noreferrer"
                 aria-label="Follow Heaven Gym on Facebook"
                 className="flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-surface-300 transition duration-200 hover:border-brand-500 hover:bg-brand-600 hover:text-white"
               >
                 <Facebook size={17} />
-              </a>
-              <a
-                href="https://youtube.com"
+              </a>}
+              {gymSettings?.youtube_url && <a
+                href={gymSettings.youtube_url}
                 target="_blank"
                 rel="noreferrer"
                 aria-label="Follow Heaven Gym on YouTube"
                 className="flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-surface-300 transition duration-200 hover:border-brand-500 hover:bg-brand-600 hover:text-white"
               >
                 <Youtube size={17} />
-              </a>
+              </a>}
             </div>
           </div>
 
@@ -161,10 +161,10 @@ export default function PublicFooter() {
                 <Clock size={14} /> Club Hours
               </div>
               <p className="mt-2 text-base font-bold text-white">
-                Mon – Sun: 5:00 AM – 10:00 PM
+                {gymSettings?.opening_hours || 'Contact us for current opening hours.'}
               </p>
               <p className="mt-1 text-xs text-surface-400 leading-relaxed">
-                Full-facility access with certified floor trainers, steam recovery, and private lockers.
+                Contact the Heaven Gym team for current facility access and availability details.
               </p>
 
               {gymSettings?.contact_phone && (
