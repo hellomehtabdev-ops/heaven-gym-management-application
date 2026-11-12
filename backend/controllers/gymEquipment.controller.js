@@ -1,3 +1,4 @@
+import { randomBytes } from 'node:crypto';
 import GymEquipment from '../models/gymEquipment.model.js';
 import { uploadToCloudinary, deleteFromCloudinary } from '../utils/cloudinaryUpload.utils.js';
 import { ApiError } from '../utils/errors.utils.js';
@@ -5,24 +6,24 @@ import { ApiError } from '../utils/errors.utils.js';
 const slugify = (value) => String(value || '').toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 const bool = (value) => value === true || value === 'true';
 
+async function generateUniqueSku(category) {
+  const categoryCode = slugify(category).split('-').map((part) => part[0]).join('').toUpperCase().slice(0, 5) || 'EQ';
+  for (let attempt = 0; attempt < 5; attempt += 1) {
+    const sku = `HG-${categoryCode}-${randomBytes(3).toString('hex').toUpperCase()}`;
+    if (!await GymEquipment.exists({ sku })) return sku;
+  }
+  throw new ApiError(500, 'Could not generate a unique equipment SKU. Please try again.');
+}
+
 function normalizeBody(body = {}) {
-  let specifications = body.specifications || {};
-  if (typeof specifications === 'string') {
-    try { specifications = JSON.parse(specifications); } catch { throw new ApiError(400, 'Specifications must be valid JSON'); }
-  }
-  if (!specifications || typeof specifications !== 'object' || Array.isArray(specifications)) {
-    throw new ApiError(400, 'Specifications must be an object');
-  }
   const price = body.price === '' || body.price == null ? null : Number(body.price);
   if (price !== null && (!Number.isFinite(price) || price < 0)) throw new ApiError(400, 'Enter a valid product price');
   const name = String(body.name || '').trim();
   if (!name) throw new ApiError(400, 'Product name is required');
   return {
     name, brand: String(body.brand || '').trim(), category: String(body.category || 'Strength Equipment').trim(),
-    sku: String(body.sku || '').trim().toUpperCase(), price,
-    price_label: String(body.price_label || '').trim(),
-    description: String(body.description || '').trim(), specifications,
-    warranty: String(body.warranty || '').trim(),
+    price, price_label: String(body.price_label || '').trim(),
+    description: String(body.description || '').trim(),
     availability: ['Available', 'Made to order', 'Enquire for availability'].includes(body.availability) ? body.availability : 'Available',
     is_featured: bool(body.is_featured), is_published: bool(body.is_published),
   };
@@ -65,9 +66,9 @@ export async function createEquipment(req, res, next) {
   try {
     for (const file of req.files || []) uploaded.push(await uploadToCloudinary(file.buffer, 'heaven-gym/equipment'));
     const values = normalizeBody(req.body);
-    const slugBase = slugify(values.name) || 'equipment';
-    const slug = `${slugBase}-${Date.now().toString(36)}`;
-    const product = await GymEquipment.create({ ...values, slug, images: uploaded.map((image, index) => ({
+    const slug = `${slugify(values.name) || 'equipment'}-${Date.now().toString(36)}`;
+    const sku = await generateUniqueSku(values.category);
+    const product = await GymEquipment.create({ ...values, slug, sku, images: uploaded.map((image, index) => ({
       url: image.secure_url, public_id: image.public_id, alt_text: values.name + (index ? ` image ${index + 1}` : ''),
     })) });
     res.status(201).json(product);
@@ -83,17 +84,17 @@ export async function updateEquipment(req, res, next) {
     const product = await GymEquipment.findById(req.params.id);
     if (!product) throw new ApiError(404, 'Equipment not found');
     for (const file of req.files || []) uploaded.push(await uploadToCloudinary(file.buffer, 'heaven-gym/equipment'));
-    const values = normalizeBody({ ...Object.fromEntries(Object.entries(product.toObject()).filter(([key]) => !['_id','slug','images','createdAt','updatedAt','__v'].includes(key))), ...req.body });
+    const values = normalizeBody({ ...product.toObject(), ...req.body });
     Object.assign(product, values);
-    if (uploaded.length) {
-      product.images.push(...uploaded.map((image) => ({ url: image.secure_url, public_id: image.public_id, alt_text: values.name })));
-    }
+    if (!product.sku) product.sku = await generateUniqueSku(values.category);
+    if (uploaded.length) product.images.push(...uploaded.map((image) => ({ url: image.secure_url, public_id: image.public_id, alt_text: values.name })));
     if (req.body.remove_image_ids) {
       const removeIds = String(req.body.remove_image_ids).split(',').filter(Boolean);
       const removed = product.images.filter((image) => removeIds.includes(String(image._id)));
       product.images = product.images.filter((image) => !removeIds.includes(String(image._id)));
       await Promise.all(removed.map((image) => deleteFromCloudinary(image.public_id).catch(() => {})));
     }
+    if (product.images.length > 5) throw new ApiError(400, 'A maximum of 5 product photos is allowed');
     await product.save();
     res.json(product);
   } catch (error) {
