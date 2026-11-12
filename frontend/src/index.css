@@ -54,7 +54,8 @@ button, input, select, textarea { font: inherit; }
 .dark .admin-shell{--admin-border:#252b36;color:#edf0f4;background:#0d1117}
 .admin-shell h1,.admin-shell h2,.admin-shell h3{letter-spacing:-.035em}
 .admin-shell h1{font-size:clamp(1.45rem,2vw,1.8rem);line-height:1.2}
-.admin-topbar{background:#11151c!important;border-color:#242a34!important;box-shadow:0 5px 22px rgba(16,24,40,.12)}
+.admin-topbar{background:rgba(255,255,255,.96)!important;border-color:#e4e7ec!important;box-shadow:0 5px 22px rgba(16,24,40,.07)}
+.dark .admin-topbar{background:rgba(8,9,12,.94)!important;border-color:#242a34!important;box-shadow:0 5px 22px rgba(0,0,0,.22)}
 .admin-sidebar{background:#fff!important;border-color:var(--admin-border)!important;box-shadow:8px 0 24px rgba(16,24,40,.025)}
 .dark .admin-sidebar{background:#11161e!important}
 .admin-nav a{min-height:42px;border:1px solid transparent;border-radius:10px;font-size:13px;letter-spacing:.005em}
