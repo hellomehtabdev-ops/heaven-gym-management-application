@@ -13,8 +13,10 @@ export async function listPublicTransformations(req, res, next) {
     if (category && category !== 'all') {
       filter.category = category;
     }
-    const safePage = Math.max(1, Math.floor(Number(page) || 1));
-    const safeLimit = Math.min(50, Math.max(1, Math.floor(Number(limit) || 12)));
+    const requestedPage = Number(page);
+    const requestedLimit = Number(limit);
+    const safePage = Number.isFinite(requestedPage) ? Math.max(1, Math.floor(requestedPage)) : 1;
+    const safeLimit = Number.isFinite(requestedLimit) ? Math.min(50, Math.max(1, Math.floor(requestedLimit))) : 12;
     const [rows, total, categories] = await Promise.all([
       Transformation.find(filter)
         .select(PUBLIC_PROJECTION)
