@@ -197,7 +197,7 @@ export default function Home() {
                   </span>
                 </h2>
                 <p className="mt-4 text-base text-surface-300 leading-relaxed">
-                  Every square foot of Heaven Gym has been engineered with purpose. Experience unmatched free-weight arrays, biomechanically pure resistance machines, thermal steam recovery, and pristine sanitization.
+                  Explore the training spaces and amenities available at Heaven Gym, from strength and cardio training to recovery and group-fitness options. Contact the team to confirm current facility availability.
                 </p>
               </div>
 
@@ -354,15 +354,15 @@ export default function Home() {
                   <span className="text-surface-100">LUXURY ATMOSPHERE.</span>
                 </h2>
                 <p className="mt-5 text-sm sm:text-base text-surface-300 leading-relaxed">
-                  We believe workout spaces should feel inspiring, pristine, and clean. Heaven Gym maintains high-volume air filtration, commercial climate control ventilation, and scheduled machine deep-wiping throughout every zone.
+                  A clean, comfortable training environment matters. Ask the Heaven Gym team about current cleaning routines, ventilation and hygiene facilities.
                 </p>
 
                 <div className="mt-8 space-y-3">
                   {[
-                    'Hourly Deep Sanitization Cycles by Dedicated Staff',
-                    'High-Volume Air Filtration & Circulation System',
-                    'Dedicated Climate Control & Odor Management',
-                    'Impeccably Sanitized Private Showers & Lockers',
+                    'Regular cleaning of equipment and high-touch surfaces',
+                    'Ventilation and airflow across training areas',
+                    'Clean and well-maintained training spaces',
+                    'Changing and shower facilities, where available',
                   ].map((item) => (
                     <div key={item} className="flex items-center gap-3 text-xs sm:text-sm text-surface-200">
                       <ShieldCheck size={18} className="text-emerald-400 shrink-0" />
@@ -597,15 +597,15 @@ export default function Home() {
                   <span className="text-cyan-200">METABOLIC ENGINE DECK.</span>
                 </h2>
                 <p className="mt-5 text-sm sm:text-base text-surface-300 leading-relaxed">
-                  Engineered for real cardiovascular conditioning. Features non-motorized curved dynamic slat treadmills that encourage natural running mechanics, commercial air ergometers, Concept2 rowers, and smooth low-impact ellipticals with individual heart-rate telemetry.
+                  Explore cardio equipment for endurance and conditioning. Machine types, brands and available features can vary; contact the team for the current equipment list.
                 </p>
 
                 <div className="mt-8 space-y-3">
                   {[
-                    'Self-Powered Curved Treadmills for Natural Running Mechanics',
-                    'Concept2 Rowers and Ski-Ergs for Full-Body Output',
-                    'Commercial Assault Bikes for High-Intensity Intervals',
-                    'Integrated Zone-Based Heart Telemetry Displays',
+                    'Treadmills for walking and running workouts',
+                    'Cardio equipment for full-body conditioning',
+                    'Options for varied cardio training',
+                    'Ask the team about machine features and availability',
                   ].map((c) => (
                     <div key={c} className="flex items-center gap-3 text-xs sm:text-sm text-surface-200">
                       <Activity size={17} className="text-cyan-400 shrink-0" />
@@ -701,13 +701,13 @@ export default function Home() {
                   <span className="text-pink-300">GROUP MOVEMENT STUDIO.</span>
                 </h2>
                 <p className="mt-5 text-sm sm:text-base text-surface-300 leading-relaxed">
-                  Experience exhilarating group fitness choreographed by certified energetic instructors. Featuring sprung hardwood flooring that absorbs 60% of joint impact, full-length acoustic mirrors, and immersive sound.
+                  Enjoy group movement and cardio-dance sessions in a supportive environment. Ask the team about class schedules, instructor availability and studio facilities.
                 </p>
 
                 <div className="mt-8 space-y-3">
                   {[
-                    'Shock-Absorbing Sprung Hardwood Timber Flooring',
-                    'Concert-Grade Acoustic Sound Distribution',
+                    'Group movement space for guided sessions',
+                    'Sound and lighting for group activities',
                     'Energetic Choreographed Cardio Dance Sessions',
                     'Supportive Community Environment for All Experience Levels',
                   ].map((z) => (
@@ -946,7 +946,7 @@ export default function Home() {
                   AUTHENTIC SUPPLEMENTS.
                 </h2>
                 <p className="mt-3 text-sm text-surface-300 max-w-xl">
-                  100% verified, genuine nutritional supplements. Lab-tested whey isolate, micronized creatine, essential amino acids, and multivitamins.
+                  Browse nutritional supplements and training essentials. Review each product listing for its brand, ingredients, pack size and availability before purchase.
                 </p>
               </div>
 
