@@ -1,6 +1,6 @@
 import GymEquipment from '../models/gymEquipment.model.js';
 
-const PUBLIC_EQUIPMENT_PROJECTION = '_id name slug brand category price compare_at_price price_label offer_label description availability images.url images.alt_text is_featured';
+const PUBLIC_EQUIPMENT_PROJECTION = '_id name slug sku brand category price compare_at_price price_label offer_label description availability images.url images.alt_text is_featured';
 
 export async function listPublicEquipment(req, res, next) {
   try {
