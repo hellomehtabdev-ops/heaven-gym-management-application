@@ -19,6 +19,7 @@ import {
 import ScrollReveal from '@/components/public/ScrollReveal';
 import Card3D from '@/components/public/Card3D';
 import api from '@/services/apiClient';
+import { getWhatsAppNumber } from '@/utils/phone';
 
 export default function Franchise() {
   const [gymSettings, setGymSettings] = useState(null);
@@ -32,6 +33,7 @@ export default function Franchise() {
     message: '',
   });
   const [submitted, setSubmitted] = useState(false);
+  const [submitError, setSubmitError] = useState('');
 
   useEffect(() => {
     let active = true;
@@ -46,20 +48,22 @@ export default function Franchise() {
     };
   }, []);
 
-  const phone = gymSettings?.contact_phone?.replace(/\D/g, '') || '';
-  const internationalNumber = phone.length === 10 ? `91${phone}` : phone;
+  const internationalNumber = getWhatsAppNumber(gymSettings?.contact_phone);
+  const enquiryMessage = encodeURIComponent(
+    `Hello Heaven Gym Team,\n\nI am enquiring about a franchise and gym business partnership:\nName: ${formData.name}\nPhone: ${formData.phone}\nEmail: ${formData.email}\nCity: ${formData.city}\nEstimated Investment: ${formData.investmentRange}\nExperience: ${formData.gymExperience}\nNotes: ${formData.message}`
+  );
+  const whatsappUrl = internationalNumber
+    ? `https://wa.me/${internationalNumber}?text=${enquiryMessage}`
+    : '';
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    setSubmitted(true);
-
-    // If WhatsApp available, open pre-filled enquiry
-    if (internationalNumber) {
-      const text = encodeURIComponent(
-        `Hello Heaven Gym Team,\n\nI am submitting a Franchise & Gym Business Enquiry:\nName: ${formData.name}\nPhone: ${formData.phone}\nEmail: ${formData.email}\nCity: ${formData.city}\nEstimated Investment: ${formData.investmentRange}\nExperience: ${formData.gymExperience}\nNotes: ${formData.message}`
-      );
-      window.open(`https://wa.me/${internationalNumber}?text=${text}`, '_blank');
+    setSubmitError('');
+    if (!internationalNumber) {
+      setSubmitError('WhatsApp contact is not configured yet. Please call or email Heaven Gym instead.');
+      return;
     }
+    setSubmitted(true);
   };
 
   const PILLARS = [
@@ -228,7 +232,7 @@ export default function Franchise() {
                 Submit Partnership Application
               </h3>
               <p className="mt-1 text-xs text-surface-400">
-                Fill out the form below. An authorized representative will get in touch within 24–48 hours.
+                Complete the details below. WhatsApp will open with your enquiry ready for you to review and send.
               </p>
 
               {submitted ? (
@@ -236,14 +240,22 @@ export default function Franchise() {
                   <ShieldCheck size={36} className="mx-auto text-emerald-400 mb-2" />
                   <h4 className="font-display text-lg font-bold text-white">Enquiry Prepared!</h4>
                   <p className="mt-1 text-xs text-surface-300">
-                    Your enquiry details have been forwarded to our corporate concierge team.
+                    Your enquiry message is ready in WhatsApp. Review the details and press Send to deliver it to Heaven Gym. The gym has not received it until you send the message.
                   </p>
+                  <a
+                    href={whatsappUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-4 inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-5 py-3 text-xs font-bold uppercase tracking-wider text-white hover:bg-emerald-500"
+                  >
+                    <MessageCircle size={15} /> Continue to WhatsApp
+                  </a>
                   <button
                     type="button"
-                    onClick={() => setSubmitted(false)}
+                    onClick={() => { setSubmitted(false); setSubmitError(''); }}
                     className="mt-4 inline-flex items-center gap-1.5 text-xs font-mono font-bold uppercase text-brand-400"
                   >
-                    Send another enquiry &rarr;
+                    Edit enquiry &rarr;
                   </button>
                 </div>
               ) : (
@@ -354,6 +366,7 @@ export default function Franchise() {
                     />
                   </label>
 
+                  {submitError && <p role="alert" className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-3 text-xs text-amber-200">{submitError}</p>}
                   <button
                     type="submit"
                     className="w-full flex items-center justify-center gap-2 rounded-xl bg-brand-600 px-6 py-3.5 text-xs font-mono font-bold uppercase tracking-wider text-white shadow-xl shadow-brand-600/30 hover:bg-brand-500 transition active:scale-95"
