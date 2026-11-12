@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   ArrowRight,
   Check,
@@ -18,6 +18,7 @@ import Button from '@/components/ui/Button';
 import ScrollReveal from '@/components/public/ScrollReveal';
 import ImageLightbox from '@/components/public/ImageLightbox';
 import SectionDivider from '@/components/public/SectionDivider';
+import api from '@/services/apiClient';
 
 const ENVIRONMENT_IMAGES = [
   {
@@ -66,6 +67,15 @@ const BRAND_VALUES = [
 export default function About() {
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [currentIdx, setCurrentIdx] = useState(0);
+  const [openingHours, setOpeningHours] = useState('');
+
+  useEffect(() => {
+    let active = true;
+    api.get('/gym-settings').then(({ data }) => {
+      if (active) setOpeningHours(data?.opening_hours || '');
+    }).catch(() => {});
+    return () => { active = false; };
+  }, []);
 
   const openLightbox = (index) => {
     setCurrentIdx(index);
@@ -132,8 +142,8 @@ export default function About() {
 
                 <div className="mt-8 flex items-center gap-4">
                   <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4 text-center min-w-[120px]">
-                    <p className="font-display text-2xl font-bold text-brand-400">5:00 AM</p>
-                    <p className="text-[11px] text-surface-400 uppercase tracking-wider font-mono">Daily Doors Open</p>
+                    <p className="font-display text-lg font-bold leading-tight text-brand-400">{openingHours || 'Ask us'}</p>
+                    <p className="mt-1 text-[11px] text-surface-400 uppercase tracking-wider font-mono">Current Opening Hours</p>
                   </div>
                   <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4 text-center min-w-[120px]">
                     <p className="font-display text-2xl font-bold text-white">Zero</p>
