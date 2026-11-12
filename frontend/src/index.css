@@ -458,7 +458,12 @@ button, input, select, textarea { font: inherit; }
   }
 
   .admin-shell .admin-content .admin-data-table button {
-    white-space: nowrap;
+    max-width: 100%;
+    min-width: 0;
+    padding-left: 8px;
+    padding-right: 8px;
+    white-space: normal;
+    line-height: 1.25;
   }
 
   .admin-shell .admin-content .overflow-x-auto > table:not(.admin-data-table) {
