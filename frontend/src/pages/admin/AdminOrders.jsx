@@ -18,12 +18,13 @@ export default function AdminOrders() {
   const [query, setQuery] = useState('');
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [statusFilter, setStatusFilter] = useState('all');
+  const [orderBucket, setOrderBucket] = useState('active');
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
 
   useEffect(() => {
-    dispatch(fetchAllOrders({ search: query, status: statusFilter, page, limit }));
-  }, [dispatch, query, statusFilter, page, limit]);
+    dispatch(fetchAllOrders({ search: query, status: statusFilter, bucket: orderBucket, page, limit }));
+  }, [dispatch, query, statusFilter, orderBucket, page, limit]);
 
   const totalPages = Math.max(1, Number(adminPagination?.pages) || 1);
   const totalOrders = Number(adminPagination?.total) || 0;
@@ -58,6 +59,14 @@ export default function AdminOrders() {
       <div>
         <h1 className="font-display text-2xl font-bold text-ink-950 dark:text-white">Orders</h1>
         <p className="mt-1 text-sm text-surface-500">Manage supplement store orders</p>
+      </div>
+
+      <div className="flex flex-wrap gap-2" role="tablist" aria-label="Order categories">
+        {[{ id: 'active', label: 'Active Orders' }, { id: 'completed', label: 'Completed' }, { id: 'cancelled', label: 'Cancelled' }].map((tab) => (
+          <button key={tab.id} type="button" role="tab" aria-selected={orderBucket === tab.id}
+            onClick={() => { setOrderBucket(tab.id); setStatusFilter('all'); setPage(1); }}
+            className={`rounded-xl px-4 py-2.5 text-sm font-semibold transition ${orderBucket === tab.id ? 'bg-brand-600 text-white' : 'border border-surface-200 bg-white text-surface-600 dark:border-surface-700 dark:bg-surface-900 dark:text-surface-300'}`}>{tab.label}</button>
+        ))}
       </div>
 
       <Card>
