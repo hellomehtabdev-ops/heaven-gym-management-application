@@ -13,6 +13,8 @@ import About from '@/pages/public/About';
 import Membership from '@/pages/public/Membership';
 import Contact from '@/pages/public/Contact';
 import Store from '@/pages/public/Store';
+import GymEquipment from '@/pages/public/GymEquipment';
+import GymEquipmentDetails from '@/pages/public/GymEquipmentDetails';
 import Login from '@/pages/auth/Login';
 import Register from '@/pages/auth/Register';
 import VerifyEmail from '@/pages/auth/VerifyEmail';
@@ -42,6 +44,7 @@ import AdminPayments from '@/pages/admin/AdminPayments';
 import AdminBodyMeasurements from '@/pages/admin/AdminBodyMeasurements';
 import AdminMemberMeasurements from '@/pages/admin/AdminMemberMeasurements';
 import AdminProducts from '@/pages/admin/AdminProducts';
+import AdminGymEquipment from '@/pages/admin/AdminGymEquipment';
 import AdminOrders from '@/pages/admin/AdminOrders';
 import AdminSupplementSelling from '@/pages/admin/AdminSupplementSelling';
 import AdminSupplementSellingDetails from '@/pages/admin/AdminSupplementSellingDetails';
@@ -63,6 +66,8 @@ export default function App() {
           <Route path="/" element={<Home />} /><Route path="/about" element={<About />} />
           <Route path="/membership" element={<Membership />} /><Route path="/store" element={<Store />} />
           <Route path="/contact" element={<Contact />} />
+          <Route path="/gym-equipment" element={<GymEquipment />} />
+          <Route path="/gym-equipment/:slug" element={<GymEquipmentDetails />} />
         </Route>
         <Route path="/login" element={<GuestRoute><Login /></GuestRoute>} />
         <Route path="/register" element={<GuestRoute><Register /></GuestRoute>} />
@@ -84,7 +89,8 @@ export default function App() {
           <Route path="users" element={<AdminUsers />} /><Route path="admissions" element={<AdminAdmissions />} />
           <Route path="membership-plans" element={<AdminMembershipPlans />} /><Route path="memberships" element={<AdminMemberships />} />
           <Route path="payments" element={<AdminPayments />} /><Route path="body-measurements" element={<AdminBodyMeasurements />} /><Route path="body-measurements/:userId" element={<AdminMemberMeasurements />} />
-          <Route path="products" element={<AdminProducts />} /><Route path="orders" element={<AdminOrders />} />
+          <Route path="products" element={<AdminProducts />} />
+          <Route path="gym-equipment" element={<AdminGymEquipment />} /><Route path="orders" element={<AdminOrders />} />
           <Route path="supplement-selling" element={<AdminSupplementSelling />} />
           <Route path="supplement-selling/:id" element={<AdminSupplementSellingDetails />} />
           <Route path="supplement-selling/bill/:id" element={<AdminSupplementBill />} />
