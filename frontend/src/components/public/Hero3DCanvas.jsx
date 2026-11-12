@@ -1,59 +1,80 @@
-import React, { useRef, useMemo, Suspense } from 'react';
+import React, { useRef, useMemo, useState, useEffect, Suspense } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { Float, Sparkles } from '@react-three/drei';
 import * as THREE from 'three';
 
-// 3D Metallic Gym Monogram / Interlocking Strength Rings
-function SculptedInsignia() {
-  const outerRingRef = useRef();
+/**
+ * Checks whether WebGL is supported by the client browser.
+ */
+function isWebGLSupported() {
+  if (typeof window === 'undefined') return true;
+  try {
+    const canvas = document.createElement('canvas');
+    return Boolean(
+      window.WebGLRenderingContext &&
+        (canvas.getContext('webgl') || canvas.getContext('experimental-webgl'))
+    );
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * 3D Sculpted Olympic Barbell Weight Plate & Strength Crest
+ * Communicates authentic gym strength, precision engineering, and luxury fitness.
+ */
+function OlympicStrengthPlate({ isMobile = false }) {
+  const mainPlateRef = useRef();
   const innerRingRef = useRef();
-  const coreHubRef = useRef();
+  const centerHubRef = useRef();
 
   useFrame((state, delta) => {
     const t = state.clock.getElapsedTime();
 
-    if (outerRingRef.current) {
-      outerRingRef.current.rotation.x = 0.4 + Math.sin(t * 0.4) * 0.15;
-      outerRingRef.current.rotation.y += delta * 0.25;
-      outerRingRef.current.rotation.z = Math.cos(t * 0.3) * 0.1;
+    // Smooth rotational drifting of the main Olympic plate
+    if (mainPlateRef.current) {
+      mainPlateRef.current.rotation.x = 0.35 + Math.sin(t * 0.35) * 0.1;
+      mainPlateRef.current.rotation.y += delta * 0.22;
+      mainPlateRef.current.rotation.z = Math.cos(t * 0.25) * 0.08;
     }
 
+    // Counter-rotating calibrated inner gold ring
     if (innerRingRef.current) {
-      innerRingRef.current.rotation.x = -0.3 + Math.cos(t * 0.35) * 0.15;
-      innerRingRef.current.rotation.y -= delta * 0.35;
-      innerRingRef.current.rotation.z = Math.sin(t * 0.25) * 0.12;
+      innerRingRef.current.rotation.x = -0.25 + Math.cos(t * 0.3) * 0.12;
+      innerRingRef.current.rotation.y -= delta * 0.28;
     }
 
-    if (coreHubRef.current) {
-      coreHubRef.current.rotation.y += delta * 0.5;
-      coreHubRef.current.position.y = Math.sin(t * 0.8) * 0.08;
+    // Subtle breathing pulse of center Olympic sleeve hub
+    if (centerHubRef.current) {
+      centerHubRef.current.rotation.y += delta * 0.4;
+      centerHubRef.current.position.y = Math.sin(t * 0.7) * 0.06;
     }
 
-    // Interactive mouse cursor parallax tilt
-    if (state.pointer) {
+    // Subtle pointer parallax tilt on desktop
+    if (!isMobile && state.pointer) {
       state.camera.position.x = THREE.MathUtils.lerp(
         state.camera.position.x,
-        state.pointer.x * 0.6,
-        0.05
+        state.pointer.x * 0.45,
+        0.04
       );
       state.camera.position.y = THREE.MathUtils.lerp(
         state.camera.position.y,
-        state.pointer.y * 0.4,
-        0.05
+        state.pointer.y * 0.3,
+        0.04
       );
       state.camera.lookAt(0, 0, 0);
     }
   });
 
-  // Materials: Deep Gunmetal and Brushed Metallic Gold
+  // Premium Materials: Brushed Metallic Gold & Matte Gunmetal Steel
   const goldMaterial = useMemo(
     () =>
       new THREE.MeshStandardMaterial({
         color: new THREE.Color('#d4af37'),
-        metalness: 0.95,
-        roughness: 0.22,
+        metalness: 0.92,
+        roughness: 0.24,
         emissive: new THREE.Color('#382806'),
-        emissiveIntensity: 0.25,
+        emissiveIntensity: 0.2,
       }),
     []
   );
@@ -61,9 +82,9 @@ function SculptedInsignia() {
   const gunmetalMaterial = useMemo(
     () =>
       new THREE.MeshStandardMaterial({
-        color: new THREE.Color('#1c202a'),
-        metalness: 0.9,
-        roughness: 0.3,
+        color: new THREE.Color('#141720'),
+        metalness: 0.88,
+        roughness: 0.32,
       }),
     []
   );
@@ -75,82 +96,110 @@ function SculptedInsignia() {
         metalness: 0.85,
         roughness: 0.25,
         emissive: new THREE.Color('#7f1d1d'),
-        emissiveIntensity: 0.3,
+        emissiveIntensity: 0.25,
       }),
     []
   );
 
+  const radialSegments = isMobile ? 36 : 64;
+
   return (
     <group position={[0, 0, 0]}>
-      {/* Outer Calibrated Torus */}
-      <mesh ref={outerRingRef} material={goldMaterial}>
-        <torusGeometry args={[2.0, 0.07, 32, 100]} />
-      </mesh>
-
-      {/* Counter-rotating Inner Heavy Ring */}
-      <mesh ref={innerRingRef} material={gunmetalMaterial}>
-        <torusGeometry args={[1.5, 0.09, 32, 100]} />
-      </mesh>
-
-      {/* Floating Central Core Monogram / Octahedron Crest */}
-      <group ref={coreHubRef}>
-        <mesh material={crimsonAccentMaterial}>
-          <octahedronGeometry args={[0.7, 0]} />
+      {/* 1. Main Calibrated Olympic Plate Body */}
+      <group ref={mainPlateRef}>
+        {/* Outer Heavy Steel Rim */}
+        <mesh material={gunmetalMaterial}>
+          <cylinderGeometry args={[2.3, 2.3, 0.16, radialSegments]} />
         </mesh>
 
-        {/* High-tension accent collar */}
-        <mesh material={goldMaterial} rotation={[Math.PI / 2, 0, 0]}>
-          <cylinderGeometry args={[0.3, 0.3, 0.8, 32]} />
+        {/* Raised Outer Edge Ring (Plate Flange) */}
+        <mesh material={goldMaterial}>
+          <torusGeometry args={[2.25, 0.08, 16, radialSegments]} />
+        </mesh>
+
+        {/* Inner Recessed Weight Channel */}
+        <mesh material={gunmetalMaterial} position={[0, 0, 0]}>
+          <cylinderGeometry args={[1.7, 1.7, 0.12, radialSegments]} />
+        </mesh>
+
+        {/* Dual Ergonomic Hand-Grip Cutout Inserts */}
+        <mesh material={goldMaterial} position={[1.25, 0, 0]}>
+          <torusGeometry args={[0.32, 0.04, 12, 24]} />
+        </mesh>
+        <mesh material={goldMaterial} position={[-1.25, 0, 0]}>
+          <torusGeometry args={[0.32, 0.04, 12, 24]} />
         </mesh>
       </group>
 
-      {/* Orbiting Satellite Floating Plates */}
-      <Float speed={2} rotationIntensity={1.2} floatIntensity={1.5}>
-        <mesh position={[2.8, 1.2, -1.2]} material={goldMaterial}>
-          <cylinderGeometry args={[0.5, 0.5, 0.08, 32]} />
+      {/* 2. Counter-Rotating Precision Calibrated Gold Ring */}
+      <mesh ref={innerRingRef} material={goldMaterial}>
+        <torusGeometry args={[1.45, 0.06, 16, radialSegments]} />
+      </mesh>
+
+      {/* 3. Center Olympic Barbell Sleeve Collar Hub */}
+      <group ref={centerHubRef}>
+        {/* Central Olympic Barbell Sleeve Hub */}
+        <mesh material={goldMaterial} rotation={[Math.PI / 2, 0, 0]}>
+          <cylinderGeometry args={[0.42, 0.42, 0.32, radialSegments]} />
+        </mesh>
+
+        {/* Knurled Collar Ring Accent */}
+        <mesh material={crimsonAccentMaterial} rotation={[Math.PI / 2, 0, 0]}>
+          <cylinderGeometry args={[0.48, 0.48, 0.08, radialSegments]} />
+        </mesh>
+
+        {/* Core Insignia Emblem Accent */}
+        <mesh material={goldMaterial} position={[0, 0, 0.18]}>
+          <boxGeometry args={[0.22, 0.22, 0.04]} />
+        </mesh>
+      </group>
+
+      {/* 4. Satellite Floating Dumbbell Plates */}
+      <Float speed={1.8} rotationIntensity={0.8} floatIntensity={1.2}>
+        <mesh position={[2.7, 1.3, -1.0]} material={goldMaterial}>
+          <cylinderGeometry args={[0.48, 0.48, 0.07, isMobile ? 24 : 36]} />
         </mesh>
       </Float>
 
-      <Float speed={1.7} rotationIntensity={1.5} floatIntensity={1.8}>
-        <mesh position={[-2.7, -1.1, -0.8]} material={gunmetalMaterial}>
-          <cylinderGeometry args={[0.65, 0.65, 0.1, 32]} />
+      <Float speed={1.5} rotationIntensity={1.0} floatIntensity={1.4}>
+        <mesh position={[-2.6, -1.2, -0.8]} material={gunmetalMaterial}>
+          <cylinderGeometry args={[0.55, 0.55, 0.09, isMobile ? 24 : 36]} />
         </mesh>
       </Float>
 
-      <Float speed={2.4} rotationIntensity={0.8} floatIntensity={1.2}>
-        <mesh position={[-2.2, 1.6, -1.5]} material={crimsonAccentMaterial}>
-          <torusGeometry args={[0.4, 0.05, 16, 32]} />
-        </mesh>
-      </Float>
-
-      <Float speed={1.9} rotationIntensity={1.1} floatIntensity={1.4}>
-        <mesh position={[2.4, -1.4, -1.0]} material={goldMaterial}>
-          <octahedronGeometry args={[0.35, 0]} />
+      <Float speed={2.0} rotationIntensity={0.6} floatIntensity={1.0}>
+        <mesh position={[-2.1, 1.5, -1.2]} material={crimsonAccentMaterial}>
+          <torusGeometry args={[0.36, 0.05, 12, isMobile ? 24 : 32]} />
         </mesh>
       </Float>
     </group>
   );
 }
 
-// Cinematic particle dust
-function AtmosphericEmbers() {
+/**
+ * Atmospheric embers drifting with gold and warm amber glow
+ */
+function AtmosphericEmbers({ isMobile = false }) {
   return (
     <Sparkles
-      count={120}
-      scale={[10, 8, 8]}
-      size={2.5}
-      speed={0.4}
-      opacity={0.65}
+      count={isMobile ? 35 : 90}
+      scale={[8, 7, 7]}
+      size={isMobile ? 2.0 : 2.6}
+      speed={0.35}
+      opacity={0.6}
       color="#e6c66e"
     />
   );
 }
 
-// Fallback when WebGL is loading or unavailable
+/**
+ * Lightweight luxury fallback displayed when WebGL is unsupported, disabled,
+ * or when the user prefers reduced motion.
+ */
 function FallbackCanvas() {
   return (
-    <div className="absolute inset-0 flex items-center justify-center bg-radial from-brand-950/20 via-black to-black">
-      <div className="h-72 w-72 rounded-full border border-brand-500/20 bg-brand-500/5 blur-3xl animate-pulse" />
+    <div className="absolute inset-0 flex items-center justify-center bg-radial from-brand-950/25 via-[#050608] to-[#050608]">
+      <div className="h-64 w-64 sm:h-80 sm:w-80 rounded-full border border-amber-500/20 bg-gradient-to-tr from-amber-500/10 via-brand-500/5 to-transparent blur-3xl animate-pulse" />
     </div>
   );
 }
@@ -163,6 +212,9 @@ class ErrorBoundary extends React.Component {
   static getDerivedStateFromError() {
     return { hasError: true };
   }
+  componentDidCatch() {
+    // Graceful degradation when Three.js fails or WebGL context is lost
+  }
   render() {
     if (this.state.hasError) return <FallbackCanvas />;
     return this.props.children;
@@ -170,37 +222,64 @@ class ErrorBoundary extends React.Component {
 }
 
 export default function Hero3DCanvas({ className = '' }) {
+  const [supported, setSupported] = useState(true);
+  const [reducedMotion, setReducedMotion] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    setSupported(isWebGLSupported());
+
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+    setReducedMotion(mq.matches);
+    const handler = (e) => setReducedMotion(e.matches);
+    mq.addEventListener?.('change', handler);
+
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile, { passive: true });
+
+    return () => {
+      mq.removeEventListener?.('change', handler);
+      window.removeEventListener('resize', checkMobile);
+    };
+  }, []);
+
+  if (!supported || reducedMotion) {
+    return <FallbackCanvas />;
+  }
+
   return (
     <div className={`relative h-full w-full pointer-events-none select-none ${className}`}>
       <ErrorBoundary>
         <Suspense fallback={<FallbackCanvas />}>
           <Canvas
-            camera={{ position: [0, 0, 6.8], fov: 45 }}
-            dpr={[1, 1.5]}
+            camera={{ position: [0, 0, isMobile ? 7.6 : 6.6], fov: 45 }}
+            dpr={isMobile ? [1, 1.25] : [1, 1.75]}
             gl={{
-              antialias: true,
+              antialias: !isMobile,
               powerPreference: 'high-performance',
               alpha: true,
+              depth: true,
             }}
-            className="h-full w-full"
+            className="h-full w-full pointer-events-none"
           >
-            {/* Ambient Base Light */}
-            <ambientLight intensity={0.6} />
+            {/* Ambient Lighting */}
+            <ambientLight intensity={0.65} />
 
             {/* Warm Metallic Gold Key Light */}
             <pointLight position={[6, 4, 5]} intensity={18} color="#f6d365" distance={15} />
 
-            {/* Crimson Fill Light */}
-            <pointLight position={[-6, -3, 3]} intensity={22} color="#dc2626" distance={15} />
+            {/* Crimson Contrast Fill Light */}
+            <pointLight position={[-6, -3, 3]} intensity={20} color="#dc2626" distance={15} />
 
-            {/* Subtle Cyan Rim Highlight */}
-            <directionalLight position={[0, 6, -3]} intensity={3.5} color="#60a5fa" />
+            {/* Subtle Metallic Specular Rim Highlight */}
+            <directionalLight position={[0, 6, -3]} intensity={3} color="#93c5fd" />
 
-            {/* 3D Insignia and Orbiting Weight Objects */}
-            <SculptedInsignia />
+            {/* 3D Olympic Weight Plate & Calibrated Rings */}
+            <OlympicStrengthPlate isMobile={isMobile} />
 
             {/* Atmospheric Drifting Embers */}
-            <AtmosphericEmbers />
+            <AtmosphericEmbers isMobile={isMobile} />
           </Canvas>
         </Suspense>
       </ErrorBoundary>

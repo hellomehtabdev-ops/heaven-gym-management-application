@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
   Activity,
   ArrowRight,
@@ -41,6 +41,7 @@ import Card3D from '@/components/public/Card3D';
 import Hero3DCanvas from '@/components/public/Hero3DCanvas';
 import TransformationShowcase from '@/components/public/TransformationShowcase';
 import BeforeAfterSlider from '@/components/public/BeforeAfterSlider';
+import { useGsapContext, animateStaggerCards, animateHeroSequence } from '@/utils/gsapAnimation';
 import { fetchMembershipPlans } from '@/redux/slices/membershipPlanSlice';
 import { fetchProducts } from '@/redux/slices/productSlice';
 import { gymEquipmentService } from '@/services/gymEquipmentService';
@@ -54,6 +55,14 @@ export default function Home() {
 
   const [gymSettings, setGymSettings] = useState(null);
   const [equipmentList, setEquipmentList] = useState([]);
+  const homeRef = useRef(null);
+  const heroRef = useRef(null);
+
+  useGsapContext(homeRef, () => {
+    animateHeroSequence(heroRef.current);
+    animateStaggerCards(homeRef.current, '.facility-preview-card', { y: 35, stagger: 0.12 });
+    animateStaggerCards(homeRef.current, '.coach-card', { y: 35, stagger: 0.12 });
+  });
 
   useEffect(() => {
     dispatch(fetchMembershipPlans());
@@ -79,11 +88,11 @@ export default function Home() {
   };
 
   return (
-    <div className="bg-[#050608] text-white selection:bg-brand-500 selection:text-white overflow-hidden">
+    <div ref={homeRef} className="bg-[#050608] text-white selection:bg-brand-500 selection:text-white overflow-hidden">
       {/* =========================================================================
           SECTION 01 — CINEMATIC HERO / FRONT PAGE ADVERTISEMENT
           ========================================================================= */}
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-28 pb-16 lg:pt-36 lg:pb-24">
+      <section ref={heroRef} className="relative min-h-screen flex items-center justify-center overflow-hidden pt-28 pb-16 lg:pt-36 lg:pb-24">
         {/* Background Atmosphere Image with Cinematic Grade */}
         <div className="absolute inset-0 z-0">
           <img
@@ -102,65 +111,55 @@ export default function Home() {
 
         {/* Hero Content Overlay */}
         <div className="relative z-20 mx-auto max-w-7xl px-5 lg:px-8 text-center flex flex-col items-center">
-          <ScrollReveal animation="fade-down">
-            <div className="inline-flex items-center gap-2.5 rounded-full border border-amber-500/30 bg-black/60 px-5 py-2 text-xs font-mono font-bold uppercase tracking-[0.25em] text-amber-300 backdrop-blur-xl shadow-2xl">
-              <Sparkles size={14} className="text-amber-400" />
-              The Luxury Fitness Standard
-            </div>
-          </ScrollReveal>
+          <div className="hero-badge inline-flex items-center gap-2.5 rounded-full border border-amber-500/30 bg-black/60 px-5 py-2 text-xs font-mono font-bold uppercase tracking-[0.25em] text-amber-300 backdrop-blur-xl shadow-2xl">
+            <Sparkles size={14} className="text-amber-400" />
+            The Luxury Fitness Standard
+          </div>
 
-          <ScrollReveal animation="fade-up" delay={150}>
-            <h1 className="mt-8 font-display text-[27px] sm:text-5xl md:text-6xl lg:text-8xl font-black tracking-tight leading-[1.1] sm:leading-[1.05] text-white max-w-5xl break-words">
-              BUILD STRENGTH. <br />
-              <span className="bg-gradient-to-r from-white via-surface-100 to-amber-200 bg-clip-text text-transparent">
-                DISCOVER YOUR POTENTIAL.
-              </span>
-            </h1>
-          </ScrollReveal>
+          <h1 className="hero-title mt-8 font-display text-[27px] sm:text-5xl md:text-6xl lg:text-8xl font-black tracking-tight leading-[1.1] sm:leading-[1.05] text-white max-w-5xl break-words">
+            BUILD STRENGTH. <br />
+            <span className="bg-gradient-to-r from-white via-surface-100 to-amber-200 bg-clip-text text-transparent">
+              DISCOVER YOUR POTENTIAL.
+            </span>
+          </h1>
 
-          <ScrollReveal animation="fade-up" delay={250}>
-            <p className="mt-6 max-w-2xl text-base sm:text-lg md:text-xl text-surface-300 font-light leading-relaxed">
-              More than a place to train. A space designed to help you move better, grow stronger, and build a healthier lifestyle.
-            </p>
-          </ScrollReveal>
+          <p className="hero-desc mt-6 max-w-2xl text-base sm:text-lg md:text-xl text-surface-300 font-light leading-relaxed">
+            More than a place to train. A space designed to help you move better, grow stronger, and build a healthier lifestyle.
+          </p>
 
-          <ScrollReveal animation="fade-up" delay={350}>
-            <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
-              <Link to="/membership">
-                <Button
-                  size="lg"
-                  className="bg-brand-600 hover:bg-brand-500 text-white text-xs sm:text-sm font-mono font-bold uppercase tracking-widest px-8 py-4 rounded-full shadow-2xl shadow-brand-600/40 border border-brand-400/30 active:scale-95 transition-all"
-                >
-                  Explore Membership <ArrowRight size={16} className="ml-2" />
-                </Button>
-              </Link>
+          <div className="hero-cta mt-10 flex flex-wrap items-center justify-center gap-4">
+            <Link to="/membership">
+              <Button
+                size="lg"
+                className="bg-brand-600 hover:bg-brand-500 text-white text-xs sm:text-sm font-mono font-bold uppercase tracking-widest px-8 py-4 rounded-full shadow-2xl shadow-brand-600/40 border border-brand-400/30 active:scale-95 transition-all"
+              >
+                Explore Membership <ArrowRight size={16} className="ml-2" />
+              </Button>
+            </Link>
 
-              <Link to="/facilities">
-                <Button
-                  variant="outline"
-                  size="lg"
-                  className="border-white/20 bg-white/[0.03] text-white hover:border-amber-400 hover:bg-amber-400/10 text-xs sm:text-sm font-mono font-bold uppercase tracking-widest px-8 py-4 rounded-full backdrop-blur-md active:scale-95 transition-all"
-                >
-                  Explore Our Facilities
-                </Button>
-              </Link>
-            </div>
-          </ScrollReveal>
+            <Link to="/facilities">
+              <Button
+                variant="outline"
+                size="lg"
+                className="border-white/20 bg-white/[0.03] text-white hover:border-amber-400 hover:bg-amber-400/10 text-xs sm:text-sm font-mono font-bold uppercase tracking-widest px-8 py-4 rounded-full backdrop-blur-md active:scale-95 transition-all"
+              >
+                Explore Our Facilities
+              </Button>
+            </Link>
+          </div>
 
           {/* Verification Watermark Badges */}
-          <ScrollReveal animation="fade-up" delay={450}>
-            <div className="mt-16 flex flex-wrap items-center justify-center gap-6 sm:gap-10 text-xs font-mono text-surface-400 border-t border-white/10 pt-6">
-              <span className="flex items-center gap-2">
-                <ShieldCheck size={16} className="text-emerald-400" /> Clinical Hygiene
-              </span>
-              <span className="flex items-center gap-2">
-                <Dumbbell size={16} className="text-amber-400" /> Calibrated Olympic Gear
-              </span>
-              <span className="flex items-center gap-2">
-                <Clock size={16} className="text-brand-400" /> Open Daily 5 AM – 10 PM
-              </span>
-            </div>
-          </ScrollReveal>
+          <div className="hero-cta mt-16 flex flex-wrap items-center justify-center gap-6 sm:gap-10 text-xs font-mono text-surface-400 border-t border-white/10 pt-6">
+            <span className="flex items-center gap-2">
+              <ShieldCheck size={16} className="text-emerald-400" /> Pristine Hygiene Standards
+            </span>
+            <span className="flex items-center gap-2">
+              <Dumbbell size={16} className="text-amber-400" /> Precision Strength Equipment
+            </span>
+            <span className="flex items-center gap-2">
+              <Clock size={16} className="text-brand-400" /> Open Daily 5 AM – 10 PM
+            </span>
+          </div>
         </div>
       </section>
 
@@ -209,45 +208,50 @@ export default function Home() {
                 sub: 'Calibrated Olympic Lifting',
                 src: 'https://images.unsplash.com/photo-1540497077202-7c8a3999166f?auto=format&fit=crop&w=1000&q=80',
                 link: '/facilities#strength',
+                alt: 'Strength training floor with Olympic power racks and barbells',
               },
               {
                 title: 'Thermal Steam & Sauna',
-                sub: 'Vasodilation & Cellular Flush',
+                sub: 'Muscular Recovery & Relaxation',
                 src: 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=1000&q=80',
                 link: '/facilities#steam',
+                alt: 'Thermal steam recovery and relaxation suite',
               },
               {
                 title: 'High-Impact Cardio Deck',
                 sub: 'Curved Slat & Air Ergometers',
                 src: 'https://images.unsplash.com/photo-1574680096145-d05b474e2155?auto=format&fit=crop&w=1000&q=80',
                 link: '/facilities#cardio',
+                alt: 'Cardio conditioning deck with rowers and curved treadmills',
               },
             ].map((f) => (
-              <Card3D key={f.title} className="h-full">
-                <Link
-                  to={f.link}
-                  className="group relative block aspect-[4/5] overflow-hidden rounded-3xl border border-white/10 bg-[#0e1017] shadow-2xl"
-                >
-                  <img
-                    src={f.src}
-                    alt={f.title}
-                    loading="lazy"
-                    className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-108 filter brightness-85 contrast-110"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent" />
-                  <div className="absolute bottom-6 left-6 right-6">
-                    <p className="text-[11px] font-mono uppercase tracking-widest text-amber-400">
-                      {f.sub}
-                    </p>
-                    <h3 className="mt-1 font-display text-2xl font-bold text-white group-hover:text-amber-300 transition-colors">
-                      {f.title}
-                    </h3>
-                    <span className="mt-3 inline-flex items-center gap-1.5 text-xs font-mono font-bold uppercase text-surface-300 group-hover:text-white">
-                      Discover Details &rarr;
-                    </span>
-                  </div>
-                </Link>
-              </Card3D>
+              <div key={f.title} className="facility-preview-card h-full">
+                <Card3D className="h-full">
+                  <Link
+                    to={f.link}
+                    className="group relative block aspect-[4/5] overflow-hidden rounded-3xl border border-white/10 bg-[#0e1017] shadow-2xl"
+                  >
+                    <img
+                      src={f.src}
+                      alt={f.alt}
+                      loading="lazy"
+                      className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-108 filter brightness-85 contrast-110"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent" />
+                    <div className="absolute bottom-6 left-6 right-6">
+                      <p className="text-[11px] font-mono uppercase tracking-widest text-amber-400">
+                        {f.sub}
+                      </p>
+                      <h3 className="mt-1 font-display text-2xl font-bold text-white group-hover:text-amber-300 transition-colors">
+                        {f.title}
+                      </h3>
+                      <span className="mt-3 inline-flex items-center gap-1.5 text-xs font-mono font-bold uppercase text-surface-300 group-hover:text-white">
+                        Discover Details &rarr;
+                      </span>
+                    </div>
+                  </Link>
+                </Card3D>
+              </div>
             ))}
           </div>
         </div>
@@ -335,18 +339,18 @@ export default function Home() {
                   Pure Cleanliness
                 </span>
                 <h2 className="mt-3 font-display text-2xl sm:text-4xl lg:text-5xl font-black text-white leading-tight break-words">
-                  CLINICAL-GRADE HYGIENE & <br />
+                  METICULOUS HYGIENE & <br />
                   <span className="text-surface-100">LUXURY ATMOSPHERE.</span>
                 </h2>
                 <p className="mt-5 text-sm sm:text-base text-surface-300 leading-relaxed">
-                  We believe workout spaces should feel inspiring, pristine, and clean. Heaven Gym maintains continuous medical-grade HEPA air filtration, scheduled hourly machine deep-wiping, and touchless sanitizing stations throughout every zone.
+                  We believe workout spaces should feel inspiring, pristine, and clean. Heaven Gym maintains high-volume air filtration, commercial climate control ventilation, and scheduled machine deep-wiping throughout every zone.
                 </p>
 
                 <div className="mt-8 space-y-3">
                   {[
                     'Hourly Deep Sanitization Cycles by Dedicated Staff',
-                    'Continuous Medical-Grade HEPA Air Purification',
-                    'Zero-Tolerance Odor Climate Control Regulation',
+                    'High-Volume Air Filtration & Circulation System',
+                    'Dedicated Climate Control & Odor Management',
                     'Impeccably Sanitized Private Showers & Lockers',
                   ].map((item) => (
                     <div key={item} className="flex items-center gap-3 text-xs sm:text-sm text-surface-200">
@@ -396,49 +400,57 @@ export default function Home() {
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {[
               {
-                name: 'Karan Mehra',
-                role: 'Head of Strength & Biomechanics',
-                spec: 'Powerlifting & Hypertrophy Protocols',
+                title: 'Strength & Biomechanics Specialist',
+                role: 'Senior Floor Coach',
+                spec: 'Barbell Form, Powerlifting & Progressive Overload',
                 img: 'https://images.unsplash.com/photo-1567013127542-490d757e51fc?auto=format&fit=crop&w=800&q=80',
+                alt: 'Certified strength and barbell technique coach',
               },
               {
-                name: 'Aarti Deshmukh',
-                role: 'Senior Mobility & Conditioning Coach',
-                spec: 'Joint Longevity & Athletic Movement',
+                title: 'Mobility & Conditioning Specialist',
+                role: 'Athletic Movement Coach',
+                spec: 'Joint Mobility, Posture & Injury Prevention',
                 img: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?auto=format&fit=crop&w=800&q=80',
+                alt: 'Certified mobility and functional athletic movement coach',
               },
               {
-                name: 'Rohan Verma',
-                role: 'Functional Endurance & HYROX Coach',
-                spec: 'High-Work Capacity & Sled Conditioning',
+                title: 'Functional Performance Coach',
+                role: 'High-Work Capacity Coach',
+                spec: 'Metabolic Conditioning, Turf Drills & Endurance',
                 img: 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&w=800&q=80',
+                alt: 'Certified functional fitness and endurance conditioning coach',
               },
             ].map((trainer) => (
-              <Card3D key={trainer.name} className="h-full">
-                <div className="relative aspect-[3/4] overflow-hidden rounded-3xl border border-white/10 bg-[#0e1017] group shadow-2xl">
-                  <img
-                    src={trainer.img}
-                    alt={trainer.name}
-                    loading="lazy"
-                    className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105 filter brightness-85 contrast-110"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent" />
-                  <div className="absolute bottom-6 left-6 right-6">
-                    <span className="rounded bg-brand-500/20 border border-brand-500/30 px-2.5 py-0.5 text-[10px] font-mono font-bold uppercase tracking-wider text-brand-400">
-                      Certified Coach
-                    </span>
-                    <h3 className="mt-2 font-display text-2xl font-bold text-white">
-                      {trainer.name}
-                    </h3>
-                    <p className="text-xs font-mono text-surface-300 mt-0.5">{trainer.role}</p>
-                    <p className="text-[11px] text-surface-400 mt-2 border-t border-white/10 pt-2">
-                      Specialty: {trainer.spec}
-                    </p>
+              <div key={trainer.title} className="coach-card h-full">
+                <Card3D className="h-full">
+                  <div className="relative aspect-[3/4] overflow-hidden rounded-3xl border border-white/10 bg-[#0e1017] group shadow-2xl">
+                    <img
+                      src={trainer.img}
+                      alt={trainer.alt}
+                      loading="lazy"
+                      className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105 filter brightness-85 contrast-110"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent" />
+                    <div className="absolute bottom-6 left-6 right-6">
+                      <span className="rounded bg-brand-500/20 border border-brand-500/30 px-2.5 py-0.5 text-[10px] font-mono font-bold uppercase tracking-wider text-brand-400">
+                        {trainer.role}
+                      </span>
+                      <h3 className="mt-2 font-display text-xl sm:text-2xl font-bold text-white">
+                        {trainer.title}
+                      </h3>
+                      <p className="text-[11px] text-surface-400 mt-2 border-t border-white/10 pt-2 font-mono">
+                        Focus: {trainer.spec}
+                      </p>
+                    </div>
                   </div>
-                </div>
-              </Card3D>
+                </Card3D>
+              </div>
             ))}
           </div>
+
+          <p className="mt-8 text-center text-xs text-surface-400 font-mono">
+            Illustrative coaching specializations. Dedicated personal training consultations and trainer bookings are arranged directly at the Heaven Gym reception desk.
+          </p>
         </div>
       </section>
 
@@ -574,7 +586,7 @@ export default function Home() {
                   <span className="text-cyan-200">METABOLIC ENGINE DECK.</span>
                 </h2>
                 <p className="mt-5 text-sm sm:text-base text-surface-300 leading-relaxed">
-                  Engineered for real cardiovascular conditioning. Features non-motorized curved dynamic slat treadmills that recruit 30% more posterior chain, commercial air ergometers, Concept2 rowers, and smooth low-impact ellipticals with individual heart-rate telemetry.
+                  Engineered for real cardiovascular conditioning. Features non-motorized curved dynamic slat treadmills that encourage natural running mechanics, commercial air ergometers, Concept2 rowers, and smooth low-impact ellipticals with individual heart-rate telemetry.
                 </p>
 
                 <div className="mt-8 space-y-3">
@@ -621,21 +633,21 @@ export default function Home() {
                   Thermal Recovery
                 </span>
                 <h2 className="mt-3 font-display text-2xl sm:text-4xl lg:text-5xl font-black text-white leading-tight break-words">
-                  RESTORATIVE BOTANICAL <br />
+                  RESTORATIVE THERMAL <br />
                   <span className="bg-gradient-to-r from-amber-300 via-amber-400 to-amber-500 bg-clip-text text-transparent">
-                    STEAM CHAMBER.
+                    STEAM FACILITY.
                   </span>
                 </h2>
                 <p className="mt-5 text-sm sm:text-base text-surface-300 leading-relaxed">
-                  Post-training recovery accelerates results. High-temperature steam therapy produces vasodilation, flushes accumulated lactic metabolites, and restores systemic elasticity to tight ligaments and tendons.
+                  Post-training recovery helps you recharge. Warm steam therapy relieves muscular tension, relaxes connective tissues, and provides a calming retreat after intense lifting sessions.
                 </p>
 
                 <div className="mt-8 space-y-3">
                   {[
-                    'Botanical Steam Infusions at Controlled 45°C - 50°C',
-                    'Impeccably Clean Italian Granite Chamber Architecture',
-                    'Direct Private Access to Refreshing Cold Showers',
-                    'Included in All Active Premium Heaven Gym Memberships',
+                    'Controlled Warm Steam for Post-Workout Muscle Relaxation',
+                    'Hygienically Sanitized Granite Chamber Architecture',
+                    'Direct Access to Refreshing Private Showers',
+                    'Included in Active Premium Heaven Gym Memberships',
                   ].map((s) => (
                     <div key={s} className="flex items-center gap-3 text-xs sm:text-sm text-surface-200">
                       <Waves size={17} className="text-amber-400 shrink-0" />
@@ -725,21 +737,21 @@ export default function Home() {
                   Nutritional Recovery
                 </span>
                 <h2 className="mt-3 font-display text-2xl sm:text-4xl lg:text-5xl font-black text-white leading-tight break-words">
-                  THE HEAVEN GYM <br />
+                  NUTRITIONAL RECOVERY & <br />
                   <span className="bg-gradient-to-r from-amber-400 via-orange-300 to-amber-200 bg-clip-text text-transparent">
-                    FUEL BAR & CAFE.
+                    FUEL BAR.
                   </span>
                 </h2>
                 <p className="mt-5 text-sm sm:text-base text-surface-300 leading-relaxed">
-                  Refuel without leaving the sanctuary. The in-house fuel bar serves freshly blended whey isolate smoothies, single-origin pre-workout espresso, intra-workout electrolytes, and calculated protein recovery bowls.
+                  Support your workouts with convenient on-demand fitness nutrition. The fuel bar offers protein shakes, pre-workout beverages, electrolyte drinks, and healthy recovery snacks to keep your training on track.
                 </p>
 
                 <div className="mt-8 space-y-3">
                   {[
-                    'Cold-Pressed Isolate Whey & Collagen Smoothies',
-                    'Artisanal Espresso & Pre-Workout Caffeine Brews',
-                    'Zero-Sugar BCAA & Electrolyte Hydration Drinks',
-                    'Comfortable Lounge Seating with High-Speed Wi-Fi',
+                    'Freshly Prepared Protein & Recovery Shakes',
+                    'Pre-Workout & Energy Hydration Options',
+                    'Zero-Sugar Electrolyte & Mineral Refreshments',
+                    'Comfortable Member Seating & Lounge Area',
                   ].map((c) => (
                     <div key={c} className="flex items-center gap-3 text-xs sm:text-sm text-surface-200">
                       <Coffee size={17} className="text-amber-400 shrink-0" />
@@ -779,18 +791,18 @@ export default function Home() {
                 </span>
                 <h2 className="mt-3 font-display text-2xl sm:text-4xl lg:text-5xl font-black text-white leading-tight break-words">
                   FUNCTIONAL CONDITIONING & <br />
-                  <span className="text-brand-400">HYROX TURF ARENA.</span>
+                  <span className="text-brand-400">ATHLETIC TURF ZONE.</span>
                 </h2>
                 <p className="mt-5 text-sm sm:text-base text-surface-300 leading-relaxed">
-                  A 30-meter high-density turf strip dedicated to sled pushing, heavy farmer carries, battle ropes, reinforced wall-balls, and functional athletic circuits that test real-world grit.
+                  A dedicated high-density turf zone built for sled pushes, farmer carries, battle ropes, slam balls, and dynamic athletic conditioning circuits.
                 </p>
 
                 <div className="mt-8 space-y-3">
                   {[
-                    '30-Meter High-Density Sled & Sprint Turf Bay',
-                    'Heavy Prowler Sleds with Dual-Height Push Poles',
-                    'Kettlebells Ranging from 8kg to 48kg Monster Weights',
-                    'Slam Balls, Plyometric Wooden Cubes, and Battle Ropes',
+                    'Indoor Turf Track for Sled Work & Movement Drills',
+                    'Push-Pull Prowler Sleds & Battle Ropes',
+                    'Comprehensive Kettlebell and Slam Ball Stations',
+                    'Plyometric Boxes & Functional Conditioning Gear',
                   ].map((h) => (
                     <div key={h} className="flex items-center gap-3 text-xs sm:text-sm text-surface-200">
                       <Crosshair size={17} className="text-brand-400 shrink-0" />
@@ -883,16 +895,16 @@ export default function Home() {
                   FIRST-AID & SAFETY READINESS.
                 </h2>
                 <p className="mt-4 text-xs sm:text-sm text-surface-300 leading-relaxed">
-                  Your physical security is always paramount. Floor staff and coaches are certified in CPR and automated external defibrillator (AED) operation, with fully stocked trauma first-aid stations and immediate access protocols.
+                  Member safety is a core priority. Floor staff and trainers are trained in first-aid protocols, standard safety procedures, and rapid assistance for training discomfort or minor injuries.
                 </p>
               </div>
 
               <div className="grid gap-3 sm:grid-cols-2">
                 {[
-                  'Certified CPR & AED Floor Staff on Every Shift',
-                  'Emergency Trauma First-Aid Response Kits',
-                  'Instant Ice Cryo Compression for Joint Sprains',
-                  'Priority Emergency Ambulance Access Route',
+                  'First-Aid Safety Station on Training Floor',
+                  'Staff Trained in Safety & Injury Guidance',
+                  'Cold Pack & Sprain Management Supplies',
+                  'Established Emergency Protocols & Quick Access',
                 ].map((item) => (
                   <div
                     key={item}
@@ -1098,7 +1110,7 @@ export default function Home() {
                       <div className="mt-6 space-y-2.5 pt-4 border-t border-white/10">
                         {[
                           'Full Access to Free Weights & Cardio Decks',
-                          'Thermal Steam Recovery Facility Included',
+                          'Access to Club Amenities & Restorative Recovery',
                           'Complimentary Coach Machine Orientation',
                           'Access to Locker & Shower Suites',
                         ].map((perk) => (
