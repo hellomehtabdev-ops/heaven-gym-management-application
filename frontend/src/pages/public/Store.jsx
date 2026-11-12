@@ -37,6 +37,7 @@ export default function Store() {
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [category, setCategory] = useState('');
   const [page, setPage] = useState(1);
+  const [retryCount, setRetryCount] = useState(0);
   const [added, setAdded] = useState('');
 
   useEffect(() => {
@@ -50,7 +51,7 @@ export default function Store() {
 
   useEffect(() => {
     dispatch(fetchProducts({ search: debouncedSearch, category: category || 'all', page, limit: PAGE_SIZE }));
-  }, [dispatch, debouncedSearch, category, page]);
+  }, [dispatch, debouncedSearch, category, page, retryCount]);
 
   const pageNumbers = Array.from(
     { length: Math.min(totalPages, 5) },
@@ -206,7 +207,7 @@ export default function Store() {
               <p className="text-sm text-surface-400 font-mono">Loading store inventory...</p>
             </div>
           ) : error ? (
-            <div role="alert" className="rounded-2xl border border-red-500/25 bg-red-500/10 p-8 text-center text-sm text-red-200">{error}</div>
+            <div role="alert" className="rounded-2xl border border-red-500/25 bg-red-500/10 p-8 text-center text-sm text-red-200">{error}<button type="button" onClick={() => setRetryCount((count) => count + 1)} className="ml-3 rounded-lg border border-red-400/30 px-3 py-2 text-xs font-bold text-white hover:bg-red-500/20">Retry</button></div>
           ) : products.length > 0 ? (
             <>
               <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
