@@ -3,8 +3,9 @@ import { adminMiddleware } from '../middlewares/admin.middleware.js';
 import upload from '../middlewares/upload.middleware.js';
 import {
   listPublicTransformations,
+  getPublicTransformationById,
   listAdminTransformations,
-  getTransformationById,
+  getAdminTransformationById,
   createTransformation,
   updateTransformation,
   togglePublishTransformation,
@@ -19,8 +20,9 @@ const transformationImagesUpload = upload.fields([
 ]);
 
 router.get('/public', listPublicTransformations);
+router.get('/public/:id', getPublicTransformationById);
 router.get('/admin', adminMiddleware, listAdminTransformations);
-router.get('/:id', getTransformationById);
+router.get('/admin/:id', adminMiddleware, getAdminTransformationById);
 router.post('/admin', adminMiddleware, transformationImagesUpload, createTransformation);
 router.put('/admin/:id', adminMiddleware, transformationImagesUpload, updateTransformation);
 router.patch('/admin/:id/publish', adminMiddleware, togglePublishTransformation);

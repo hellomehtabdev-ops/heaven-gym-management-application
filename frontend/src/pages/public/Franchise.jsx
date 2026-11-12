@@ -135,7 +135,7 @@ export default function Franchise() {
         </ScrollReveal>
 
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {PILLARS.map((p, idx) => (
+          {PILLARS.map((p) => (
             <Card3D key={p.title} className="h-full">
               <div className="flex flex-col h-full rounded-3xl border border-white/10 bg-[#0e1017] p-6 shadow-xl hover:border-brand-500/30 transition">
                 <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-500/10 border border-brand-500/20 text-brand-400 mb-5">

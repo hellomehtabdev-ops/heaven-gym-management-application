@@ -222,7 +222,7 @@ export default function Home() {
                 src: 'https://images.unsplash.com/photo-1574680096145-d05b474e2155?auto=format&fit=crop&w=1000&q=80',
                 link: '/facilities#cardio',
               },
-            ].map((f, i) => (
+            ].map((f) => (
               <Card3D key={f.title} className="h-full">
                 <Link
                   to={f.link}

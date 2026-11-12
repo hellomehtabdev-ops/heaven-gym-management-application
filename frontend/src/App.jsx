@@ -48,7 +48,6 @@ import AdminBodyMeasurements from '@/pages/admin/AdminBodyMeasurements';
 import AdminMemberMeasurements from '@/pages/admin/AdminMemberMeasurements';
 import AdminTransformations from '@/pages/admin/AdminTransformations';
 import AdminProducts from '@/pages/admin/AdminProducts';
-import AdminGymEquipment from '@/pages/admin/AdminGymEquipment';
 import AdminOrders from '@/pages/admin/AdminOrders';
 import AdminSupplementSelling from '@/pages/admin/AdminSupplementSelling';
 import AdminSupplementSellingDetails from '@/pages/admin/AdminSupplementSellingDetails';
@@ -102,7 +101,7 @@ export default function App() {
           <Route path="payments" element={<AdminPayments />} /><Route path="body-measurements" element={<AdminBodyMeasurements />} /><Route path="body-measurements/:userId" element={<AdminMemberMeasurements />} />
           <Route path="transformations" element={<AdminTransformations />} />
           <Route path="products" element={<AdminProducts />} />
-          <Route path="gym-equipment" element={<AdminGymEquipment />} /><Route path="orders" element={<AdminOrders />} />
+          <Route path="orders" element={<AdminOrders />} />
           <Route path="supplement-selling" element={<AdminSupplementSelling />} />
           <Route path="supplement-selling/:id" element={<AdminSupplementSellingDetails />} />
           <Route path="supplement-selling/bill/:id" element={<AdminSupplementBill />} />

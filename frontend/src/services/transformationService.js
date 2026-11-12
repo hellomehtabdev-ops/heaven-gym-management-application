@@ -5,12 +5,16 @@ export const transformationService = {
     return api.get('/transformations/public', { params }).then((res) => res.data);
   },
 
+  getPublicTransformation(id) {
+    return api.get(`/transformations/public/${id}`).then((res) => res.data);
+  },
+
   getAdminTransformations() {
     return api.get('/transformations/admin').then((res) => res.data);
   },
 
-  getTransformation(id) {
-    return api.get(`/transformations/${id}`).then((res) => res.data);
+  getAdminTransformation(id) {
+    return api.get(`/transformations/admin/${id}`).then((res) => res.data);
   },
 
   createTransformation(formData) {
@@ -29,9 +33,12 @@ export const transformationService = {
       .then((res) => res.data);
   },
 
-  togglePublish(id, is_published) {
+  togglePublish(id, is_published, member_consent_obtained) {
     return api
-      .patch(`/transformations/admin/${id}/publish`, { is_published })
+      .patch(`/transformations/admin/${id}/publish`, {
+        is_published,
+        member_consent_obtained,
+      })
       .then((res) => res.data);
   },
 

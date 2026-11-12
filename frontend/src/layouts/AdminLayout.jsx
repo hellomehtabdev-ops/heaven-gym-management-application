@@ -23,7 +23,6 @@ const navItems = [
   { to: '/admin/body-measurements', icon: Ruler, label: 'Measurements' },
   { to: '/admin/transformations', icon: Sparkles, label: 'Transformations' },
   { to: '/admin/products', icon: Package, label: 'Supplements' },
-  { to: '/admin/gym-equipment', icon: Dumbbell, label: 'Gym Equipment' },
   { to: '/admin/orders', icon: ShoppingCart, label: 'Orders' },
   { to: '/admin/payments', icon: CreditCard, label: 'Payments' },
   { to: '/admin/banners', icon: PanelsTopLeft, label: 'Banner' },

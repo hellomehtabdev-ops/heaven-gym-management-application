@@ -4,7 +4,7 @@ import { Float, Sparkles } from '@react-three/drei';
 import * as THREE from 'three';
 
 // 3D Metallic Gym Monogram / Interlocking Strength Rings
-function SculptedInsignia({ pointer }) {
+function SculptedInsignia() {
   const outerRingRef = useRef();
   const innerRingRef = useRef();
   const coreHubRef = useRef();

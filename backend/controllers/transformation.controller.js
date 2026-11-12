@@ -4,6 +4,8 @@ import { ApiError } from '../utils/errors.utils.js';
 
 const bool = (value) => value === true || value === 'true';
 
+const PUBLIC_PROJECTION = '_id title category description duration achievement story before_image.url after_image.url is_published order createdAt';
+
 export async function listPublicTransformations(req, res, next) {
   try {
     const { category, limit = 20 } = req.query;
@@ -14,6 +16,7 @@ export async function listPublicTransformations(req, res, next) {
     const safeLimit = Math.min(50, Math.max(1, Number(limit) || 20));
     const [rows, total, categories] = await Promise.all([
       Transformation.find(filter)
+        .select(PUBLIC_PROJECTION)
         .sort({ order: 1, createdAt: -1 })
         .limit(safeLimit)
         .lean(),
@@ -22,6 +25,24 @@ export async function listPublicTransformations(req, res, next) {
     ]);
 
     res.json({ rows, total, categories });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function getPublicTransformationById(req, res, next) {
+  try {
+    const transformation = await Transformation.findOne({
+      _id: req.params.id,
+      is_published: true,
+    })
+      .select(PUBLIC_PROJECTION)
+      .lean();
+
+    if (!transformation) {
+      throw new ApiError(404, 'Transformation not found');
+    }
+    res.json(transformation);
   } catch (error) {
     next(error);
   }
@@ -36,7 +57,7 @@ export async function listAdminTransformations(req, res, next) {
   }
 }
 
-export async function getTransformationById(req, res, next) {
+export async function getAdminTransformationById(req, res, next) {
   try {
     const transformation = await Transformation.findById(req.params.id).lean();
     if (!transformation) {
@@ -72,6 +93,13 @@ export async function createTransformation(req, res, next) {
       throw new ApiError(400, 'Description is required');
     }
 
+    const shouldPublish = bool(req.body.is_published);
+    const consentObtained = bool(req.body.member_consent_obtained);
+
+    if (shouldPublish && !consentObtained) {
+      throw new ApiError(400, 'Explicit member consent must be confirmed before publishing transformation photos.');
+    }
+
     const beforeUpload = await uploadToCloudinary(beforeFile.buffer, 'heaven-gym/transformations');
     uploaded.push(beforeUpload);
 
@@ -93,7 +121,10 @@ export async function createTransformation(req, res, next) {
         url: afterUpload.secure_url,
         public_id: afterUpload.public_id,
       },
-      is_published: bool(req.body.is_published),
+      member_consent_obtained: consentObtained,
+      consent_confirmed_at: consentObtained ? new Date() : null,
+      consent_notes: String(req.body.consent_notes || '').trim(),
+      is_published: shouldPublish,
       order: Number(req.body.order) || 0,
     });
 
@@ -167,8 +198,26 @@ export async function updateTransformation(req, res, next) {
       record.story = String(req.body.story || '').trim();
     }
 
+    if (req.body.member_consent_obtained !== undefined) {
+      const consent = bool(req.body.member_consent_obtained);
+      record.member_consent_obtained = consent;
+      if (consent && !record.consent_confirmed_at) {
+        record.consent_confirmed_at = new Date();
+      } else if (!consent) {
+        record.consent_confirmed_at = null;
+      }
+    }
+
+    if (req.body.consent_notes !== undefined) {
+      record.consent_notes = String(req.body.consent_notes || '').trim();
+    }
+
     if (req.body.is_published !== undefined) {
-      record.is_published = bool(req.body.is_published);
+      const willPublish = bool(req.body.is_published);
+      if (willPublish && !record.member_consent_obtained) {
+        throw new ApiError(400, 'Explicit member consent must be confirmed before publishing transformation photos.');
+      }
+      record.is_published = willPublish;
     }
 
     if (req.body.order !== undefined) {
@@ -197,7 +246,21 @@ export async function togglePublishTransformation(req, res, next) {
     if (!record) {
       throw new ApiError(404, 'Transformation not found');
     }
-    record.is_published = req.body.is_published !== undefined ? bool(req.body.is_published) : !record.is_published;
+
+    const nextPublished = req.body.is_published !== undefined ? bool(req.body.is_published) : !record.is_published;
+
+    if (nextPublished) {
+      const consentPassed = req.body.member_consent_obtained !== undefined ? bool(req.body.member_consent_obtained) : record.member_consent_obtained;
+      if (!consentPassed) {
+        throw new ApiError(400, 'Explicit member consent must be confirmed before publishing transformation photos.');
+      }
+      record.member_consent_obtained = true;
+      if (!record.consent_confirmed_at) {
+        record.consent_confirmed_at = new Date();
+      }
+    }
+
+    record.is_published = nextPublished;
     await record.save();
     res.json(record);
   } catch (error) {

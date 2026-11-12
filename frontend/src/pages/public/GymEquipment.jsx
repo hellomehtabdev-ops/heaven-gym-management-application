@@ -31,7 +31,7 @@ export default function GymEquipment() {
     return () => { active = false; };
   }, [debouncedSearch, category]);
 
-  const rows = data.rows || [];
+  const rows = useMemo(() => data.rows || [], [data.rows]);
   const totalPages = Math.max(1, Math.ceil(rows.length / PAGE_SIZE));
   const currentPage = Math.min(page, totalPages);
   const visibleRows = useMemo(() => rows.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE), [rows, currentPage]);
