@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import {
   Dumbbell, Menu, X, LayoutDashboard, Users, UserPlus, CreditCard, Ruler,
   Package, ShoppingCart, Bell, Settings, LogOut, ClipboardList, UserRound,
-  PanelsTopLeft, ChevronDown, PanelLeftClose, PanelLeftOpen,
+  PanelsTopLeft, ChevronDown, PanelLeftClose, PanelLeftOpen, Sparkles,
 } from 'lucide-react';
 import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
@@ -21,6 +21,7 @@ const navItems = [
   { to: '/admin/membership-plans', icon: CreditCard, label: 'Plans' },
   { to: '/admin/memberships', icon: ClipboardList, label: 'Memberships' },
   { to: '/admin/body-measurements', icon: Ruler, label: 'Measurements' },
+  { to: '/admin/transformations', icon: Sparkles, label: 'Transformations' },
   { to: '/admin/products', icon: Package, label: 'Supplements' },
   { to: '/admin/gym-equipment', icon: Dumbbell, label: 'Gym Equipment' },
   { to: '/admin/orders', icon: ShoppingCart, label: 'Orders' },

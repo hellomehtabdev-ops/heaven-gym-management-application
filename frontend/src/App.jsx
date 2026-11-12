@@ -10,11 +10,14 @@ import AdminRoute from '@/routes/AdminRoute';
 import GuestRoute from '@/routes/GuestRoute';
 import Home from '@/pages/public/Home';
 import About from '@/pages/public/About';
+import Facilities from '@/pages/public/Facilities';
+import Transformations from '@/pages/public/Transformations';
 import Membership from '@/pages/public/Membership';
 import Contact from '@/pages/public/Contact';
 import Store from '@/pages/public/Store';
 import GymEquipment from '@/pages/public/GymEquipment';
 import GymEquipmentDetails from '@/pages/public/GymEquipmentDetails';
+import Franchise from '@/pages/public/Franchise';
 import Login from '@/pages/auth/Login';
 import Register from '@/pages/auth/Register';
 import VerifyEmail from '@/pages/auth/VerifyEmail';
@@ -43,6 +46,7 @@ import AdminMemberships from '@/pages/admin/AdminMemberships';
 import AdminPayments from '@/pages/admin/AdminPayments';
 import AdminBodyMeasurements from '@/pages/admin/AdminBodyMeasurements';
 import AdminMemberMeasurements from '@/pages/admin/AdminMemberMeasurements';
+import AdminTransformations from '@/pages/admin/AdminTransformations';
 import AdminProducts from '@/pages/admin/AdminProducts';
 import AdminGymEquipment from '@/pages/admin/AdminGymEquipment';
 import AdminOrders from '@/pages/admin/AdminOrders';
@@ -63,11 +67,18 @@ export default function App() {
     <BrowserRouter>
       <Routes>
         <Route element={<PublicLayout />}>
-          <Route path="/" element={<Home />} /><Route path="/about" element={<About />} />
-          <Route path="/membership" element={<Membership />} /><Route path="/store" element={<Store />} />
+          <Route path="/" element={<Home />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/facilities" element={<Facilities />} />
+          <Route path="/transformations" element={<Transformations />} />
+          <Route path="/membership" element={<Membership />} />
+          <Route path="/store" element={<Store />} />
+          <Route path="/supplements" element={<Navigate to="/store" replace />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/gym-equipment" element={<GymEquipment />} />
+          <Route path="/equipment" element={<Navigate to="/gym-equipment" replace />} />
           <Route path="/gym-equipment/:slug" element={<GymEquipmentDetails />} />
+          <Route path="/franchise" element={<Franchise />} />
         </Route>
         <Route path="/login" element={<GuestRoute><Login /></GuestRoute>} />
         <Route path="/register" element={<GuestRoute><Register /></GuestRoute>} />
@@ -89,6 +100,7 @@ export default function App() {
           <Route path="users" element={<AdminUsers />} /><Route path="admissions" element={<AdminAdmissions />} />
           <Route path="membership-plans" element={<AdminMembershipPlans />} /><Route path="memberships" element={<AdminMemberships />} />
           <Route path="payments" element={<AdminPayments />} /><Route path="body-measurements" element={<AdminBodyMeasurements />} /><Route path="body-measurements/:userId" element={<AdminMemberMeasurements />} />
+          <Route path="transformations" element={<AdminTransformations />} />
           <Route path="products" element={<AdminProducts />} />
           <Route path="gym-equipment" element={<AdminGymEquipment />} /><Route path="orders" element={<AdminOrders />} />
           <Route path="supplement-selling" element={<AdminSupplementSelling />} />
