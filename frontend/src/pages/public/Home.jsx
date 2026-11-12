@@ -66,18 +66,21 @@ export default function Home() {
   });
 
   useEffect(() => {
+    let active = true;
     dispatch(fetchMembershipPlans());
     dispatch(fetchProducts());
 
     gymEquipmentService
       .getPublic({ limit: 4 })
-      .then((data) => setEquipmentList(data.rows || []))
+      .then((data) => { if (active) setEquipmentList(data.rows || []); })
       .catch(() => {});
 
     api
       .get('/gym-settings')
-      .then(({ data }) => setGymSettings(data))
+      .then(({ data }) => { if (active) setGymSettings(data); })
       .catch(() => {});
+
+    return () => { active = false; };
   }, [dispatch]);
 
   const internationalPhone = getWhatsAppNumber(gymSettings?.contact_phone);
@@ -160,7 +163,7 @@ export default function Home() {
                 </span>
                 <span className="flex items-center gap-2 col-span-2 sm:col-span-1">
                   <Clock size={15} className="text-brand-400 shrink-0" />
-                  <span>Open 5 AM – 10 PM</span>
+                  <span>{gymSettings?.opening_hours || 'Contact for current hours'}</span>
                 </span>
               </div>
             </div>
