@@ -3,8 +3,8 @@ import { orderService } from '@/services/orderService';
 
 const errorMessage = (error, fallback) => error.response?.data?.error || fallback;
 
-export const fetchMyOrders = createAsyncThunk('orders/fetchMyOrders', async (_, { rejectWithValue }) => {
-  try { return await orderService.getMine(); } catch (error) { return rejectWithValue(errorMessage(error, 'Failed to fetch orders')); }
+export const fetchMyOrders = createAsyncThunk('orders/fetchMyOrders', async (params, { rejectWithValue }) => {
+  try { return await orderService.getMine(params); } catch (error) { return rejectWithValue(errorMessage(error, 'Failed to fetch orders')); }
 });
 
 export const fetchAllOrders = createAsyncThunk('orders/fetchAll', async (params, { rejectWithValue }) => {
@@ -21,12 +21,12 @@ export const updateOrderStatus = createAsyncThunk('orders/updateStatus', async (
 
 const orderSlice = createSlice({
   name: 'orders',
-  initialState: { items: [], adminItems: [], adminPagination: { total: 0, page: 1, pages: 1, limit: 10 }, loading: false, error: null, lastCreated: null },
+  initialState: { items: [], userPagination: { total: 0, page: 1, pages: 1, limit: 10 }, adminItems: [], adminPagination: { total: 0, page: 1, pages: 1, limit: 10 }, loading: false, error: null, lastCreated: null },
   reducers: {},
   extraReducers: (builder) => {
     builder
       .addCase(fetchMyOrders.pending, (state) => { state.loading = true; state.error = null; })
-      .addCase(fetchMyOrders.fulfilled, (state, action) => { state.items = action.payload; state.loading = false; })
+      .addCase(fetchMyOrders.fulfilled, (state, action) => { state.items = action.payload.rows || []; state.userPagination = { total: action.payload.total || 0, page: action.payload.page || 1, pages: action.payload.pages || 1, limit: action.payload.limit || 10 }; state.loading = false; })
       .addCase(fetchMyOrders.rejected, (state, action) => { state.loading = false; state.error = action.payload; })
       .addCase(fetchAllOrders.pending, (state) => { state.loading = true; state.error = null; })
       .addCase(fetchAllOrders.fulfilled, (state, action) => { state.adminItems = action.payload.rows || []; state.adminPagination = { total: action.payload.total || 0, page: action.payload.page || 1, pages: action.payload.pages || 1, limit: action.payload.limit || 10 }; state.loading = false; })

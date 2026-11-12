@@ -1,7 +1,7 @@
 import * as orderService from '../services/order.service.js';
 
 export const getMyOrders = async (req, res, next) => {
-  try { res.json(await orderService.getOrdersByUserId(req.user._id)); } catch (err) { next(err); }
+  try { res.json(await orderService.getOrdersByUserId(req.user._id, req.query)); } catch (err) { next(err); }
 };
 export const getAllOrders = async (req, res, next) => {
   try { res.json(await orderService.getAllOrders(req.query)); } catch (err) { next(err); }
