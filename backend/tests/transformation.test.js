@@ -238,6 +238,8 @@ test('3. Public API Privacy and Access Control Suite', async (suite) => {
   await suite.test('Public transformation listing returns only published records with safe projection', async (t) => {
     let capturedFilter = null;
     let capturedProjection = null;
+    let capturedSkip = null;
+    let capturedLimit = null;
 
     const publicLeanRecord = {
       _id: 'pub_story_1',
@@ -262,10 +264,16 @@ test('3. Public API Privacy and Access Control Suite', async (suite) => {
           return {
             sort() {
               return {
-                limit() {
+                skip(value) {
+                  capturedSkip = value;
                   return {
-                    lean() {
-                      return Promise.resolve([publicLeanRecord]);
+                    limit(value) {
+                      capturedLimit = value;
+                      return {
+                        lean() {
+                          return Promise.resolve([publicLeanRecord]);
+                        },
+                      };
                     },
                   };
                 },
@@ -280,7 +288,7 @@ test('3. Public API Privacy and Access Control Suite', async (suite) => {
     t.mock.method(Transformation, 'distinct', (field, filter) => Promise.resolve(['Strength & Conditioning']));
 
     let responseData = null;
-    const req = { query: {} };
+    const req = { query: { page: '2', limit: '12' } };
     const res = { json: (data) => { responseData = data; } };
     const next = (err) => { if (err) throw err; };
 
@@ -288,6 +296,10 @@ test('3. Public API Privacy and Access Control Suite', async (suite) => {
 
     // Verify filter strictly enforces published status
     assert.equal(capturedFilter.is_published, true, 'Query filter MUST strictly specify is_published: true');
+    assert.equal(capturedSkip, 12, 'Page 2 with 12 records per page must skip the first 12 records');
+    assert.equal(capturedLimit, 12, 'Public transformation query must enforce the requested safe page size');
+    assert.equal(responseData.page, 2, 'Response must include the current page');
+    assert.equal(responseData.pages, 1, 'Response must include the calculated page count');
 
     // Verify projection excludes private fields and Cloudinary public_ids
     assert.ok(capturedProjection.includes('before_image.url'), 'Projection must include before image URL');
