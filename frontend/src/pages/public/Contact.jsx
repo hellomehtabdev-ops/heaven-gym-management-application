@@ -184,10 +184,10 @@ export default function Contact() {
                     </div>
                     <h3 className="font-display text-base font-bold text-white">Operating Schedule</h3>
                     <p className="mt-2 text-xs font-mono text-white font-semibold">
-                      Monday &ndash; Sunday: 5:00 AM &ndash; 10:00 PM
+                      {settings?.opening_hours || 'Contact Heaven Gym for current opening hours.'}
                     </p>
                     <p className="mt-2 text-[11px] text-surface-500">
-                      Doors open early every morning for discipline lifters.
+                      Opening hours are maintained by gym administration.
                     </p>
                   </div>
                 </div>
