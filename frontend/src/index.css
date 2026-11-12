@@ -425,6 +425,60 @@ button, input, select, textarea { font: inherit; }
 }
 
 
+/* Desktop admin responsiveness: fit management tables to the available content width.
+   Mobile card/table behavior remains governed by the existing max-width media queries. */
+@media (min-width: 1024px) {
+  .admin-shell .admin-content .admin-table-scroll {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    overflow-x: hidden;
+  }
+
+  .admin-shell .admin-content .admin-table-scroll > .admin-data-table {
+    display: table;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    table-layout: fixed !important;
+  }
+
+  .admin-shell .admin-content .admin-data-table th,
+  .admin-shell .admin-content .admin-data-table td {
+    padding-left: clamp(7px, 0.85vw, 14px) !important;
+    padding-right: clamp(7px, 0.85vw, 14px) !important;
+    white-space: normal !important;
+    overflow-wrap: anywhere;
+    word-break: normal;
+    vertical-align: middle;
+  }
+
+  .admin-shell .admin-content .admin-data-table td > * {
+    max-width: 100%;
+  }
+
+  .admin-shell .admin-content .admin-data-table button {
+    white-space: nowrap;
+  }
+
+  .admin-shell .admin-content .overflow-x-auto > table:not(.admin-data-table) {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    table-layout: fixed;
+  }
+}
+
+@media (min-width: 1024px) and (max-width: 1279px) {
+  .admin-content {
+    padding: 22px !important;
+  }
+
+  .admin-content > .space-y-6 {
+    gap: 20px;
+  }
+}
+
 /* Banner carousel: gentle cross-fade and subtle zoom between images. */
 @keyframes banner-change {
   from { opacity: .55; transform: scale(1.025); }
