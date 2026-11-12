@@ -967,7 +967,8 @@ export default function Home() {
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
               {products.slice(0, 4).map((p) => {
                 const img = p.image_url || p.images?.[0]?.url;
-                const price = p.sale_price || p.price;
+                const price = p.price;
+                const hasDiscount = p.mrp != null && Number(p.mrp) > Number(p.price);
                 const waUrl = getWhatsAppLink(
                   `Hello Heaven Gym, I would like to enquire about purchasing "${p.name}".`
                 );
@@ -987,7 +988,7 @@ export default function Home() {
                           ) : (
                             <Package size={42} className="text-surface-500" />
                           )}
-                          {p.sale_price && (
+                          {hasDiscount && (
                             <span className="absolute top-2 right-2 rounded bg-brand-600 px-2 py-0.5 text-[9px] font-mono font-bold uppercase text-white">
                               Offer
                             </span>
