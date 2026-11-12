@@ -284,7 +284,7 @@ test('3. Public API Privacy and Access Control Suite', async (suite) => {
       };
     });
 
-    t.mock.method(Transformation, 'countDocuments', (filter) => Promise.resolve(1));
+    t.mock.method(Transformation, 'countDocuments', (filter) => Promise.resolve(25));
     t.mock.method(Transformation, 'distinct', (field, filter) => Promise.resolve(['Strength & Conditioning']));
 
     let responseData = null;
@@ -299,7 +299,7 @@ test('3. Public API Privacy and Access Control Suite', async (suite) => {
     assert.equal(capturedSkip, 12, 'Page 2 with 12 records per page must skip the first 12 records');
     assert.equal(capturedLimit, 12, 'Public transformation query must enforce the requested safe page size');
     assert.equal(responseData.page, 2, 'Response must include the current page');
-    assert.equal(responseData.pages, 1, 'Response must include the calculated page count');
+    assert.equal(responseData.pages, 3, 'Response must include the calculated page count');
 
     // Verify projection excludes private fields and Cloudinary public_ids
     assert.ok(capturedProjection.includes('before_image.url'), 'Projection must include before image URL');
