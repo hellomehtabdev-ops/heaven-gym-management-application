@@ -26,7 +26,7 @@ export default function GymEquipment() {
     setLoading(true);
     gymEquipmentService.getPublic({ search: debouncedSearch, category, page, limit: PAGE_SIZE }).then((result) => {
       if (active) { setData(result); setError(''); }
-    }).catch(() => { if (active) setError('Equipment catalogue could not be loaded. Please try again.'); })
+    }).catch(() => { if (active) { setData({ rows: [], total: 0, page: 1, pages: 0, categories: [] }); setError('Equipment catalogue could not be loaded. Please try again.'); } })
       .finally(() => { if (active) setLoading(false); });
     return () => { active = false; };
   }, [debouncedSearch, category, page]);
