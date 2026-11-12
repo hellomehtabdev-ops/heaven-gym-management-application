@@ -25,6 +25,14 @@ const transformationSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+transformationSchema.pre('save', function (next) {
+  if (!this.member_consent_obtained) {
+    this.is_published = false;
+    this.consent_confirmed_at = null;
+  }
+  if (typeof next === 'function') next();
+});
+
 transformationSchema.index({ is_published: 1, createdAt: -1 });
 
 export default mongoose.model('Transformation', transformationSchema);

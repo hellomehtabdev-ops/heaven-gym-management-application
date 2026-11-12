@@ -591,7 +591,14 @@ export default function AdminTransformations() {
                     type="checkbox"
                     id="consent_checkbox"
                     checked={form.member_consent_obtained}
-                    onChange={(e) => change('member_consent_obtained', e.target.checked)}
+                    onChange={(e) => {
+                      const checked = e.target.checked;
+                      setForm((prev) => ({
+                        ...prev,
+                        member_consent_obtained: checked,
+                        is_published: checked ? prev.is_published : false,
+                      }));
+                    }}
                     className="mt-0.5 h-4 w-4 rounded text-brand-500 focus:ring-brand-500 cursor-pointer"
                   />
                   <label htmlFor="consent_checkbox" className="cursor-pointer">

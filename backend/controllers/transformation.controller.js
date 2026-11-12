@@ -201,10 +201,11 @@ export async function updateTransformation(req, res, next) {
     if (req.body.member_consent_obtained !== undefined) {
       const consent = bool(req.body.member_consent_obtained);
       record.member_consent_obtained = consent;
-      if (consent && !record.consent_confirmed_at) {
-        record.consent_confirmed_at = new Date();
-      } else if (!consent) {
+      if (!consent) {
         record.consent_confirmed_at = null;
+        record.is_published = false;
+      } else if (!record.consent_confirmed_at) {
+        record.consent_confirmed_at = new Date();
       }
     }
 
@@ -218,6 +219,12 @@ export async function updateTransformation(req, res, next) {
         throw new ApiError(400, 'Explicit member consent must be confirmed before publishing transformation photos.');
       }
       record.is_published = willPublish;
+    }
+
+    // Defense-in-depth: if consent is not confirmed, unconditionally force unpublished state and clear timestamp
+    if (!record.member_consent_obtained) {
+      record.is_published = false;
+      record.consent_confirmed_at = null;
     }
 
     if (req.body.order !== undefined) {
@@ -247,10 +254,15 @@ export async function togglePublishTransformation(req, res, next) {
       throw new ApiError(404, 'Transformation not found');
     }
 
-    const nextPublished = req.body.is_published !== undefined ? bool(req.body.is_published) : !record.is_published;
+    const consentPassed = req.body.member_consent_obtained !== undefined
+      ? bool(req.body.member_consent_obtained)
+      : record.member_consent_obtained;
+
+    const nextPublished = req.body.is_published !== undefined
+      ? bool(req.body.is_published)
+      : !record.is_published;
 
     if (nextPublished) {
-      const consentPassed = req.body.member_consent_obtained !== undefined ? bool(req.body.member_consent_obtained) : record.member_consent_obtained;
       if (!consentPassed) {
         throw new ApiError(400, 'Explicit member consent must be confirmed before publishing transformation photos.');
       }
@@ -258,9 +270,23 @@ export async function togglePublishTransformation(req, res, next) {
       if (!record.consent_confirmed_at) {
         record.consent_confirmed_at = new Date();
       }
+      record.is_published = true;
+    } else {
+      record.is_published = false;
+      if (req.body.member_consent_obtained !== undefined) {
+        record.member_consent_obtained = consentPassed;
+        if (!consentPassed) {
+          record.consent_confirmed_at = null;
+        }
+      }
     }
 
-    record.is_published = nextPublished;
+    // Defense-in-depth: If consent is revoked or missing, force draft and clear confirmation date
+    if (!record.member_consent_obtained) {
+      record.is_published = false;
+      record.consent_confirmed_at = null;
+    }
+
     await record.save();
     res.json(record);
   } catch (error) {
