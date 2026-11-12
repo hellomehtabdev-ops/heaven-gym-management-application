@@ -484,6 +484,104 @@ button, input, select, textarea { font: inherit; }
   }
 }
 
+/* Admin theme contrast pass: scoped to admin pages; keeps the shared shell and mobile layout intact. */
+.admin-shell {
+  color-scheme: light;
+}
+.dark .admin-shell {
+  color-scheme: dark;
+}
+
+/* Surfaces that use plain Tailwind background utilities inside admin pages. */
+.dark .admin-shell .admin-content .bg-white:not(button):not(input):not(select):not(option) {
+  background-color: #151c27 !important;
+}
+.dark .admin-shell .admin-content .bg-surface-50,
+.dark .admin-shell .admin-content .bg-gray-50,
+.dark .admin-shell .admin-content .bg-slate-50 {
+  background-color: #111923 !important;
+}
+.dark .admin-shell .admin-content .bg-surface-100,
+.dark .admin-shell .admin-content .bg-gray-100,
+.dark .admin-shell .admin-content .bg-slate-100 {
+  background-color: #202a38 !important;
+}
+.dark .admin-shell .admin-content .bg-surface-200,
+.dark .admin-shell .admin-content .bg-gray-200,
+.dark .admin-shell .admin-content .bg-slate-200 {
+  background-color: #2a3545 !important;
+}
+.dark .admin-shell .admin-content .border-surface-100,
+.dark .admin-shell .admin-content .border-surface-200,
+.dark .admin-shell .admin-content .border-gray-100,
+.dark .admin-shell .admin-content .border-gray-200,
+.dark .admin-shell .admin-content .border-slate-100,
+.dark .admin-shell .admin-content .border-slate-200 {
+  border-color: #303b4b !important;
+}
+
+/* Keep secondary labels, metadata, and headings readable in dark mode. */
+.dark .admin-shell .admin-content .text-gray-900,
+.dark .admin-shell .admin-content .text-slate-900,
+.dark .admin-shell .admin-content .text-surface-900,
+.dark .admin-shell .admin-content .text-ink-950,
+.dark .admin-shell .admin-content .text-ink-900 {
+  color: #f1f5f9 !important;
+}
+.dark .admin-shell .admin-content .text-gray-800,
+.dark .admin-shell .admin-content .text-gray-700,
+.dark .admin-shell .admin-content .text-slate-800,
+.dark .admin-shell .admin-content .text-slate-700,
+.dark .admin-shell .admin-content .text-surface-700,
+.dark .admin-shell .admin-content .text-surface-600 {
+  color: #d5deea !important;
+}
+.dark .admin-shell .admin-content .text-gray-600,
+.dark .admin-shell .admin-content .text-gray-500,
+.dark .admin-shell .admin-content .text-slate-600,
+.dark .admin-shell .admin-content .text-slate-500 {
+  color: #aeb9c8 !important;
+}
+
+/* Tables, chart controls, and admin list rows. */
+.dark .admin-shell .admin-content table thead th {
+  color: #cbd5e1 !important;
+}
+.dark .admin-shell .admin-content table tbody td {
+  color: #d5deea;
+}
+.dark .admin-shell .admin-content table tbody tr {
+  background-color: #151c27;
+}
+.dark .admin-shell .admin-content table tbody tr:hover {
+  background-color: #202a38;
+}
+.dark .admin-shell .admin-content .hover\\:bg-surface-100:hover,
+.dark .admin-shell .admin-content .hover\\:bg-gray-50:hover,
+.dark .admin-shell .admin-content .hover\\:bg-slate-50:hover {
+  background-color: #202a38 !important;
+}
+
+/* Native dropdown menus and form controls need their own dark palette. */
+.dark .admin-shell .admin-content select,
+.dark .admin-shell .admin-content select option {
+  color: #f1f5f9;
+  background-color: #101923;
+}
+.dark .admin-shell .admin-content input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+}
+.admin-shell .admin-content :is(input, select, textarea):focus-visible {
+  outline: 2px solid rgba(220, 38, 38, .35);
+  outline-offset: 1px;
+}
+
+/* Dashboard chart labels and summary text retain contrast in both themes. */
+.admin-shell .admin-content .text-surface-500 { color: #596579; }
+.dark .admin-shell .admin-content .text-surface-500 { color: #aeb9c8 !important; }
+.admin-shell .admin-content .text-surface-600 { color: #475467; }
+.dark .admin-shell .admin-content .text-surface-600 { color: #c2ccda !important; }
+
 /* Banner carousel: gentle cross-fade and subtle zoom between images. */
 @keyframes banner-change {
   from { opacity: .55; transform: scale(1.025); }
