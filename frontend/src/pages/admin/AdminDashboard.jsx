@@ -52,18 +52,18 @@ function RevenueChart({ analytics, period, onPeriodChange }) {
 
   return (
     <Card>
-      <div className="mb-4 flex items-center justify-between">
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-2">
           <Activity size={18} className="text-brand-500" />
           <h3 className="font-display text-lg font-semibold text-ink-950 dark:text-white">Revenue Trend</h3>
         </div>
-        <div className="flex gap-1 rounded-lg bg-surface-100 p-1 dark:bg-surface-800">
+        <div className="flex max-w-full flex-wrap gap-1 rounded-lg bg-surface-100 p-1 dark:bg-surface-800">
           {periods.map((p) => (
             <button key={p.key} onClick={() => onPeriodChange(p.key)} className={`rounded-md px-3 py-1.5 text-xs font-semibold transition ${period === p.key ? 'bg-brand-600 text-white' : 'text-surface-500 hover:text-surface-700 dark:hover:text-surface-300'}`}>{p.label}</button>
           ))}
         </div>
       </div>
-      <div className="mb-4 flex items-center gap-4 text-xs">
+      <div className="mb-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs">
         <span className="flex items-center gap-1.5"><span className="h-3 w-3 rounded-sm bg-brand-600" /> Gym Memberships</span>
         <span className="flex items-center gap-1.5"><span className="h-3 w-3 rounded-sm bg-blue-500" /> Supplement Store (online + counter)</span>
       </div>
@@ -74,14 +74,14 @@ function RevenueChart({ analytics, period, onPeriodChange }) {
           <div><p className="text-[11px] text-surface-500">Store</p><p className="mt-1 text-sm font-semibold text-ink-950 dark:text-white">{formatCurrency((analytics?.storeRevenue || []).reduce((sum, item) => sum + item.amount, 0))}</p></div>
           <div><p className="text-[11px] text-surface-500">Total</p><p className="mt-1 text-sm font-semibold text-ink-950 dark:text-white">{formatCurrency([...(analytics?.gymRevenue || []), ...(analytics?.storeRevenue || [])].reduce((sum, item) => sum + item.amount, 0))}</p></div>
         </div>
-        <div className="flex items-end gap-1 overflow-x-auto" style={{ minHeight: '180px' }}> 
+        <div className="flex min-w-0 items-end gap-0.5 overflow-x-auto" style={{ minHeight: '180px' }}> 
           {uniqueDates.map((date) => {
             const gym = getAmount(analytics.gymRevenue, date);
             const store = getAmount(analytics.storeRevenue, date);
             const gymH = (gym / maxAmount) * 160;
             const storeH = (store / maxAmount) * 160;
             return (
-              <div key={date} className="flex min-w-[40px] flex-1 flex-col items-center gap-1">
+              <div key={date} className="flex min-w-[18px] flex-1 flex-col items-center gap-1 sm:min-w-[24px]">
                 <div className="flex w-full items-end justify-center gap-1" style={{ height: '160px' }}>
                   <div className="w-3 rounded-t bg-brand-600 transition-all duration-300" style={{ height: `${gymH}px` }} title={`Gym: ${formatCurrency(gym)}`} />
                   <div className="w-3 rounded-t bg-blue-500 transition-all duration-300" style={{ height: `${storeH}px` }} title={`Store: ${formatCurrency(store)}`} />
@@ -119,7 +119,7 @@ export default function AdminDashboard() {
         <p className="mt-1 text-sm text-surface-500">Business overview and analytics</p>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard icon={Users} label="Registered Users" value={s.totalUsers} tone="info" />
         <StatCard icon={Dumbbell} label="Gym Members" value={s.totalAdmitted} tone="success" sublabel={`${s.notAdmitted} not admitted`} />
         <StatCard icon={CreditCard} label="Active Memberships" value={s.activeMemberships} tone="teal" sublabel={`${s.expiredMemberships} expired`} />
@@ -135,7 +135,7 @@ export default function AdminDashboard() {
 
       {loading && !analytics ? <AdminLoadingSkeleton variant="chart" /> : <RevenueChart analytics={analytics} period={period} onPeriodChange={setPeriod} />}
 
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="grid gap-6 xl:grid-cols-2">
         <Card padding={false}>
           <div className="flex items-center justify-between border-b border-surface-200 px-5 py-4 dark:border-surface-800">
             <h3 className="font-display text-lg font-semibold text-ink-950 dark:text-white">Recent Orders</h3>
