@@ -31,12 +31,12 @@ const FACILITIES = [
     icon: Dumbbell,
     image: 'https://images.unsplash.com/photo-1540497077202-7c8a3999166f?auto=format&fit=crop&w=1600&q=80',
     description:
-      'Engineered for serious progressive overload. Equipped with competition power cages, Olympic calibrated weight plates, knurled Texas power bars, dumbbell racks extending to heavy pairs, and heavy-duty adjustable incline benches.',
+      'Explore strength-training stations and resistance equipment for progressive workouts. Contact the team for the current equipment list and available weight ranges.',
     highlights: [
-      'Calibrated Olympic Barbells & Bumper Plates',
-      'Solid Steel Dumbbells to 50+ kg',
-      'Heavy-duty Power Cages with Safety Straps',
-      'Deadlift Platforms with Vibration Dampening',
+      'Barbells and weight plates, where available',
+      'Dumbbells and free-weight options',
+      'Power racks and strength stations, where available',
+      'Dedicated lifting platforms, where available',
     ],
   },
   {
@@ -46,12 +46,12 @@ const FACILITIES = [
     icon: Zap,
     image: 'https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?auto=format&fit=crop&w=1600&q=80',
     description:
-      'Engineered to match natural human muscle resistance curves. Features converging chest presses, dual cable crossovers with micro-adjustments, plate-loaded hack squats, and targeted isolateral leg machines.',
+      'Explore strength and resistance-training equipment for a range of movement patterns. Ask the team about the machines and stations currently available.',
     highlights: [
       'Isolateral Diverging & Converging Movements',
-      'Zero-Slack Kevlar Belt Drive Cables',
+      'Adjustable cable stations, where available',
       'Adjustable Pivot Ergonomic Seating',
-      'Precision Plate-Loaded Squat & Press Systems',
+      'Plate-loaded strength equipment, where available',
     ],
   },
   {
@@ -61,12 +61,12 @@ const FACILITIES = [
     icon: Activity,
     image: 'https://images.unsplash.com/photo-1574680096145-d05b474e2155?auto=format&fit=crop&w=1600&q=80',
     description:
-      'A dedicated endurance zone configured with curved self-powered treadmills, high-incline motorized decks, commercial air bikes, Concept2 rowers, and precision elliptical cross-trainers with integrated heart-rate monitoring.',
+      'A cardio area for endurance and conditioning. Contact the team for the current machine list, brands and available features.',
     highlights: [
-      'Non-Motorized Curved Dynamic Slat Treadmills',
-      'Concept2 Rowers & Air Ergometers',
+      'Treadmills for walking and running workouts',
+      'Rowing and air-resistance cardio options, where available',
       'Low-Impact Commercial Ellipticals',
-      'Interactive Zone-Based Heart Tracking',
+      'Ask about heart-rate and console features on available machines',
     ],
   },
   {
@@ -79,9 +79,9 @@ const FACILITIES = [
       'Post-training recovery helps you recharge. Warm steam therapy relieves muscular tension, relaxes connective tissues, and provides a calming retreat after intense training sessions.',
     highlights: [
       'Warm Steam for Muscle Relaxation & Heat Therapy',
-      'Comfortable & Clean Granite Steam Chamber',
+      'Steam-room facilities, subject to current availability',
       'Private Shower & Changing Facilities',
-      'Included as an Exclusive Club Amenity',
+      'Ask the team whether recovery facilities are included in your selected membership',
     ],
   },
   {
@@ -91,11 +91,11 @@ const FACILITIES = [
     icon: Crosshair,
     image: 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&w=1600&q=80',
     description:
-      'Dedicated high-density turf strip built for heavy sled pushing, battle ropes, plyometric boxes, farmer carry handles, slam balls, and dynamic athletic functional circuits.',
+      'A functional training area for movement-based conditioning. Ask the team which training tools and equipment are currently available.',
     highlights: [
-      'High-Density Indoor Sled & Movement Turf',
-      'Heavy Dual-Handle Push & Pull Prowler Sleds',
-      'Reinforced Wall-Balls, Plyo Cubes & Sandbags',
+      'Functional movement and conditioning space, where available',
+      'Sled-based training equipment, where available',
+      'Functional training accessories, where available',
       'Commercial Battle Ropes & Kettlebell Stacks',
     ],
   },
@@ -106,9 +106,9 @@ const FACILITIES = [
     icon: Leaf,
     image: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&w=1600&q=80',
     description:
-      'A serene, sound-insulated hardwood studio dedicated to mobility restoration, Vinyasa flow, spine decompression, and joint longevity away from the energy of the main training floor.',
+      'A calm space for mobility, stretching and guided movement sessions. Contact the team for current class schedules and studio availability.',
     highlights: [
-      'Acoustically Dampened Natural Wood Floor',
+      'Studio flooring and setup, subject to location',
       'Warm Natural Lighting & Clean Air Circulation',
       'Supportive Cork Blocks, Straps & Bolsters',
       'Guided Mobility & Flow Sessions',
@@ -121,9 +121,9 @@ const FACILITIES = [
     icon: Music,
     image: 'https://images.unsplash.com/photo-1518611012118-696072aa579a?auto=format&fit=crop&w=1600&q=80',
     description:
-      'A dynamic group movement hall equipped with concert-grade surround sound, shock-absorbent sprung timber flooring, and dynamic lighting for exhilarating cardio-dance workouts.',
+      'A group movement space for guided cardio-dance and fitness sessions. Contact the team for current schedules and studio facilities.',
     highlights: [
-      'Shock-Absorbent Sprung Timber Floor',
+      'Group movement studio space',
       'Acoustic Surround Sound System',
       'Full-Length Wall Mirrors for Cadence & Form',
       'Energetic Group Choreography Sessions',
