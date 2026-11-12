@@ -213,7 +213,8 @@ export default function Store() {
               {products.map((product) => {
                 const imgUrl = product.image_url || product.images?.[0]?.url;
                 const isAdded = added === product.id;
-                const price = product.sale_price ?? product.price;
+                const price = product.price;
+                const hasDiscount = product.mrp != null && Number(product.mrp) > Number(product.price);
                 const outOfStock = product.stock_status === 'out_of_stock' || Number(product.available_quantity) <= 0;
 
                 return (
@@ -233,7 +234,7 @@ export default function Store() {
                             <ShoppingBag size={54} className="text-brand-500/40" />
                           )}
 
-                          {product.sale_price && (
+                          {hasDiscount && (
                             <span className="absolute top-3 right-3 rounded bg-brand-600 px-2 py-0.5 text-[10px] font-mono font-bold text-white uppercase tracking-wider">
                               Special Price
                             </span>
@@ -260,9 +261,9 @@ export default function Store() {
                             <span className="font-display text-xl font-black text-white">
                               {formatCurrency(price)}
                             </span>
-                            {product.sale_price && (
+                            {hasDiscount && (
                               <span className="text-xs text-surface-400 line-through font-mono">
-                                {formatCurrency(product.price)}
+                                {formatCurrency(product.mrp)}
                               </span>
                             )}
                           </div>
