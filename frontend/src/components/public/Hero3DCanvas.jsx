@@ -1,6 +1,6 @@
 import React, { useRef, useMemo, useState, useEffect, Suspense } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { Float, Sparkles } from '@react-three/drei';
+import { Sparkles } from '@react-three/drei';
 import * as THREE from 'three';
 
 /**
@@ -20,186 +20,272 @@ function isWebGLSupported() {
 }
 
 /**
- * 3D Sculpted Olympic Barbell Weight Plate & Strength Crest
- * Communicates authentic gym strength, precision engineering, and luxury fitness.
+ * 3D Sculpted Olympic Barbell Weight Plate
+ * 
+ * Features authentic commercial gym geometry:
+ * - Solid circular plate body with recessed web.
+ * - Real 50.4mm Olympic standard center through-hole (bore hole).
+ * - 3 ergonomic grip cutout openings (tri-grip design).
+ * - Raised outer rim (flange) with beveled protective lip.
+ * - Machined stainless steel center collar insert.
+ * - Subtle metallic gold accent pinstriping embedded into the rim.
+ * - 3/4 isometric perspective angle showing thickness, center hole, and face depth.
  */
-function OlympicStrengthPlate({ isMobile = false }) {
-  const mainPlateRef = useRef();
-  const innerRingRef = useRef();
-  const centerHubRef = useRef();
+function OlympicWeightPlate({ isMobile = false }) {
+  const plateGroupRef = useRef();
 
-  useFrame((state, delta) => {
+  // Create real Olympic plate geometries with through-holes
+  const { webGeom, rimGeom, hubGeom, collarGeom, goldRingGeom } = useMemo(() => {
+    const curveSegments = isMobile ? 24 : 36;
+    const outerR = 1.95;
+    const rimInnerR = 1.66;
+    const centerR = 0.28; // Standard 50.4mm bore radius
+    const hubOuterR = 0.54;
+    const gripRadius = 1.14;
+
+    // 1. Recessed Web with Center Hole and 3 Ergonomic Grip Openings
+    const webShape = new THREE.Shape();
+    webShape.absarc(0, 0, outerR - 0.02, 0, Math.PI * 2, false);
+
+    const centerHole = new THREE.Path();
+    centerHole.absarc(0, 0, centerR, 0, Math.PI * 2, true);
+    webShape.holes.push(centerHole);
+
+    for (let i = 0; i < 3; i++) {
+      const angle = (i * 2 * Math.PI) / 3 + Math.PI / 6;
+      const cx = Math.cos(angle) * gripRadius;
+      const cy = Math.sin(angle) * gripRadius;
+      const w = 0.56;
+      const h = 0.24;
+
+      const grip = new THREE.Path();
+      const rot = angle + Math.PI / 2;
+      const cosR = Math.cos(rot);
+      const sinR = Math.sin(rot);
+      const dx = (w / 2) * cosR;
+      const dy = (w / 2) * sinR;
+      const nx = (h / 2) * -sinR;
+      const ny = (h / 2) * cosR;
+
+      grip.moveTo(cx - dx - nx, cy - dy - ny);
+      grip.lineTo(cx + dx - nx, cy + dy - ny);
+      grip.quadraticCurveTo(cx + dx, cy + dy, cx + dx + nx, cy + dy + ny);
+      grip.lineTo(cx - dx + nx, cy - dy + ny);
+      grip.quadraticCurveTo(cx - dx, cy - dy, cx - dx - nx, cy - dy - ny);
+      webShape.holes.push(grip);
+    }
+
+    const web = new THREE.ExtrudeGeometry(webShape, {
+      depth: 0.12,
+      bevelEnabled: true,
+      bevelThickness: 0.02,
+      bevelSize: 0.02,
+      bevelSegments: 2,
+      curveSegments,
+    });
+    web.center();
+
+    // 2. Raised Outer Rim (Flange)
+    const rimShape = new THREE.Shape();
+    rimShape.absarc(0, 0, outerR, 0, Math.PI * 2, false);
+    const rimHole = new THREE.Path();
+    rimHole.absarc(0, 0, rimInnerR, 0, Math.PI * 2, true);
+    rimShape.holes.push(rimHole);
+
+    const rim = new THREE.ExtrudeGeometry(rimShape, {
+      depth: 0.22,
+      bevelEnabled: true,
+      bevelThickness: 0.025,
+      bevelSize: 0.02,
+      bevelSegments: 2,
+      curveSegments,
+    });
+    rim.center();
+
+    // 3. Center Hub
+    const hubShape = new THREE.Shape();
+    hubShape.absarc(0, 0, hubOuterR, 0, Math.PI * 2, false);
+    const hubHole = new THREE.Path();
+    hubHole.absarc(0, 0, centerR, 0, Math.PI * 2, true);
+    hubShape.holes.push(hubHole);
+
+    const hub = new THREE.ExtrudeGeometry(hubShape, {
+      depth: 0.22,
+      bevelEnabled: true,
+      bevelThickness: 0.02,
+      bevelSize: 0.015,
+      bevelSegments: 2,
+      curveSegments,
+    });
+    hub.center();
+
+    // 4. Stainless Steel Inner Collar Ring
+    const collarShape = new THREE.Shape();
+    collarShape.absarc(0, 0, centerR + 0.08, 0, Math.PI * 2, false);
+    const collarHole = new THREE.Path();
+    collarHole.absarc(0, 0, centerR, 0, Math.PI * 2, true);
+    collarShape.holes.push(collarHole);
+
+    const collar = new THREE.ExtrudeGeometry(collarShape, {
+      depth: 0.24,
+      bevelEnabled: true,
+      bevelThickness: 0.015,
+      bevelSize: 0.01,
+      bevelSegments: 2,
+      curveSegments,
+    });
+    collar.center();
+
+    // 5. Subtle Gold Accent Inlay
+    const goldRingShape = new THREE.Shape();
+    goldRingShape.absarc(0, 0, rimInnerR + 0.01, 0, Math.PI * 2, false);
+    const goldHole = new THREE.Path();
+    goldHole.absarc(0, 0, rimInnerR - 0.02, 0, Math.PI * 2, true);
+    goldRingShape.holes.push(goldHole);
+
+    const goldRing = new THREE.ExtrudeGeometry(goldRingShape, {
+      depth: 0.14,
+      bevelEnabled: false,
+      curveSegments,
+    });
+    goldRing.center();
+
+    return {
+      webGeom: web,
+      rimGeom: rim,
+      hubGeom: hub,
+      collarGeom: collar,
+      goldRingGeom: goldRing,
+    };
+  }, [isMobile]);
+
+  // Clean, realistic commercial gym materials
+  const castIronMaterial = useMemo(
+    () =>
+      new THREE.MeshStandardMaterial({
+        color: new THREE.Color('#222630'),
+        metalness: 0.7,
+        roughness: 0.38,
+      }),
+    []
+  );
+
+  const steelCollarMaterial = useMemo(
+    () =>
+      new THREE.MeshStandardMaterial({
+        color: new THREE.Color('#f1f5f9'),
+        metalness: 0.94,
+        roughness: 0.18,
+      }),
+    []
+  );
+
+  const goldAccentMaterial = useMemo(
+    () =>
+      new THREE.MeshStandardMaterial({
+        color: new THREE.Color('#e5b842'),
+        metalness: 0.88,
+        roughness: 0.24,
+        emissive: new THREE.Color('#241a04'),
+        emissiveIntensity: 0.15,
+      }),
+    []
+  );
+
+  useFrame((state) => {
     const t = state.clock.getElapsedTime();
 
-    // Smooth rotational drifting of the main Olympic plate
-    if (mainPlateRef.current) {
-      mainPlateRef.current.rotation.x = 0.35 + Math.sin(t * 0.35) * 0.1;
-      mainPlateRef.current.rotation.y += delta * 0.22;
-      mainPlateRef.current.rotation.z = Math.cos(t * 0.25) * 0.08;
-    }
+    if (plateGroupRef.current) {
+      // 3/4 isometric perspective base orientation
+      const baseRotY = -0.32;
+      const baseRotX = 0.26;
+      const baseRotZ = 0.03;
 
-    // Counter-rotating calibrated inner gold ring
-    if (innerRingRef.current) {
-      innerRingRef.current.rotation.x = -0.25 + Math.cos(t * 0.3) * 0.12;
-      innerRingRef.current.rotation.y -= delta * 0.28;
-    }
+      // Slow, majestic floating levitation and subtle drift
+      const targetRotY =
+        baseRotY +
+        Math.sin(t * 0.45) * 0.12 +
+        (!isMobile && state.pointer ? state.pointer.x * 0.15 : 0);
 
-    // Subtle breathing pulse of center Olympic sleeve hub
-    if (centerHubRef.current) {
-      centerHubRef.current.rotation.y += delta * 0.4;
-      centerHubRef.current.position.y = Math.sin(t * 0.7) * 0.06;
-    }
+      const targetRotX =
+        baseRotX +
+        Math.cos(t * 0.35) * 0.05 -
+        (!isMobile && state.pointer ? state.pointer.y * 0.1 : 0);
 
-    // Subtle pointer parallax tilt on desktop
-    if (!isMobile && state.pointer) {
-      state.camera.position.x = THREE.MathUtils.lerp(
-        state.camera.position.x,
-        state.pointer.x * 0.45,
-        0.04
+      plateGroupRef.current.rotation.y = THREE.MathUtils.lerp(
+        plateGroupRef.current.rotation.y,
+        targetRotY,
+        0.05
       );
-      state.camera.position.y = THREE.MathUtils.lerp(
-        state.camera.position.y,
-        state.pointer.y * 0.3,
-        0.04
+      plateGroupRef.current.rotation.x = THREE.MathUtils.lerp(
+        plateGroupRef.current.rotation.x,
+        targetRotX,
+        0.05
       );
-      state.camera.lookAt(0, 0, 0);
+      plateGroupRef.current.rotation.z = baseRotZ + Math.sin(t * 0.3) * 0.02;
+
+      plateGroupRef.current.position.y = Math.sin(t * 0.6) * 0.07;
     }
   });
 
-  // Premium Materials: Brushed Metallic Gold & Matte Gunmetal Steel
-  const goldMaterial = useMemo(
-    () =>
-      new THREE.MeshStandardMaterial({
-        color: new THREE.Color('#d4af37'),
-        metalness: 0.92,
-        roughness: 0.24,
-        emissive: new THREE.Color('#382806'),
-        emissiveIntensity: 0.2,
-      }),
-    []
-  );
-
-  const gunmetalMaterial = useMemo(
-    () =>
-      new THREE.MeshStandardMaterial({
-        color: new THREE.Color('#141720'),
-        metalness: 0.88,
-        roughness: 0.32,
-      }),
-    []
-  );
-
-  const crimsonAccentMaterial = useMemo(
-    () =>
-      new THREE.MeshStandardMaterial({
-        color: new THREE.Color('#dc2626'),
-        metalness: 0.85,
-        roughness: 0.25,
-        emissive: new THREE.Color('#7f1d1d'),
-        emissiveIntensity: 0.25,
-      }),
-    []
-  );
-
-  const radialSegments = isMobile ? 36 : 64;
-
   return (
-    <group position={[0, 0, 0]}>
-      {/* 1. Main Calibrated Olympic Plate Body */}
-      <group ref={mainPlateRef}>
-        {/* Outer Heavy Steel Rim */}
-        <mesh material={gunmetalMaterial}>
-          <cylinderGeometry args={[2.3, 2.3, 0.16, radialSegments]} />
-        </mesh>
+    <group ref={plateGroupRef} position={[0, 0, 0]}>
+      {/* 1. Recessed Web with 3 Ergonomic Grip Openings */}
+      <mesh geometry={webGeom} material={castIronMaterial} />
 
-        {/* Raised Outer Edge Ring (Plate Flange) */}
-        <mesh material={goldMaterial}>
-          <torusGeometry args={[2.25, 0.08, 16, radialSegments]} />
-        </mesh>
+      {/* 2. Raised Outer Rim Flange */}
+      <mesh geometry={rimGeom} material={castIronMaterial} />
 
-        {/* Inner Recessed Weight Channel */}
-        <mesh material={gunmetalMaterial} position={[0, 0, 0]}>
-          <cylinderGeometry args={[1.7, 1.7, 0.12, radialSegments]} />
-        </mesh>
+      {/* 3. Center Hub */}
+      <mesh geometry={hubGeom} material={castIronMaterial} />
 
-        {/* Dual Ergonomic Hand-Grip Cutout Inserts */}
-        <mesh material={goldMaterial} position={[1.25, 0, 0]}>
-          <torusGeometry args={[0.32, 0.04, 12, 24]} />
-        </mesh>
-        <mesh material={goldMaterial} position={[-1.25, 0, 0]}>
-          <torusGeometry args={[0.32, 0.04, 12, 24]} />
-        </mesh>
-      </group>
+      {/* 4. Machined Stainless Steel Collar Sleeve Insert */}
+      <mesh geometry={collarGeom} material={steelCollarMaterial} />
 
-      {/* 2. Counter-Rotating Precision Calibrated Gold Ring */}
-      <mesh ref={innerRingRef} material={goldMaterial}>
-        <torusGeometry args={[1.45, 0.06, 16, radialSegments]} />
-      </mesh>
-
-      {/* 3. Center Olympic Barbell Sleeve Collar Hub */}
-      <group ref={centerHubRef}>
-        {/* Central Olympic Barbell Sleeve Hub */}
-        <mesh material={goldMaterial} rotation={[Math.PI / 2, 0, 0]}>
-          <cylinderGeometry args={[0.42, 0.42, 0.32, radialSegments]} />
-        </mesh>
-
-        {/* Knurled Collar Ring Accent */}
-        <mesh material={crimsonAccentMaterial} rotation={[Math.PI / 2, 0, 0]}>
-          <cylinderGeometry args={[0.48, 0.48, 0.08, radialSegments]} />
-        </mesh>
-
-        {/* Core Insignia Emblem Accent */}
-        <mesh material={goldMaterial} position={[0, 0, 0.18]}>
-          <boxGeometry args={[0.22, 0.22, 0.04]} />
-        </mesh>
-      </group>
-
-      {/* 4. Satellite Floating Dumbbell Plates */}
-      <Float speed={1.8} rotationIntensity={0.8} floatIntensity={1.2}>
-        <mesh position={[2.7, 1.3, -1.0]} material={goldMaterial}>
-          <cylinderGeometry args={[0.48, 0.48, 0.07, isMobile ? 24 : 36]} />
-        </mesh>
-      </Float>
-
-      <Float speed={1.5} rotationIntensity={1.0} floatIntensity={1.4}>
-        <mesh position={[-2.6, -1.2, -0.8]} material={gunmetalMaterial}>
-          <cylinderGeometry args={[0.55, 0.55, 0.09, isMobile ? 24 : 36]} />
-        </mesh>
-      </Float>
-
-      <Float speed={2.0} rotationIntensity={0.6} floatIntensity={1.0}>
-        <mesh position={[-2.1, 1.5, -1.2]} material={crimsonAccentMaterial}>
-          <torusGeometry args={[0.36, 0.05, 12, isMobile ? 24 : 32]} />
-        </mesh>
-      </Float>
+      {/* 5. Subtle Metallic Gold Inlay Ring */}
+      <mesh geometry={goldRingGeom} material={goldAccentMaterial} />
     </group>
   );
 }
 
 /**
  * Atmospheric embers drifting with gold and warm amber glow
+ * Kept restrained to avoid visual clutter.
  */
 function AtmosphericEmbers({ isMobile = false }) {
   return (
     <Sparkles
-      count={isMobile ? 35 : 90}
-      scale={[8, 7, 7]}
-      size={isMobile ? 2.0 : 2.6}
-      speed={0.35}
-      opacity={0.6}
+      count={isMobile ? 12 : 24}
+      scale={[7, 6, 5]}
+      size={isMobile ? 1.5 : 2.0}
+      speed={0.25}
+      opacity={0.4}
       color="#e6c66e"
     />
   );
 }
 
 /**
- * Lightweight luxury fallback displayed when WebGL is unsupported, disabled,
- * or when the user prefers reduced motion.
+ * Lightweight SVG/CSS Olympic weight plate fallback for reduced-motion
+ * or environments without WebGL acceleration.
  */
 function FallbackCanvas() {
   return (
-    <div className="absolute inset-0 flex items-center justify-center bg-radial from-brand-950/25 via-[#050608] to-[#050608]">
-      <div className="h-64 w-64 sm:h-80 sm:w-80 rounded-full border border-amber-500/20 bg-gradient-to-tr from-amber-500/10 via-brand-500/5 to-transparent blur-3xl animate-pulse" />
+    <div className="absolute inset-0 flex items-center justify-center p-4">
+      <div className="relative h-60 w-60 sm:h-72 sm:w-72 rounded-full border-4 border-[#2d323f] bg-gradient-to-tr from-[#161820] to-[#252936] shadow-2xl flex items-center justify-center">
+        {/* Outer Gold Accent Rim */}
+        <div className="absolute inset-2.5 rounded-full border border-amber-500/30" />
+        
+        {/* 3 Grip Opening Representations */}
+        <div className="absolute top-5 h-5 w-16 rounded-full bg-[#050608] border border-white/10" />
+        <div className="absolute bottom-9 left-6 h-5 w-16 -rotate-60 rounded-full bg-[#050608] border border-white/10" />
+        <div className="absolute bottom-9 right-6 h-5 w-16 rotate-60 rounded-full bg-[#050608] border border-white/10" />
+
+        {/* Center Collar & Bore Hole */}
+        <div className="relative h-20 w-20 rounded-full border-2 border-surface-300 bg-gradient-to-b from-surface-200 to-surface-400 flex items-center justify-center shadow-lg">
+          <div className="h-9 w-9 rounded-full bg-[#050608] border border-white/20 shadow-inner" />
+        </div>
+      </div>
     </div>
   );
 }
@@ -253,7 +339,7 @@ export default function Hero3DCanvas({ className = '' }) {
       <ErrorBoundary>
         <Suspense fallback={<FallbackCanvas />}>
           <Canvas
-            camera={{ position: [0, 0, isMobile ? 7.6 : 6.6], fov: 45 }}
+            camera={{ position: [0, 0, isMobile ? 6.2 : 5.4], fov: 42 }}
             dpr={isMobile ? [1, 1.25] : [1, 1.75]}
             gl={{
               antialias: !isMobile,
@@ -263,22 +349,22 @@ export default function Hero3DCanvas({ className = '' }) {
             }}
             className="h-full w-full pointer-events-none"
           >
-            {/* Ambient Lighting */}
-            <ambientLight intensity={0.65} />
+            {/* Ambient Lighting for base visibility */}
+            <ambientLight intensity={0.9} />
 
-            {/* Warm Metallic Gold Key Light */}
-            <pointLight position={[6, 4, 5]} intensity={18} color="#f6d365" distance={15} />
+            {/* Studio Key Light (warm white) illuminating the plate face & grip bevels */}
+            <directionalLight position={[5, 5, 5]} intensity={3.6} color="#fff6e5" />
 
-            {/* Crimson Contrast Fill Light */}
-            <pointLight position={[-6, -3, 3]} intensity={20} color="#dc2626" distance={15} />
+            {/* Studio Rim Light (cool slate) picking up the outer cylindrical edge & plate thickness */}
+            <directionalLight position={[-4, 4, -4]} intensity={4.5} color="#cbd5e1" />
 
-            {/* Subtle Metallic Specular Rim Highlight */}
-            <directionalLight position={[0, 6, -3]} intensity={3} color="#93c5fd" />
+            {/* Soft Amber Accent Fill from lower angle */}
+            <pointLight position={[-3, -3, 3]} intensity={8} color="#d97706" distance={10} />
 
-            {/* 3D Olympic Weight Plate & Calibrated Rings */}
-            <OlympicStrengthPlate isMobile={isMobile} />
+            {/* Dedicated 3D Olympic Weight Plate */}
+            <OlympicWeightPlate isMobile={isMobile} />
 
-            {/* Atmospheric Drifting Embers */}
+            {/* Subtle atmospheric dust motes */}
             <AtmosphericEmbers isMobile={isMobile} />
           </Canvas>
         </Suspense>

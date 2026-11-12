@@ -93,72 +93,83 @@ export default function Home() {
           SECTION 01 — CINEMATIC HERO / FRONT PAGE ADVERTISEMENT
           ========================================================================= */}
       <section ref={heroRef} className="relative min-h-screen flex items-center justify-center overflow-hidden pt-28 pb-16 lg:pt-36 lg:pb-24">
-        {/* Background Atmosphere Image with Cinematic Grade */}
+        {/* Background Atmosphere Image with Controlled Cinematic Grade */}
         <div className="absolute inset-0 z-0">
           <img
             src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=2000&q=85"
-            alt="Heaven Gym Elite Facility"
-            className="h-full w-full object-cover filter brightness-[0.22] contrast-125"
+            alt="Heaven Gym Elite Facility Interior"
+            className="h-full w-full object-cover filter brightness-[0.32] contrast-115"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#050608] via-[#050608]/70 to-[#050608]/90" />
-          <div className="absolute inset-0 bg-radial from-transparent via-[#050608]/50 to-[#050608]" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#050608] via-[#050608]/75 to-[#050608]/60" />
+          <div className="absolute inset-0 bg-radial from-transparent via-[#050608]/40 to-[#050608]" />
+          <div className="absolute top-1/4 right-1/4 h-96 w-96 rounded-full bg-amber-500/10 blur-[140px] pointer-events-none" />
         </div>
 
-        {/* 3D Interactive Canvas Layer */}
-        <div className="absolute inset-0 z-10 opacity-75">
-          <Hero3DCanvas />
-        </div>
+        {/* Hero Content Overlay: Asymmetrical 2-Column Responsive Layout */}
+        <div className="relative z-20 mx-auto max-w-7xl px-5 sm:px-6 lg:px-8 w-full py-8 lg:py-12">
+          <div className="grid lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+            
+            {/* Left/Central Column: Headline, Subtitle, and CTAs (lg:col-span-7) */}
+            <div className="lg:col-span-7 flex flex-col items-start text-left z-20">
+              <div className="hero-badge inline-flex items-center gap-2 rounded-full border border-amber-500/30 bg-black/60 px-4 py-1.5 text-[11px] sm:text-xs font-mono font-bold uppercase tracking-[0.2em] text-amber-300 backdrop-blur-xl shadow-lg">
+                <Sparkles size={13} className="text-amber-400" />
+                The Luxury Fitness Standard
+              </div>
 
-        {/* Hero Content Overlay */}
-        <div className="relative z-20 mx-auto max-w-7xl px-5 lg:px-8 text-center flex flex-col items-center">
-          <div className="hero-badge inline-flex items-center gap-2.5 rounded-full border border-amber-500/30 bg-black/60 px-5 py-2 text-xs font-mono font-bold uppercase tracking-[0.25em] text-amber-300 backdrop-blur-xl shadow-2xl">
-            <Sparkles size={14} className="text-amber-400" />
-            The Luxury Fitness Standard
-          </div>
+              <h1 className="hero-title mt-6 font-display text-3xl sm:text-5xl lg:text-6xl xl:text-7xl font-black tracking-tight leading-[1.08] text-white">
+                BUILD STRENGTH. <br />
+                <span className="bg-gradient-to-r from-amber-200 via-amber-300 to-amber-500 bg-clip-text text-transparent">
+                  DISCOVER YOUR POTENTIAL.
+                </span>
+              </h1>
 
-          <h1 className="hero-title mt-8 font-display text-[27px] sm:text-5xl md:text-6xl lg:text-8xl font-black tracking-tight leading-[1.1] sm:leading-[1.05] text-white max-w-5xl break-words">
-            BUILD STRENGTH. <br />
-            <span className="bg-gradient-to-r from-white via-surface-100 to-amber-200 bg-clip-text text-transparent">
-              DISCOVER YOUR POTENTIAL.
-            </span>
-          </h1>
+              <p className="hero-desc mt-5 max-w-xl text-sm sm:text-base lg:text-lg text-surface-300 font-normal leading-relaxed">
+                More than a place to train. A space designed to help you move better, grow stronger, and build a healthier lifestyle.
+              </p>
 
-          <p className="hero-desc mt-6 max-w-2xl text-base sm:text-lg md:text-xl text-surface-300 font-light leading-relaxed">
-            More than a place to train. A space designed to help you move better, grow stronger, and build a healthier lifestyle.
-          </p>
+              <div className="hero-cta mt-8 flex flex-wrap items-center gap-4 w-full sm:w-auto">
+                <Link to="/membership" className="w-full sm:w-auto">
+                  <Button
+                    size="lg"
+                    className="w-full sm:w-auto bg-brand-600 hover:bg-brand-500 text-white text-xs sm:text-sm font-mono font-bold uppercase tracking-wider px-7 py-3.5 rounded-full shadow-xl shadow-brand-600/30 border border-brand-400/25 active:scale-95 transition-all"
+                  >
+                    Explore Membership <ArrowRight size={16} className="ml-2" />
+                  </Button>
+                </Link>
 
-          <div className="hero-cta mt-10 flex flex-wrap items-center justify-center gap-4">
-            <Link to="/membership">
-              <Button
-                size="lg"
-                className="bg-brand-600 hover:bg-brand-500 text-white text-xs sm:text-sm font-mono font-bold uppercase tracking-widest px-8 py-4 rounded-full shadow-2xl shadow-brand-600/40 border border-brand-400/30 active:scale-95 transition-all"
-              >
-                Explore Membership <ArrowRight size={16} className="ml-2" />
-              </Button>
-            </Link>
+                <Link to="/facilities" className="w-full sm:w-auto">
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    className="w-full sm:w-auto border-white/20 bg-white/[0.04] text-white hover:border-amber-400 hover:bg-amber-400/10 text-xs sm:text-sm font-mono font-bold uppercase tracking-wider px-7 py-3.5 rounded-full backdrop-blur-md active:scale-95 transition-all"
+                  >
+                    Explore Our Facilities
+                  </Button>
+                </Link>
+              </div>
 
-            <Link to="/facilities">
-              <Button
-                variant="outline"
-                size="lg"
-                className="border-white/20 bg-white/[0.03] text-white hover:border-amber-400 hover:bg-amber-400/10 text-xs sm:text-sm font-mono font-bold uppercase tracking-widest px-8 py-4 rounded-full backdrop-blur-md active:scale-95 transition-all"
-              >
-                Explore Our Facilities
-              </Button>
-            </Link>
-          </div>
+              {/* Verification Watermark Badges */}
+              <div className="hero-cta mt-10 pt-6 border-t border-white/10 grid grid-cols-2 sm:grid-cols-3 gap-4 w-full text-xs font-mono text-surface-400">
+                <span className="flex items-center gap-2">
+                  <ShieldCheck size={15} className="text-emerald-400 shrink-0" />
+                  <span>Pristine Hygiene</span>
+                </span>
+                <span className="flex items-center gap-2">
+                  <Dumbbell size={15} className="text-amber-400 shrink-0" />
+                  <span>Calibrated Weights</span>
+                </span>
+                <span className="flex items-center gap-2 col-span-2 sm:col-span-1">
+                  <Clock size={15} className="text-brand-400 shrink-0" />
+                  <span>Open 5 AM – 10 PM</span>
+                </span>
+              </div>
+            </div>
 
-          {/* Verification Watermark Badges */}
-          <div className="hero-cta mt-16 flex flex-wrap items-center justify-center gap-6 sm:gap-10 text-xs font-mono text-surface-400 border-t border-white/10 pt-6">
-            <span className="flex items-center gap-2">
-              <ShieldCheck size={16} className="text-emerald-400" /> Pristine Hygiene Standards
-            </span>
-            <span className="flex items-center gap-2">
-              <Dumbbell size={16} className="text-amber-400" /> Precision Strength Equipment
-            </span>
-            <span className="flex items-center gap-2">
-              <Clock size={16} className="text-brand-400" /> Open Daily 5 AM – 10 PM
-            </span>
+            {/* Right Column: Dedicated 3D Olympic Weight Plate Viewport (lg:col-span-5) */}
+            <div className="lg:col-span-5 relative flex items-center justify-center w-full h-[320px] sm:h-[380px] lg:h-[500px] xl:h-[560px] pointer-events-none">
+              <Hero3DCanvas />
+            </div>
+
           </div>
         </div>
       </section>
