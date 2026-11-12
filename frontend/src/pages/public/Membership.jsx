@@ -24,7 +24,7 @@ import { formatCurrency } from '@/utils/formatters';
 const MEMBERSHIP_FAQS = [
   {
     q: 'What is included with my Heaven Gym membership?',
-    a: 'Membership access depends on the selected plan and the gym's posted opening hours. Please confirm which training zones and amenities are included with reception before purchasing.',
+    a: "Membership access depends on the selected plan and the gym's posted opening hours. Please confirm which training zones and amenities are included with reception before purchasing.",
   },
   {
     q: 'Can I freeze or pause my membership if I travel?',
