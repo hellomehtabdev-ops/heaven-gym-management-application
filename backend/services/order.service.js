@@ -50,13 +50,6 @@ export async function getOrdersByUserId(userId, { search = '', bucket = 'all', p
 
 export async function getAllOrders({ search = '', status = 'all', bucket = 'all', page = 1, limit = 10 } = {}) {
   const filter = buildOrderFilter({ search, status, bucket });
-  const safePage = Math.max(1, Number(page) || 1);
-  const safeLimit = Math.min(50, Math.max(1, Number(limit) || 10));
-  const [rows, total] = await Promise.all([Order.find(filter).sort({ createdAt: -1, _id: -1 }).skip((safePage - 1) * safeLimit).limit(safeLimit).lean(), Order.countDocuments(filter)]);
-  return { rows: rows.map((order) => ({ ...order, id: String(order._id) })), total, page: safePage, pages: Math.max(1, Math.ceil(total / safeLimit)), limit: safeLimit };
-}
-export async function getAllOrders({ search = '', status = 'all', bucket = 'all', page = 1, limit = 10 } = {}) {
-  const filter = buildOrderFilter({ search, status, bucket });
   const safeSearch = String(search).trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   if (safeSearch) {
     filter.$or = [
