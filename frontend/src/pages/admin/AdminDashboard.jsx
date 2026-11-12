@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Users, Dumbbell, CreditCard, TrendingUp, IndianRupee, ShoppingCart, AlertTriangle, ArrowRight, Activity, Store } from 'lucide-react';
+import { Users, Dumbbell, CreditCard, TrendingUp, IndianRupee, ShoppingCart, AlertTriangle, ArrowRight, Activity, Store, ShieldCheck, Building2 } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
 import AdminLoadingSkeleton from '@/components/admin/AdminLoadingSkeleton';
 import Card from '@/components/ui/Card';
@@ -114,10 +114,47 @@ export default function AdminDashboard() {
 
   return (
     <div className="space-y-6">
-      <div className="pt-2">
-        <h1 className="font-display text-2xl font-bold text-ink-950 dark:text-white">Admin Dashboard</h1>
-        <p className="mt-1 text-sm text-surface-500">Business overview and analytics</p>
-      </div>
+      <section className="relative isolate overflow-hidden rounded-2xl border border-slate-800 bg-[#111827] px-5 py-6 text-white shadow-xl shadow-slate-950/10 sm:px-7 sm:py-7">
+        <div className="pointer-events-none absolute -right-10 -top-16 h-56 w-56 rounded-full border-[28px] border-white/[0.035]" />
+        <div className="pointer-events-none absolute -bottom-24 right-44 h-48 w-48 rounded-full border border-red-400/15" />
+        <div className="relative flex flex-wrap items-center justify-between gap-5">
+          <div className="flex min-w-0 items-center gap-4">
+            <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-red-400/25 bg-red-500/15 text-red-300 shadow-inner sm:h-14 sm:w-14">
+              <ShieldCheck size={27} strokeWidth={1.8} />
+            </span>
+            <div className="min-w-0">
+              <div className="mb-1 flex flex-wrap items-center gap-2">
+                <p className="text-[10px] font-extrabold uppercase tracking-[0.22em] text-red-300">Admin control center</p>
+                <span className="h-1 w-1 rounded-full bg-slate-500" />
+                <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-400">Heaven Gym</span>
+              </div>
+              <h1 className="font-display text-2xl font-extrabold tracking-tight text-white sm:text-[28px]">Business Overview</h1>
+              <p className="mt-1 text-sm text-slate-400">Manage operations, members, revenue and inventory from one place.</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.06] px-3.5 py-2.5">
+            <Building2 size={17} className="text-red-300" />
+            <div>
+              <p className="text-[9px] font-bold uppercase tracking-[0.16em] text-slate-400">Workspace</p>
+              <p className="text-xs font-bold text-white">Gym Administration</p>
+            </div>
+          </div>
+        </div>
+        <div className="relative mt-6 grid grid-cols-3 gap-2 border-t border-white/10 pt-4 sm:max-w-[520px] sm:gap-6">
+          <div>
+            <p className="text-[9px] font-bold uppercase tracking-[0.14em] text-slate-500">Members</p>
+            <p className="mt-1 text-sm font-bold text-white sm:text-base">{s.totalAdmitted.toLocaleString('en-IN')}</p>
+          </div>
+          <div>
+            <p className="text-[9px] font-bold uppercase tracking-[0.14em] text-slate-500">Active plans</p>
+            <p className="mt-1 text-sm font-bold text-white sm:text-base">{s.activeMemberships.toLocaleString('en-IN')}</p>
+          </div>
+          <div>
+            <p className="text-[9px] font-bold uppercase tracking-[0.14em] text-slate-500">Total revenue</p>
+            <p className="mt-1 text-sm font-bold text-white sm:text-base">{formatCurrency(s.totalRevenue)}</p>
+          </div>
+        </div>
+      </section>
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard icon={Users} label="Registered Users" value={s.totalUsers} tone="info" />
@@ -126,7 +163,7 @@ export default function AdminDashboard() {
         <StatCard icon={ShoppingCart} label="Total Orders" value={s.totalOrders} tone="violet" sublabel={`${s.pendingOrders} pending`} />
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard icon={IndianRupee} label="Gym Revenue" value={formatCurrency(s.gymRevenue)} tone="success" />
         <StatCard icon={Store} label="Store Revenue" value={formatCurrency(s.storeRevenue)} tone="violet" />
         <StatCard icon={IndianRupee} label="Total Revenue" value={formatCurrency(s.totalRevenue)} tone="success" />
