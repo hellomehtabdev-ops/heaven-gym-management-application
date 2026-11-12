@@ -17,15 +17,29 @@ const productSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(fetchProducts.pending, (state) => { state.loading = true; state.error = null; })
+      .addCase(fetchProducts.pending, (state, action) => {
+        state.loading = true;
+        state.error = null;
+        state.currentRequestId = action.meta.requestId;
+      })
       .addCase(fetchProducts.fulfilled, (state, action) => {
+        if (state.currentRequestId !== action.meta.requestId) return;
         state.items = action.payload.rows || [];
         state.total = Number(action.payload.total) || 0;
         state.page = Number(action.payload.page) || 1;
         state.pages = Number(action.payload.pages) || 0;
         state.loading = false;
+        state.currentRequestId = undefined;
       })
-      .addCase(fetchProducts.rejected, (state, action) => { state.loading = false; state.error = action.payload; state.items = []; state.total = 0; state.pages = 0; })
+      .addCase(fetchProducts.rejected, (state, action) => {
+        if (state.currentRequestId !== action.meta.requestId) return;
+        state.loading = false;
+        state.error = action.payload;
+        state.items = [];
+        state.total = 0;
+        state.pages = 0;
+        state.currentRequestId = undefined;
+      })
       .addCase(fetchCategories.fulfilled, (state, action) => { state.categories = action.payload; });
   },
 });
