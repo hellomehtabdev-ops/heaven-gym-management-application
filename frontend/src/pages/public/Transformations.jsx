@@ -152,7 +152,8 @@ export default function Transformations() {
         ) : error ? (
           <div role="alert" className="rounded-2xl border border-red-500/25 bg-red-500/10 p-8 text-center text-sm text-red-200">{error}</div>
         ) : transformations.length > 0 ? (
-          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+          <>
+            <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
             {transformations.map((item) => (
               <Card3D key={item._id} className="h-full">
                 <article className="flex flex-col h-full rounded-3xl border border-white/10 bg-[#0e1017] p-5 shadow-2xl transition-all duration-300 hover:border-brand-500/40">
@@ -229,7 +230,8 @@ export default function Transformations() {
               </button>
               <span className="ml-2 text-[11px] text-surface-500">Page {page} of {totalPages} · {total} results</span>
             </nav>
-          )}
+            )}
+          </>
         ) : (
           <div className="rounded-3xl border border-dashed border-white/15 bg-white/[0.01] p-16 text-center max-w-xl mx-auto">
             <Award className="mx-auto text-amber-400" size={36} />
