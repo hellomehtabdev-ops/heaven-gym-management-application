@@ -47,6 +47,7 @@ import { fetchProducts } from '@/redux/slices/productSlice';
 import { gymEquipmentService } from '@/services/gymEquipmentService';
 import { formatCurrency } from '@/utils/formatters';
 import api from '@/services/apiClient';
+import { getWhatsAppNumber } from '@/utils/phone';
 
 export default function Home() {
   const dispatch = useDispatch();
@@ -79,8 +80,7 @@ export default function Home() {
       .catch(() => {});
   }, [dispatch]);
 
-  const rawPhone = gymSettings?.contact_phone?.replace(/\D/g, '') || '';
-  const internationalPhone = rawPhone.length === 10 ? `91${rawPhone}` : rawPhone;
+  const internationalPhone = getWhatsAppNumber(gymSettings?.contact_phone);
 
   const getWhatsAppLink = (message) => {
     if (!internationalPhone) return '';
@@ -97,7 +97,7 @@ export default function Home() {
         <div className="absolute inset-0 z-0">
           <img
             src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=2000&q=85"
-            alt="Heaven Gym Elite Facility Interior"
+            alt="Gym training facility interior"
             className="h-full w-full object-cover filter brightness-[0.32] contrast-115"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-[#050608] via-[#050608]/75 to-[#050608]/60" />
