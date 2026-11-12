@@ -194,7 +194,7 @@ export default function About() {
                   Empowering Real Transformation
                 </h3>
                 <p className="text-sm text-surface-300 leading-relaxed">
-                  To provide an uncompromising training environment equipped with professional strength equipment, certified coaching expertise, and a community standard that turns effort into compounding physical resilience.
+                  To provide an uncompromising training environment equipped with professional strength equipment, coaching support, and a community standard that turns effort into compounding physical resilience.
                 </p>
               </div>
             </ScrollReveal>
