@@ -245,7 +245,7 @@ export default function HeavenLogo({
       <WingedDumbbell />
       <div className="flex flex-col justify-center leading-none">
         <div className="flex items-baseline gap-1.5">
-          <span className={`font-display font-black tracking-[0.12em] text-lg sm:text-xl ${isLight ? 'text-slate-900' : 'text-white'}`}>
+          <span className={`font-display font-black tracking-[0.12em] text-lg sm:text-xl ${isAuto ? 'text-slate-900 dark:text-white' : isLight ? 'text-slate-900' : 'text-white'}`}>
             HEAVEN
           </span>
           <span className="font-display font-black tracking-[0.14em] text-lg sm:text-xl text-brand-500">
