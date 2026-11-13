@@ -12,6 +12,10 @@ import { paymentService } from '@/services/paymentService';
 import { membershipService } from '@/services/membershipService';
 import { formatCurrency, formatDate, getDaysRemaining } from '@/utils/formatters';
 
+function getMembershipId(membership) {
+  return membership?.id || membership?._id;
+}
+
 export default function Membership() {
   const dispatch = useDispatch();
   const memberships = useSelector((state) => state.memberships.items);
@@ -34,7 +38,7 @@ export default function Membership() {
   const daysLeft = getDaysRemaining(currentMembership?.end_date);
 
   async function payMembership(membership) {
-    const { keyId, razorpayOrder } = await paymentService.createRazorpayOrder({ membershipId: membership.id });
+    const { keyId, razorpayOrder } = await paymentService.createRazorpayOrder({ membershipId: getMembershipId(membership) });
     if (!razorpayOrder || !keyId || typeof window.Razorpay !== 'function') throw new Error('Online payment is temporarily unavailable. Please try again later.');
     await new Promise((resolve, reject) => {
       const rzp = new window.Razorpay({
@@ -188,7 +192,7 @@ export default function Membership() {
         </section>
       )}
 
-      <Card padding={false}><div className="border-b border-surface-200 px-5 py-4 dark:border-surface-800"><h3 className="font-display text-lg font-semibold text-ink-950 dark:text-white">Membership History</h3></div>{(memberships || []).length > 0 ? <div className="p-5"><div className="space-y-3">{memberships.map((m) => <div key={m.id} className="flex items-center justify-between border-b border-surface-100 pb-3 last:border-0 dark:border-surface-800"><div><p className="text-sm font-medium text-ink-900 dark:text-white">{m.plan_name_snapshot} — {formatCurrency(m.plan_price_snapshot)}</p><p className="text-xs text-surface-500">{formatDate(m.start_date)} → {formatDate(m.end_date)}</p><p className="text-xs text-surface-500">Advance applied: {formatCurrency(Number(m.advance_paid || 0))} · Remaining: {formatCurrency(Number(m.amount_due ?? 0))}</p></div><div className="flex items-center gap-3">{m.payment_status === 'pending' && Number(m.amount_due) > 0 && (<div className="flex gap-1.5"><Button size="sm" onClick={() => payMembership(m)}>Pay Now</Button><Button size="sm" variant="ghost" onClick={() => cancelPending(m.id)}>Cancel</Button></div>)}{(m.effective_status || m.status) === 'expired' && <Button size="sm" variant="secondary" onClick={() => renew(m.id)}>Renew</Button>}<Badge tone={statusTone[m.effective_status || m.status] || 'neutral'}>{m.payment_status === 'pending' && Number(m.amount_due) > 0 ? 'payment pending' : (m.effective_status || m.status).replace(/_/g, ' ')}</Badge></div></div>)}</div></div> : <div className="p-5"><EmptyState title="No memberships yet" /></div>}</Card>
+      <Card padding={false}><div className="border-b border-surface-200 px-5 py-4 dark:border-surface-800"><h3 className="font-display text-lg font-semibold text-ink-950 dark:text-white">Membership History</h3></div>{(memberships || []).length > 0 ? <div className="p-5"><div className="space-y-3">{memberships.map((m) => <div key={getMembershipId(m)} className="flex items-center justify-between border-b border-surface-100 pb-3 last:border-0 dark:border-surface-800"><div><p className="text-sm font-medium text-ink-900 dark:text-white">{m.plan_name_snapshot} — {formatCurrency(m.plan_price_snapshot)}</p><p className="text-xs text-surface-500">{formatDate(m.start_date)} → {formatDate(m.end_date)}</p><p className="text-xs text-surface-500">Advance applied: {formatCurrency(Number(m.advance_paid || 0))} · Remaining: {formatCurrency(Number(m.amount_due ?? 0))}</p></div><div className="flex items-center gap-3">{m.payment_status === 'pending' && Number(m.amount_due) > 0 && (<div className="flex gap-1.5"><Button size="sm" onClick={() => payMembership(m)}>Pay Now</Button><Button size="sm" variant="ghost" onClick={() => cancelPending(getMembershipId(m))}>Cancel</Button></div>)}{(m.effective_status || m.status) === 'expired' && <Button size="sm" variant="secondary" onClick={() => renew(getMembershipId(m))}>Renew</Button>}<Badge tone={statusTone[m.effective_status || m.status] || 'neutral'}>{m.payment_status === 'pending' && Number(m.amount_due) > 0 ? 'payment pending' : (m.effective_status || m.status).replace(/_/g, ' ')}</Badge></div></div>)}</div></div> : <div className="p-5"><EmptyState title="No memberships yet" /></div>}</Card>
     </div>
   );
 }
