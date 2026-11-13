@@ -28,6 +28,8 @@ export default function Transformations() {
   const [activeItem, setActiveItem] = useState(null);
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
+  const [allTotal, setAllTotal] = useState(0);
+  const [retryKey, setRetryKey] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [error, setError] = useState('');
 
@@ -67,7 +69,20 @@ export default function Transformations() {
     return () => {
       active = false;
     };
-  }, [selectedCategory, page]);
+    if (selectedCategory === 'all') {
+      transformationService.getPublicTransformations({ page: 1, limit: 1 })
+        .then((data) => {
+          if (active) setAllTotal(Number(data.total) || 0);
+        })
+        .catch(() => {});
+    } else {
+      transformationService.getPublicTransformations({ page: 1, limit: 1 })
+        .then((data) => {
+          if (active) setAllTotal(Number(data.total) || 0);
+        })
+        .catch(() => {});
+    }
+  }, [selectedCategory, page, retryKey]);
 
   const pageNumbers = Array.from(
     { length: Math.min(totalPages, 5) },
@@ -86,7 +101,7 @@ export default function Transformations() {
           <ScrollReveal animation="fade-up">
             <div className="inline-flex items-center gap-2 rounded-full border border-brand-500/30 bg-brand-500/10 px-4 py-1.5 text-xs font-mono font-bold uppercase tracking-[0.25em] text-brand-400 backdrop-blur-md">
               <Sparkles size={14} className="text-brand-400" />
-              Verified Member Achievements
+              Member Transformation Gallery
             </div>
 
             <h1 className="mt-5 font-display text-2xl sm:text-4xl md:text-5xl lg:text-7xl font-black tracking-tight text-white leading-tight break-words">
@@ -97,7 +112,7 @@ export default function Transformations() {
             </h1>
 
             <p className="mt-6 max-w-2xl mx-auto text-base sm:text-lg text-surface-300 leading-relaxed">
-              Explore authentic, coach-verified physical milestones achieved by members of Heaven Gym. No fabricated before-and-after imagery. Real effort, calibrated nutrition, and progressive overload.
+              Explore transformation stories shared by Heaven Gym members. Each published story is displayed with member consent. Individual experiences and results vary.
             </p>
           </ScrollReveal>
 
@@ -113,7 +128,7 @@ export default function Transformations() {
                     : 'bg-white/5 text-surface-400 hover:bg-white/10 hover:text-white border border-white/10'
                 }`}
               >
-                All Milestones ({total})
+                All Milestones ({allTotal})
               </button>
               {categories.map((cat) => (
                 <button
@@ -150,7 +165,16 @@ export default function Transformations() {
             ))}
           </div>
         ) : error ? (
-          <div role="alert" className="rounded-2xl border border-red-500/25 bg-red-500/10 p-8 text-center text-sm text-red-200">{error}</div>
+          <div role="alert" className="rounded-2xl border border-red-500/25 bg-red-500/10 p-8 text-center">
+            <p className="text-sm text-red-200">{error}</p>
+            <button
+              type="button"
+              onClick={() => setRetryKey((current) => current + 1)}
+              className="mt-4 rounded-full border border-red-300/30 px-5 py-2 text-xs font-bold text-white transition hover:bg-red-500/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-red-300"
+            >
+              Retry
+            </button>
+          </div>
         ) : transformations.length > 0 ? (
           <>
             <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
@@ -183,7 +207,7 @@ export default function Transformations() {
                         {item.category}
                       </span>
                       <span className="flex items-center gap-1 text-[11px] font-mono text-emerald-400">
-                        <ShieldCheck size={13} /> Official Milestone
+                        <ShieldCheck size={13} /> Published Member Story
                       </span>
                     </div>
 
@@ -239,7 +263,7 @@ export default function Transformations() {
               Authentic Transformations In Progress
             </h3>
             <p className="mt-2 text-sm text-surface-400 leading-relaxed">
-              Heaven Gym does not display stock photos or simulated results. Certified before-and-after transformations will be published here as soon as our coaches log active milestones.
+              Heaven Gym does not display stock photos or simulated results. Member transformation stories will appear here when they are submitted and approved for publication.
             </p>
             <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
               <Link
@@ -261,7 +285,7 @@ export default function Transformations() {
         {/* Ethical Transparency Statement */}
         <div className="mt-16 rounded-2xl border border-white/10 bg-white/[0.02] p-6 text-center max-w-2xl mx-auto">
           <p className="text-xs text-surface-400 leading-relaxed font-mono">
-            * All results are earned through personalized resistance protocols, cardiovascular conditioning, balanced caloric intake, and consistent sleep hygiene. Individual adaptation rates vary depending on genetics and adherence.
+            * Transformation experiences are individual and may vary. The stories shown here are shared for general information and are not a guarantee of similar results.
           </p>
         </div>
       </section>
@@ -332,7 +356,7 @@ export default function Transformations() {
 
                 <div className="pt-4 flex items-center justify-between border-t border-white/10">
                   <span className="text-[11px] font-mono text-emerald-400 flex items-center gap-1.5">
-                    <ShieldCheck size={14} /> Official Heaven Gym Milestone
+                    <ShieldCheck size={14} /> Published Member Story
                   </span>
                   <Link
                     to="/membership"
