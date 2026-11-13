@@ -72,6 +72,7 @@ export default function Orders() {
     } catch (error) {
       setPaymentError(error?.response?.data?.error || error.message || 'Payment could not be completed. Please check your order status before trying again.');
       setPaymentMessage('');
+      await dispatch(fetchMyOrders({ bucket: tab, search, page, limit })).unwrap().catch(() => {});
     } finally {
       paymentLock.current = false;
       setRetryingOrderId('');
@@ -103,6 +104,7 @@ export default function Orders() {
             {order.fulfillment_method === 'admin_delivery' && <p className="mt-1 text-xs text-surface-500">Online Store delivery address: {order.shipping_address}</p>}
             <div className="mt-4 space-y-2 border-t border-surface-100 pt-3 dark:border-surface-800">{order.order_items?.map((item) => <div key={item.id} className="flex justify-between text-sm"><span className="text-surface-600 dark:text-surface-300">{item.product_name_snapshot} × {item.quantity}</span><span className="font-medium">{formatCurrency(item.subtotal)}</span></div>)}</div>
             {canRetryPayment && <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-surface-100 pt-4 dark:border-surface-800"><p className="text-xs text-surface-500">Payment is pending. Your stock is reserved temporarily.</p><Button size="sm" loading={retryingOrderId === order.id} disabled={Boolean(retryingOrderId)} onClick={() => retryOrderPayment(order)}>Pay now</Button></div>}
+            {order.status === 'pending' && order.payment_status === 'pending' && order.inventory_status === 'reserved' && order.reservation_expires_at && new Date(order.reservation_expires_at).getTime() <= Date.now() && <p className="mt-4 rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-800 dark:bg-amber-500/10 dark:text-amber-300">This payment window has expired. If you already paid, contact Heaven Gym before placing another order.</p>}
           </Card>;
         })}
         <div className="flex items-center justify-between gap-3"><p className="text-xs text-surface-500">Page {pagination.page} of {pagination.pages}</p><div className="flex gap-2"><Button variant="outline" size="sm" disabled={page <= 1 || loading} onClick={() => setPage((value) => value - 1)}>Previous</Button><Button variant="outline" size="sm" disabled={page >= pagination.pages || loading} onClick={() => setPage((value) => value + 1)}>Next</Button></div></div>
