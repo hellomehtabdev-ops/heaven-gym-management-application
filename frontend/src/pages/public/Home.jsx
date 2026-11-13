@@ -443,11 +443,8 @@ export default function Home() {
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent" />
                     <div className="absolute bottom-6 left-6 right-6">
-                      <span className="rounded bg-brand-500/20 border border-brand-500/30 px-2.5 py-0.5 text-[10px] font-mono font-bold uppercase tracking-wider text-brand-400">
-                        {trainer.role}
-                      </span>
-                      <h3 className="mt-2 font-display text-xl sm:text-2xl font-bold text-white">
-                        {trainer.title}
+                      <h3 className="font-display text-xl sm:text-2xl font-bold text-white">
+                        {trainer.name}
                       </h3>
 
                     </div>
