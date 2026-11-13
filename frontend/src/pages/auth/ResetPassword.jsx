@@ -35,7 +35,7 @@ export default function ResetPassword() {
     <div className="flex min-h-screen items-center justify-center bg-surface-50 px-5 dark:bg-surface-950">
       <div className="w-full max-w-md">
         <Link to="/" className="mb-8 flex items-center justify-center gap-3">
-<HeavenLogo variant="header" theme="light" size="sm" />
+<HeavenLogo variant="header" theme="auto" size="sm" />
         </Link>
         <div className="rounded-2xl border border-surface-200 bg-white p-8 shadow-sm dark:border-surface-800 dark:bg-surface-900">
           {done ? (
