@@ -39,7 +39,7 @@ export default function Login() {
         <div className="absolute -left-20 top-1/3 h-96 w-96 rounded-full bg-brand-500/20 blur-[100px]" />
         <div className="relative flex h-full flex-col justify-between p-12 text-white">
           <Link to="/" className="flex items-center gap-3">
-<HeavenLogo variant="header" theme="auto" size="sm" />
+<HeavenLogo variant="header" theme="dark" size="sm" />
           </Link>
           <div>
             <p className="font-display text-4xl font-bold leading-tight">Welcome back.<br /><span className="text-brand-400">Let's get to work.</span></p>
