@@ -39,7 +39,7 @@ export default function Login() {
         <div className="absolute -left-20 top-1/3 h-96 w-96 rounded-full bg-brand-500/20 blur-[100px]" />
         <div className="relative flex h-full flex-col justify-between p-12 text-white">
           <Link to="/" className="flex items-center gap-3">
-<HeavenLogo variant="header" size="sm" />
+<HeavenLogo variant="header" theme="auto" size="sm" />
           </Link>
           <div>
             <p className="font-display text-4xl font-bold leading-tight">Welcome back.<br /><span className="text-brand-400">Let's get to work.</span></p>
@@ -51,7 +51,7 @@ export default function Login() {
       <div className="flex w-full items-center justify-center bg-surface-50 px-5 py-12 dark:bg-surface-950 lg:w-1/2">
         <div className="w-full max-w-md">
           <Link to="/" className="mb-8 flex items-center gap-3 lg:hidden">
-<HeavenLogo variant="header" theme="light" size="sm" />
+<HeavenLogo variant="header" theme="auto" size="sm" />
           </Link>
           <h1 className="font-display text-3xl font-bold text-ink-950 dark:text-white">Sign in</h1>
           <p className="mt-2 text-sm text-surface-500">Enter your credentials to access your account</p>
