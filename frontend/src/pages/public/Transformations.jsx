@@ -47,6 +47,7 @@ export default function Transformations() {
         if (active) {
           setTransformations(data.rows || []);
           setTotal(Number(data.total) || 0);
+          if (selectedCategory === 'all') setAllTotal(Number(data.total) || 0);
           setTotalPages(Number(data.pages) || 0);
           setError('');
           if (data.categories?.length) {
@@ -66,22 +67,17 @@ export default function Transformations() {
         if (active) setLoading(false);
       });
 
-    return () => {
-      active = false;
-    };
-    if (selectedCategory === 'all') {
-      transformationService.getPublicTransformations({ page: 1, limit: 1 })
-        .then((data) => {
-          if (active) setAllTotal(Number(data.total) || 0);
-        })
-        .catch(() => {});
-    } else {
+    if (selectedCategory !== 'all') {
       transformationService.getPublicTransformations({ page: 1, limit: 1 })
         .then((data) => {
           if (active) setAllTotal(Number(data.total) || 0);
         })
         .catch(() => {});
     }
+
+    return () => {
+      active = false;
+    };
   }, [selectedCategory, page, retryKey]);
 
   const pageNumbers = Array.from(
