@@ -13,8 +13,6 @@ import {
   UploadCloud,
   X,
   SlidersHorizontal,
-  ShieldCheck,
-  AlertTriangle,
 } from 'lucide-react';
 import { transformationService } from '@/services/transformationService';
 import BeforeAfterSlider from '@/components/public/BeforeAfterSlider';
@@ -26,8 +24,6 @@ const blank = {
   achievement: '',
   story: '',
   description: '',
-  member_consent_obtained: false,
-  consent_notes: '',
   is_published: false,
 };
 
@@ -98,8 +94,6 @@ export default function AdminTransformations() {
       achievement: item.achievement || '',
       story: item.story || '',
       description: item.description || '',
-      member_consent_obtained: !!item.member_consent_obtained,
-      consent_notes: item.consent_notes || '',
       is_published: !!item.is_published,
     });
     setBeforeFile(null);
@@ -122,10 +116,6 @@ export default function AdminTransformations() {
         throw new Error('Please select both a BEFORE image and an AFTER image.');
       }
 
-      if (form.is_published && !form.member_consent_obtained) {
-        throw new Error('Explicit member consent must be confirmed before publishing transformation photos.');
-      }
-
       const formData = new FormData();
       formData.append('title', form.title);
       formData.append('category', form.category);
@@ -133,8 +123,6 @@ export default function AdminTransformations() {
       formData.append('duration', form.duration || '');
       formData.append('achievement', form.achievement || '');
       formData.append('story', form.story || '');
-      formData.append('member_consent_obtained', form.member_consent_obtained ? 'true' : 'false');
-      formData.append('consent_notes', form.consent_notes || '');
       formData.append('is_published', form.is_published ? 'true' : 'false');
 
       if (beforeFile) formData.append('before_image', beforeFile);
@@ -157,15 +145,7 @@ export default function AdminTransformations() {
 
   async function handleTogglePublish(item) {
     try {
-      if (!item.is_published && !item.member_consent_obtained) {
-        const confirmed = window.confirm(
-          `Publishing "${item.title}" requires explicit member photo consent.\n\nDo you confirm that verifiable permission has been obtained from this member to showcase their before and after photographs publicly on the Heaven Gym website?`
-        );
-        if (!confirmed) return;
-        await transformationService.togglePublish(item._id, true, true);
-      } else {
-        await transformationService.togglePublish(item._id, !item.is_published);
-      }
+      await transformationService.togglePublish(item._id, !item.is_published);
       await load();
     } catch (err) {
       setError(err.response?.data?.error || 'Could not update publish status.');
@@ -195,7 +175,7 @@ export default function AdminTransformations() {
             Transformation Management
           </h1>
           <p className="mt-1 max-w-2xl text-sm text-surface-500 dark:text-slate-400">
-            Publish authentic gym member body transformations. Each transformation record links verified BEFORE and AFTER imagery with progressive milestones. Explicit member photo consent is required prior to public display.
+            Upload BEFORE and AFTER images and publish them directly to the public Heaven Gym website.
           </p>
         </div>
 
@@ -292,15 +272,7 @@ export default function AdminTransformations() {
                   <span className="text-[10px] font-bold uppercase tracking-widest text-brand-500">
                     {item.category}
                   </span>
-                  {item.member_consent_obtained ? (
-                    <span className="flex items-center gap-1 text-[10px] font-mono text-emerald-600 dark:text-emerald-400 font-bold">
-                      <ShieldCheck size={12} /> Consent Confirmed
-                    </span>
-                  ) : (
-                    <span className="flex items-center gap-1 text-[10px] font-mono text-amber-500 font-bold">
-                      <AlertTriangle size={12} /> Consent Required
-                    </span>
-                  )}
+
                 </div>
 
                 <h2 className="mt-1 text-base font-extrabold text-ink-900 dark:text-white line-clamp-1">
@@ -584,50 +556,6 @@ export default function AdminTransformations() {
                 )}
               </div>
 
-              {/* Photo Consent Confirmation Card (Mandatory before Publishing) */}
-              <div className="sm:col-span-2 rounded-xl border border-amber-500/30 bg-amber-500/5 p-4 space-y-3">
-                <div className="flex items-start gap-3">
-                  <input
-                    type="checkbox"
-                    id="consent_checkbox"
-                    checked={form.member_consent_obtained}
-                    onChange={(e) => {
-                      const checked = e.target.checked;
-                      setForm((prev) => ({
-                        ...prev,
-                        member_consent_obtained: checked,
-                        is_published: checked ? prev.is_published : false,
-                      }));
-                    }}
-                    className="mt-0.5 h-4 w-4 rounded text-brand-500 focus:ring-brand-500 cursor-pointer"
-                  />
-                  <label htmlFor="consent_checkbox" className="cursor-pointer">
-                    <span className="text-xs font-bold text-ink-900 dark:text-white flex items-center gap-1.5">
-                      Explicit Member Photo Consent Obtained <span className="text-amber-500 font-semibold">* (Required for Publishing)</span>
-                    </span>
-                    <p className="mt-0.5 text-[11px] text-surface-500 dark:text-slate-400 leading-relaxed">
-                      I certify that verifiable, explicit permission has been obtained from this member to showcase their BEFORE and AFTER body transformation photographs on the Heaven Gym public website.
-                    </p>
-                  </label>
-                </div>
-                {form.member_consent_obtained && (
-                  <div className="pt-2 border-t border-amber-500/20">
-                    <label className="block">
-                      <span className="block text-[10px] font-mono uppercase tracking-wider text-surface-400 mb-1">
-                        Consent Verification Notes (Optional)
-                      </span>
-                      <input
-                        type="text"
-                        placeholder="e.g. Signed member consent waiver on 12-Nov-2026"
-                        value={form.consent_notes}
-                        onChange={(e) => change('consent_notes', e.target.value)}
-                        className="w-full rounded-lg border border-surface-200 bg-transparent px-2.5 py-1.5 text-xs outline-none focus:border-brand-500 dark:border-white/10 text-ink-900 dark:text-white"
-                      />
-                    </label>
-                  </div>
-                )}
-              </div>
-
               {/* Publish Checkbox */}
               <label className="flex items-center gap-3 sm:col-span-2 cursor-pointer p-3 rounded-xl border border-surface-200 dark:border-white/10">
                 <input
@@ -641,7 +569,7 @@ export default function AdminTransformations() {
                     Publish immediately to public website
                   </span>
                   <p className="text-[11px] text-surface-400">
-                    Requires verified member consent. If unchecked, this transformation will be saved as draft and hidden from public visitors.
+                    If unchecked, this transformation will be saved as a draft and hidden from public visitors.
                   </p>
                 </div>
               </label>
