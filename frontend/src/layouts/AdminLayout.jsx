@@ -125,7 +125,7 @@ export default function AdminLayout() {
           collapsed ? 'justify-center px-3' : 'justify-between px-5'
         }`}>
           <Link to="/admin/dashboard" className="group flex min-w-0 items-center gap-3">
-            {collapsed ? <HeavenLogo variant="emblem" size="xs" /> : <HeavenLogo variant="header" size="sm" />}
+            {collapsed ? <HeavenLogo variant="emblem" theme="auto" size="xs" /> : <HeavenLogo variant="header" theme="auto" size="sm" />}
           </Link>
           {!collapsed && (
             <button
@@ -203,7 +203,7 @@ export default function AdminLayout() {
       }`}>
         <div className="flex h-[72px] items-center justify-between border-b border-surface-200 px-5 dark:border-white/[0.08]">
           <Link to="/admin/dashboard" className="flex items-center gap-3">
-<HeavenLogo variant="header" size="sm" />
+<HeavenLogo variant="header" theme="auto" size="sm" />
           </Link>
           <button
             type="button"
