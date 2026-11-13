@@ -87,7 +87,9 @@ export default function Checkout() {
       const order = await dispatch(createOrder({ items, shippingAddress, fulfillmentMethod, customerName: form.full_name.trim(), customerPhone: form.phone.trim(), checkoutRequestId: checkoutRequestId.current })).unwrap();
       checkoutStage = 'payment_setup';
       setProgressMessage('Preparing secure payment. Please keep this page open…');
-      const { keyId, razorpayOrder } = await paymentService.createRazorpayOrder({ orderId: order.id });
+      const orderId = order.id || order._id;
+      if (!orderId) throw new Error('Order was created but its ID was not returned. Please check My Orders before retrying.');
+      const { keyId, razorpayOrder } = await paymentService.createRazorpayOrder({ orderId });
 
       if (!razorpayOrder || !keyId || typeof window.Razorpay !== 'function') {
         throw new Error('Online payment is temporarily unavailable. Your order is saved as pending; please try again from your orders.');
@@ -197,7 +199,7 @@ export default function Checkout() {
           <h3 className="mb-4 font-display text-lg font-semibold text-ink-950 dark:text-white">Order Summary</h3>
           <div className="space-y-3">
             {items.map((item) => (
-              <div key={item.product.id} className="flex justify-between text-sm">
+              <div key={item.product.id || item.product._id} className="flex justify-between text-sm">
                 <span className="text-surface-600 dark:text-surface-300">{item.product.name} × {item.quantity}</span>
                 <span className="font-medium">{formatCurrency(Number(latestProducts[item.product.id || item.product._id]?.price ?? item.product.price ?? 0) * item.quantity)}</span>
               </div>
