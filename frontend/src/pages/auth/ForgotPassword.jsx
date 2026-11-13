@@ -124,7 +124,7 @@ export default function ForgotPassword() {
     <div className="flex min-h-screen items-center justify-center bg-surface-50 px-5 dark:bg-surface-950">
       <div className="w-full max-w-md">
         <Link to="/" className="mb-8 flex items-center justify-center gap-3">
-<HeavenLogo variant="header" theme="light" size="sm" />
+<HeavenLogo variant="header" theme="auto" size="sm" />
         </Link>
         <div className="rounded-2xl border border-surface-200 bg-white p-8 shadow-sm dark:border-surface-800 dark:bg-surface-900">
           <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-xl bg-brand-50 text-brand-600 dark:bg-brand-500/10 dark:text-brand-400">
