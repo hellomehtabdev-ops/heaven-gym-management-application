@@ -414,32 +414,29 @@ export default function Home() {
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {[
               {
-                title: 'Strength & Biomechanics Specialist',
-                role: 'Senior Floor Coach',
-                spec: 'Barbell Form, Powerlifting & Progressive Overload',
-                img: 'https://images.unsplash.com/photo-1567013127542-490d757e51fc?auto=format&fit=crop&w=800&q=80',
-                alt: 'Strength training and barbell technique',
+                name: 'Kishan Shah',
+                role: 'Owner 1 · Fitness Trainer',
+                image: '/images/trainers/kishan-shah.jpeg',
+                alt: 'Kishan Shah, Heaven Gym fitness trainer',
               },
               {
-                title: 'Mobility & Conditioning Specialist',
-                role: 'Athletic Movement Coach',
-                spec: 'Joint Mobility, Posture & Injury Prevention',
-                img: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?auto=format&fit=crop&w=800&q=80',
-                alt: 'Mobility and functional movement training',
+                name: 'Ashif Khan',
+                role: 'Owner 2',
+                image: '/images/trainers/ashif-khan.jpeg',
+                alt: 'Ashif Khan, Heaven Gym owner',
               },
               {
-                title: 'Functional Performance Coach',
-                role: 'High-Work Capacity Coach',
-                spec: 'Metabolic Conditioning, Turf Drills & Endurance',
-                img: 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&w=800&q=80',
-                alt: 'Functional fitness and endurance training',
+                name: 'Somen Karmkaar',
+                role: 'Owner 3',
+                image: '/images/trainers/somen-karmkaar.jpeg',
+                alt: 'Somen Karmkaar, Heaven Gym owner',
               },
             ].map((trainer) => (
-              <div key={trainer.title} className="coach-card h-full">
+              <div key={trainer.name} className="coach-card h-full">
                 <Card3D className="h-full">
                   <div className="relative aspect-[3/4] overflow-hidden rounded-3xl border border-white/10 bg-[#0e1017] group shadow-2xl">
                     <img
-                      src={trainer.img}
+                      src={trainer.image}
                       alt={trainer.alt}
                       loading="lazy"
                       className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105 filter brightness-85 contrast-110"
@@ -452,9 +449,7 @@ export default function Home() {
                       <h3 className="mt-2 font-display text-xl sm:text-2xl font-bold text-white">
                         {trainer.title}
                       </h3>
-                      <p className="text-[11px] text-surface-400 mt-2 border-t border-white/10 pt-2 font-mono">
-                        Focus: {trainer.spec}
-                      </p>
+
                     </div>
                   </div>
                 </Card3D>
@@ -463,7 +458,7 @@ export default function Home() {
           </div>
 
           <p className="mt-8 text-center text-xs text-surface-400 font-mono">
-            Illustrative coaching specializations. Dedicated personal training consultations and trainer bookings are arranged directly at the Heaven Gym reception desk.
+            Meet the Heaven Gym owners and fitness team.
           </p>
         </div>
       </section>
