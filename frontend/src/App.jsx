@@ -61,11 +61,14 @@ import AdminBadgeManager from '@/pages/admin/AdminBadgeManager';
 export default function App() {
   const [showSplash, setShowSplash] = useState(true);
   useAuth();
+
   if (showSplash) return <SplashScreen onComplete={() => setShowSplash(false)} />;
+
   return (
     <BrowserRouter>
       <Routes>
-        <Route element={<PublicLayout />}>
+        {/* Public pages are available only to visitors who are not signed in. */}
+        <Route element={<GuestRoute><PublicLayout /></GuestRoute>}>
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<About />} />
           <Route path="/facilities" element={<Facilities />} />
@@ -79,36 +82,56 @@ export default function App() {
           <Route path="/gym-equipment/:slug" element={<GymEquipmentDetails />} />
           <Route path="/franchise" element={<Franchise />} />
         </Route>
+
         <Route path="/login" element={<GuestRoute><Login /></GuestRoute>} />
         <Route path="/register" element={<GuestRoute><Register /></GuestRoute>} />
-        <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
-        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+        <Route path="/terms-and-conditions" element={<GuestRoute><TermsAndConditions /></GuestRoute>} />
+        <Route path="/privacy-policy" element={<GuestRoute><PrivacyPolicy /></GuestRoute>} />
         <Route path="/verify-email" element={<GuestRoute><VerifyEmail /></GuestRoute>} />
         <Route path="/forgot-password" element={<GuestRoute><ForgotPassword /></GuestRoute>} />
         <Route path="/reset-password" element={<GuestRoute><ResetPassword /></GuestRoute>} />
+
         <Route path="/user" element={<ProtectedRoute><UserLayout /></ProtectedRoute>}>
-          <Route index element={<Navigate to="/user/dashboard" />} /><Route path="dashboard" element={<Dashboard />} />
-          <Route path="profile" element={<Profile />} /><Route path="gym" element={<MyGym />} />
-          <Route path="membership" element={<MembershipPage />} /><Route path="payments" element={<Payments />} />
-          <Route path="body-progress" element={<BodyProgress />} /><Route path="store" element={<UserStore />} /><Route path="store/:id" element={<SupplementDetails />} />
-          <Route path="cart" element={<Cart />} /><Route path="checkout" element={<Checkout />} />
-          <Route path="orders" element={<Orders />} /><Route path="notifications" element={<Notifications />} /><Route path="settings" element={<Settings />} />
+          <Route index element={<Navigate to="/user/dashboard" replace />} />
+          <Route path="dashboard" element={<Dashboard />} />
+          <Route path="profile" element={<Profile />} />
+          <Route path="gym" element={<MyGym />} />
+          <Route path="membership" element={<MembershipPage />} />
+          <Route path="payments" element={<Payments />} />
+          <Route path="body-progress" element={<BodyProgress />} />
+          <Route path="store" element={<UserStore />} />
+          <Route path="store/:id" element={<SupplementDetails />} />
+          <Route path="cart" element={<Cart />} />
+          <Route path="checkout" element={<Checkout />} />
+          <Route path="orders" element={<Orders />} />
+          <Route path="notifications" element={<Notifications />} />
+          <Route path="settings" element={<Settings />} />
         </Route>
+
         <Route path="/admin" element={<AdminRoute><AdminLayout /></AdminRoute>}>
-          <Route index element={<Navigate to="/admin/dashboard" />} /><Route path="dashboard" element={<AdminDashboard />} /><Route path="profile" element={<AdminProfile />} />
-          <Route path="users" element={<AdminUsers />} /><Route path="admissions" element={<AdminAdmissions />} />
-          <Route path="membership-plans" element={<AdminMembershipPlans />} /><Route path="memberships" element={<AdminMemberships />} />
-          <Route path="payments" element={<AdminPayments />} /><Route path="body-measurements" element={<AdminBodyMeasurements />} /><Route path="body-measurements/:userId" element={<AdminMemberMeasurements />} />
+          <Route index element={<Navigate to="/admin/dashboard" replace />} />
+          <Route path="dashboard" element={<AdminDashboard />} />
+          <Route path="profile" element={<AdminProfile />} />
+          <Route path="users" element={<AdminUsers />} />
+          <Route path="admissions" element={<AdminAdmissions />} />
+          <Route path="membership-plans" element={<AdminMembershipPlans />} />
+          <Route path="memberships" element={<AdminMemberships />} />
+          <Route path="payments" element={<AdminPayments />} />
+          <Route path="body-measurements" element={<AdminBodyMeasurements />} />
+          <Route path="body-measurements/:userId" element={<AdminMemberMeasurements />} />
           <Route path="transformations" element={<AdminTransformations />} />
           <Route path="products" element={<AdminProducts />} />
           <Route path="orders" element={<AdminOrders />} />
           <Route path="supplement-selling" element={<AdminSupplementSelling />} />
           <Route path="supplement-selling/:id" element={<AdminSupplementSellingDetails />} />
           <Route path="supplement-selling/bill/:id" element={<AdminSupplementBill />} />
-          <Route path="banners" element={<AdminBadges />} /><Route path="banners/:section" element={<AdminBadgeManager />} />
-          <Route path="notifications" element={<AdminNotifications />} /><Route path="settings" element={<AdminSettings />} />
+          <Route path="banners" element={<AdminBadges />} />
+          <Route path="banners/:section" element={<AdminBadgeManager />} />
+          <Route path="notifications" element={<AdminNotifications />} />
+          <Route path="settings" element={<AdminSettings />} />
         </Route>
-        <Route path="*" element={<Navigate to="/" />} />
+
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
   );
