@@ -416,19 +416,19 @@ export default function Home() {
               {
                 name: 'Kishan Shah',
                 role: 'Owner 1 · Fitness Trainer',
-                image: '/images/trainers/kishan-shah.jpeg',
+                image: '/image/trainers/kishan-shah.jpeg.jpeg',
                 alt: 'Kishan Shah, Heaven Gym fitness trainer',
               },
               {
                 name: 'Ashif Khan',
                 role: 'Owner 2',
-                image: '/images/trainers/ashif-khan.jpeg',
+                image: '/image/trainers/ashif-khan.jpeg.jpeg',
                 alt: 'Ashif Khan, Heaven Gym owner',
               },
               {
                 name: 'Somen Karmkaar',
                 role: 'Owner 3',
-                image: '/images/trainers/somen-karmkaar.jpeg',
+                image: '/image/trainers/somen-karmkaar.jpeg.jpeg',
                 alt: 'Somen Karmkaar, Heaven Gym owner',
               },
             ].map((trainer) => (
