@@ -76,7 +76,7 @@ export default function UserLayout() {
       <aside className={`user-sidebar fixed inset-y-0 left-0 z-50 hidden border-r border-surface-200 bg-white lg:flex lg:flex-col dark:border-white/[0.08] dark:bg-[#11131b] ${collapsed ? 'w-[84px]' : 'w-[286px]'}`}>
         <div className={`flex h-[72px] shrink-0 items-center border-b border-surface-200 dark:border-white/[0.08] ${collapsed ? 'justify-center px-3' : 'justify-between px-5'}`}>
           <Link to="/user/dashboard" className="group flex min-w-0 items-center gap-3">
-            {collapsed ? <HeavenLogo variant="emblem" size="xs" /> : <HeavenLogo variant="header" size="sm" />}
+            {collapsed ? <HeavenLogo variant="emblem" theme="auto" size="xs" /> : <HeavenLogo variant="header" theme="auto" size="sm" />}
           </Link>
           {!collapsed && <button type="button" onClick={() => setCollapsed(true)} aria-label="Collapse sidebar" className="rounded-lg p-2 text-surface-400 transition hover:bg-surface-100 hover:text-ink-900 dark:text-slate-500 dark:hover:bg-white/[0.06] dark:hover:text-white"><PanelLeftClose size={17} /></button>}
         </div>
@@ -107,7 +107,7 @@ export default function UserLayout() {
 
       <aside className={`fixed inset-y-0 left-0 z-[60] w-[286px] transform border-r border-surface-200 bg-white transition-transform duration-300 lg:hidden dark:border-white/[0.08] dark:bg-[#11131b] ${open ? 'translate-x-0' : '-translate-x-full'}`}>
         <div className="flex h-[72px] items-center justify-between border-b border-surface-200 px-5 dark:border-white/[0.08]">
-          <Link to="/user/dashboard" aria-label="Heaven Gym dashboard"><HeavenLogo variant="header" size="sm" /></Link>
+          <Link to="/user/dashboard" aria-label="Heaven Gym dashboard"><HeavenLogo variant="header" theme="auto" size="sm" /></Link>
           <button type="button" onClick={() => setOpen(false)} className="rounded-lg p-2 text-surface-500 hover:bg-surface-100 hover:text-ink-900 dark:text-slate-400 dark:hover:bg-white/[0.06] dark:hover:text-white" aria-label="Close menu"><X size={20} /></button>
         </div>
         <nav className="custom-scrollbar overflow-y-auto px-3 py-5" style={{ maxHeight: 'calc(100vh - 72px)' }}>
