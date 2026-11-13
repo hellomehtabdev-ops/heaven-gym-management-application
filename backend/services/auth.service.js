@@ -158,7 +158,7 @@ export async function getLoginPasswordError(user, password) {
 
   const passwordMatches = await bcrypt.compare(password, user?.password || DUMMY_PASSWORD_HASH);
   if (!user) return 'Invalid email or password';
-  if (!passwordMatches) return 'Incorrect password. Please try again.';
+  if (!passwordMatches) return 'Invalid email or password';
   return null;
 }
 
