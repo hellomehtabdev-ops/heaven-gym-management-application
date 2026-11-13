@@ -16,7 +16,7 @@ export default function Payments() {
 
   if (loading) return <UserLoadingSkeleton variant="list" />;
 
-  const totalPaid = payments.filter((p) => p.status === 'success').reduce((sum, p) => sum + Number(p.amount), 0);
+  const totalPaid = payments.filter((payment) => payment.status === 'success').reduce((sum, payment) => sum + Number(payment.amount), 0);
 
   return (
     <div className="space-y-6">
@@ -24,7 +24,7 @@ export default function Payments() {
       <div className="grid gap-4 sm:grid-cols-3">
         <Card className="!border-emerald-200/80 !bg-emerald-50/70 dark:!border-emerald-500/20 dark:!bg-emerald-500/[0.08]"><p className="text-xs text-surface-500">Total paid</p><p className="mt-2 font-display text-2xl font-bold text-brand-600">{formatCurrency(totalPaid)}</p></Card>
         <Card className="!border-blue-200/80 !bg-blue-50/70 dark:!border-blue-500/20 dark:!bg-blue-500/[0.08]"><p className="text-xs text-surface-500">Total transactions</p><p className="mt-2 font-display text-2xl font-bold">{payments.length}</p></Card>
-        <Card className="!border-teal-200/80 !bg-teal-50/70 dark:!border-teal-500/20 dark:!bg-teal-500/[0.08]"><p className="text-xs text-surface-500">Successful</p><p className="mt-2 font-display text-2xl font-bold">{payments.filter((p) => p.status === 'success').length}</p></Card>
+        <Card className="!border-teal-200/80 !bg-teal-50/70 dark:!border-teal-500/20 dark:!bg-teal-500/[0.08]"><p className="text-xs text-surface-500">Successful</p><p className="mt-2 font-display text-2xl font-bold">{payments.filter((payment) => payment.status === 'success').length}</p></Card>
       </div>
       <Card>
         <h3 className="mb-4 font-display text-lg font-semibold text-ink-950 dark:text-white">Transaction History</h3>
@@ -35,13 +35,13 @@ export default function Payments() {
                 <th className="pb-3 font-medium">Date</th><th className="pb-3 font-medium">Type</th><th className="pb-3 font-medium">Method</th><th className="pb-3 font-medium">Amount</th><th className="pb-3 font-medium">Status</th>
               </tr></thead>
               <tbody>
-                {payments.map((p) => (
-                  <tr key={p.id} className="border-b border-surface-100 last:border-0 dark:border-surface-800">
-                    <td className="py-3">{formatDate(p.payment_date)}</td>
-                    <td className="py-3 capitalize">{p.payment_type.replace(/_/g, ' ')}</td>
-                    <td className="py-3 capitalize">{p.payment_method}</td>
-                    <td className="py-3 font-semibold">{formatCurrency(p.amount)}</td>
-                    <td className="py-3"><Badge tone={p.status === 'success' ? 'success' : p.status === 'pending' ? 'warning' : 'danger'}>{p.status}</Badge></td>
+                {payments.map((payment) => (
+                  <tr key={payment._id || payment.id} className="border-b border-surface-100 last:border-0 dark:border-surface-800">
+                    <td className="py-3">{formatDate(payment.payment_date)}</td>
+                    <td className="py-3 capitalize">{payment.payment_type.replace(/_/g, ' ')}</td>
+                    <td className="py-3 capitalize">{payment.payment_method}</td>
+                    <td className="py-3 font-semibold">{formatCurrency(payment.amount)}</td>
+                    <td className="py-3"><Badge tone={payment.status === 'success' ? 'success' : payment.status === 'pending' ? 'warning' : 'danger'}>{payment.status}</Badge></td>
                   </tr>
                 ))}
               </tbody>
