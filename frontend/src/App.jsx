@@ -10,9 +10,14 @@ import AdminRoute from '@/routes/AdminRoute';
 import GuestRoute from '@/routes/GuestRoute';
 import Home from '@/pages/public/Home';
 import About from '@/pages/public/About';
+import Facilities from '@/pages/public/Facilities';
+import Transformations from '@/pages/public/Transformations';
 import Membership from '@/pages/public/Membership';
 import Contact from '@/pages/public/Contact';
 import Store from '@/pages/public/Store';
+import GymEquipment from '@/pages/public/GymEquipment';
+import GymEquipmentDetails from '@/pages/public/GymEquipmentDetails';
+import Franchise from '@/pages/public/Franchise';
 import Login from '@/pages/auth/Login';
 import Register from '@/pages/auth/Register';
 import VerifyEmail from '@/pages/auth/VerifyEmail';
@@ -41,6 +46,7 @@ import AdminMemberships from '@/pages/admin/AdminMemberships';
 import AdminPayments from '@/pages/admin/AdminPayments';
 import AdminBodyMeasurements from '@/pages/admin/AdminBodyMeasurements';
 import AdminMemberMeasurements from '@/pages/admin/AdminMemberMeasurements';
+import AdminTransformations from '@/pages/admin/AdminTransformations';
 import AdminProducts from '@/pages/admin/AdminProducts';
 import AdminOrders from '@/pages/admin/AdminOrders';
 import AdminSupplementSelling from '@/pages/admin/AdminSupplementSelling';
@@ -55,43 +61,77 @@ import AdminBadgeManager from '@/pages/admin/AdminBadgeManager';
 export default function App() {
   const [showSplash, setShowSplash] = useState(true);
   useAuth();
+
   if (showSplash) return <SplashScreen onComplete={() => setShowSplash(false)} />;
+
   return (
     <BrowserRouter>
       <Routes>
-        <Route element={<PublicLayout />}>
-          <Route path="/" element={<Home />} /><Route path="/about" element={<About />} />
-          <Route path="/membership" element={<Membership />} /><Route path="/store" element={<Store />} />
+        {/* Public pages are available only to visitors who are not signed in. */}
+        <Route element={<GuestRoute><PublicLayout /></GuestRoute>}>
+          <Route path="/" element={<Home />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/facilities" element={<Facilities />} />
+          <Route path="/transformations" element={<Transformations />} />
+          <Route path="/membership" element={<Membership />} />
+          <Route path="/store" element={<Store />} />
+          <Route path="/supplements" element={<Navigate to="/store" replace />} />
           <Route path="/contact" element={<Contact />} />
+          <Route path="/gym-equipment" element={<GymEquipment />} />
+          <Route path="/equipment" element={<Navigate to="/gym-equipment" replace />} />
+          <Route path="/gym-equipment/:slug" element={<GymEquipmentDetails />} />
+          <Route path="/franchise" element={<Franchise />} />
         </Route>
+
         <Route path="/login" element={<GuestRoute><Login /></GuestRoute>} />
         <Route path="/register" element={<GuestRoute><Register /></GuestRoute>} />
-        <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
-        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+        <Route path="/terms-and-conditions" element={<GuestRoute><TermsAndConditions /></GuestRoute>} />
+        <Route path="/privacy-policy" element={<GuestRoute><PrivacyPolicy /></GuestRoute>} />
         <Route path="/verify-email" element={<GuestRoute><VerifyEmail /></GuestRoute>} />
         <Route path="/forgot-password" element={<GuestRoute><ForgotPassword /></GuestRoute>} />
         <Route path="/reset-password" element={<GuestRoute><ResetPassword /></GuestRoute>} />
+
         <Route path="/user" element={<ProtectedRoute><UserLayout /></ProtectedRoute>}>
-          <Route index element={<Navigate to="/user/dashboard" />} /><Route path="dashboard" element={<Dashboard />} />
-          <Route path="profile" element={<Profile />} /><Route path="gym" element={<MyGym />} />
-          <Route path="membership" element={<MembershipPage />} /><Route path="payments" element={<Payments />} />
-          <Route path="body-progress" element={<BodyProgress />} /><Route path="store" element={<UserStore />} /><Route path="store/:id" element={<SupplementDetails />} />
-          <Route path="cart" element={<Cart />} /><Route path="checkout" element={<Checkout />} />
-          <Route path="orders" element={<Orders />} /><Route path="notifications" element={<Notifications />} /><Route path="settings" element={<Settings />} />
+          <Route index element={<Navigate to="/user/dashboard" replace />} />
+          <Route path="dashboard" element={<Dashboard />} />
+          <Route path="profile" element={<Profile />} />
+          <Route path="gym" element={<MyGym />} />
+          <Route path="membership" element={<MembershipPage />} />
+          <Route path="payments" element={<Payments />} />
+          <Route path="body-progress" element={<BodyProgress />} />
+          <Route path="store" element={<UserStore />} />
+          <Route path="store/:id" element={<SupplementDetails />} />
+          <Route path="cart" element={<Cart />} />
+          <Route path="checkout" element={<Checkout />} />
+          <Route path="orders" element={<Orders />} />
+          <Route path="notifications" element={<Notifications />} />
+          <Route path="settings" element={<Settings />} />
         </Route>
+
         <Route path="/admin" element={<AdminRoute><AdminLayout /></AdminRoute>}>
-          <Route index element={<Navigate to="/admin/dashboard" />} /><Route path="dashboard" element={<AdminDashboard />} /><Route path="profile" element={<AdminProfile />} />
-          <Route path="users" element={<AdminUsers />} /><Route path="admissions" element={<AdminAdmissions />} />
-          <Route path="membership-plans" element={<AdminMembershipPlans />} /><Route path="memberships" element={<AdminMemberships />} />
-          <Route path="payments" element={<AdminPayments />} /><Route path="body-measurements" element={<AdminBodyMeasurements />} /><Route path="body-measurements/:userId" element={<AdminMemberMeasurements />} />
-          <Route path="products" element={<AdminProducts />} /><Route path="orders" element={<AdminOrders />} />
+          <Route index element={<Navigate to="/admin/dashboard" replace />} />
+          <Route path="dashboard" element={<AdminDashboard />} />
+          <Route path="profile" element={<AdminProfile />} />
+          <Route path="users" element={<AdminUsers />} />
+          <Route path="admissions" element={<AdminAdmissions />} />
+          <Route path="membership-plans" element={<AdminMembershipPlans />} />
+          <Route path="memberships" element={<AdminMemberships />} />
+          <Route path="payments" element={<AdminPayments />} />
+          <Route path="body-measurements" element={<AdminBodyMeasurements />} />
+          <Route path="body-measurements/:userId" element={<AdminMemberMeasurements />} />
+          <Route path="transformations" element={<AdminTransformations />} />
+          <Route path="products" element={<AdminProducts />} />
+          <Route path="orders" element={<AdminOrders />} />
           <Route path="supplement-selling" element={<AdminSupplementSelling />} />
           <Route path="supplement-selling/:id" element={<AdminSupplementSellingDetails />} />
           <Route path="supplement-selling/bill/:id" element={<AdminSupplementBill />} />
-          <Route path="banners" element={<AdminBadges />} /><Route path="banners/:section" element={<AdminBadgeManager />} />
-          <Route path="notifications" element={<AdminNotifications />} /><Route path="settings" element={<AdminSettings />} />
+          <Route path="banners" element={<AdminBadges />} />
+          <Route path="banners/:section" element={<AdminBadgeManager />} />
+          <Route path="notifications" element={<AdminNotifications />} />
+          <Route path="settings" element={<AdminSettings />} />
         </Route>
-        <Route path="*" element={<Navigate to="/" />} />
+
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
   );

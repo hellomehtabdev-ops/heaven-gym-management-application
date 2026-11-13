@@ -1,117 +1,81 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
+import { gsap, isReducedMotion } from '@/utils/gsapAnimation';
 
 /**
  * ScrollReveal Component
- * Smoothly reveals content when scrolled into the viewport using native IntersectionObserver.
+ * Smoothly reveals content using GSAP ScrollTrigger with automatic context cleanup.
  * Fully respects prefers-reduced-motion for accessibility.
  */
 export default function ScrollReveal({
   children,
   animation = 'fade-up',
   delay = 0,
-  duration = 600,
-  threshold = 0.15,
+  duration = 700,
   className = '',
   once = true,
 }) {
-  const [isVisible, setIsVisible] = useState(false);
   const domRef = useRef(null);
 
   useEffect(() => {
-    // Check if user prefers reduced motion
-    const prefersReducedMotion = window.matchMedia(
-      '(prefers-reduced-motion: reduce)'
-    ).matches;
+    if (!domRef.current) return;
 
-    if (prefersReducedMotion) {
-      setIsVisible(true);
+    if (isReducedMotion()) {
+      gsap.set(domRef.current, { opacity: 1, x: 0, y: 0, scale: 1 });
       return;
     }
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setIsVisible(true);
-            if (once && domRef.current) {
-              observer.unobserve(domRef.current);
-            }
-          } else if (!once) {
-            setIsVisible(false);
-          }
-        });
-      },
-      { threshold }
-    );
+    const el = domRef.current;
+    let fromVars = { opacity: 0 };
 
-    const currentElem = domRef.current;
-    if (currentElem) {
-      observer.observe(currentElem);
+    switch (animation) {
+      case 'fade-up':
+        fromVars = { opacity: 0, y: 32 };
+        break;
+      case 'fade-down':
+        fromVars = { opacity: 0, y: -32 };
+        break;
+      case 'fade-left':
+        fromVars = { opacity: 0, x: 38 };
+        break;
+      case 'fade-right':
+        fromVars = { opacity: 0, x: -38 };
+        break;
+      case 'zoom-in':
+        fromVars = { opacity: 0, scale: 0.94 };
+        break;
+      default:
+        fromVars = { opacity: 0 };
     }
 
-    return () => {
-      if (currentElem) {
-        observer.unobserve(currentElem);
-      }
-    };
-  }, [threshold, once]);
+    const durationSec = typeof duration === 'number' && duration > 10 ? duration / 1000 : (duration || 0.7);
+    const delaySec = typeof delay === 'number' && delay > 10 ? delay / 1000 : (delay || 0);
 
-  const getAnimationStyles = () => {
-    const baseTransition = `opacity ${duration}ms cubic-bezier(0.16, 1, 0.3, 1) ${delay}ms, transform ${duration}ms cubic-bezier(0.16, 1, 0.3, 1) ${delay}ms`;
+    const ctx = gsap.context(() => {
+      gsap.fromTo(
+        el,
+        fromVars,
+        {
+          opacity: 1,
+          x: 0,
+          y: 0,
+          scale: 1,
+          duration: durationSec,
+          delay: delaySec,
+          ease: 'power3.out',
+          scrollTrigger: {
+            trigger: el,
+            start: 'top 90%',
+            toggleActions: once ? 'play none none none' : 'play reverse play reverse',
+          },
+        }
+      );
+    }, domRef);
 
-    if (!isVisible) {
-      switch (animation) {
-        case 'fade-up':
-          return {
-            opacity: 0,
-            transform: 'translate3d(0, 32px, 0)',
-            transition: baseTransition,
-          };
-        case 'fade-down':
-          return {
-            opacity: 0,
-            transform: 'translate3d(0, -32px, 0)',
-            transition: baseTransition,
-          };
-        case 'fade-left':
-          return {
-            opacity: 0,
-            transform: 'translate3d(40px, 0, 0)',
-            transition: baseTransition,
-          };
-        case 'fade-right':
-          return {
-            opacity: 0,
-            transform: 'translate3d(-40px, 0, 0)',
-            transition: baseTransition,
-          };
-        case 'zoom-in':
-          return {
-            opacity: 0,
-            transform: 'scale3d(0.94, 0.94, 1)',
-            transition: baseTransition,
-          };
-        default:
-          return {
-            opacity: 0,
-            transition: baseTransition,
-          };
-      }
-    }
-
-    return {
-      opacity: 1,
-      transform: 'translate3d(0, 0, 0) scale3d(1, 1, 1)',
-      transition: baseTransition,
-    };
-  };
+    return () => ctx.revert();
+  }, [animation, delay, duration, once]);
 
   return (
-    <div
-      ref={domRef}
-      style={getAnimationStyles()}
-      className={`will-change-transform ${className}`}
-    >
+    <div ref={domRef} className={`will-change-transform ${className}`}>
       {children}
     </div>
   );

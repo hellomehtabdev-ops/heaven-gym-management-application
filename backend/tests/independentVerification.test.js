@@ -556,7 +556,7 @@ test('Auth: Password reset lifecycle enforcing 12-char limit, single-use token, 
   // Old password login fails
   await assert.rejects(
     async () => loginUser({ email, password: oldPassword }),
-    { message: /invalid credentials/i }
+    { message: /invalid email or password/i }
   );
 
   // New password login succeeds

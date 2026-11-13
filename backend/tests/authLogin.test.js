@@ -3,12 +3,12 @@ import assert from 'node:assert/strict';
 import bcrypt from 'bcryptjs';
 import { getLoginPasswordError } from '../services/auth.service.js';
 
-test('returns a clear message when a registered account has the wrong password', async () => {
+test('keeps wrong-password feedback generic for registered accounts', async () => {
   const user = { password: await bcrypt.hash('CorrectPassword123', 4) };
 
   assert.equal(
     await getLoginPasswordError(user, 'WrongPassword123'),
-    'Incorrect password. Please try again.',
+    'Invalid email or password',
   );
 });
 

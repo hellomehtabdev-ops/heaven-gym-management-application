@@ -24,19 +24,19 @@ import { formatCurrency } from '@/utils/formatters';
 const MEMBERSHIP_FAQS = [
   {
     q: 'What is included with my Heaven Gym membership?',
-    a: 'Every active membership provides unlimited entry to all training zones during operating hours (5:00 AM – 10:00 PM daily). This includes access to free weights, power racks, cardio deck, functional turf, and locker facilities.',
+    a: "Membership access depends on the selected plan and the gym's posted opening hours. Please confirm which training zones and amenities are included with reception before purchasing.",
   },
   {
     q: 'Can I freeze or pause my membership if I travel?',
-    a: 'Yes. Members on multi-month or annual plans can request a temporary membership freeze for medical reasons or official travel by speaking directly with reception administration.',
+    a: 'Membership pause or freeze options depend on the selected plan and management approval. Please ask reception about the current policy before purchasing.',
   },
   {
     q: 'Do you offer an introductory equipment orientation?',
-    a: 'Absolutely. Every new member receives a complimentary facility walkthrough and machine orientation session with one of our certified floor coaches to ensure safe, confident usage.',
+    a: 'Ask reception whether a facility walkthrough or equipment orientation is available with your selected membership.',
   },
   {
     q: 'Are personal training sessions included or separate?',
-    a: 'Standard memberships include full floor access and general trainer guidance. Dedicated 1-on-1 private coaching packages can be arranged directly through our certified coaching staff.',
+    a: 'Personal-training availability, included guidance and any additional fees depend on the current coaching options. Contact reception for details.',
   },
   {
     q: 'How do I complete my registration and admission?',

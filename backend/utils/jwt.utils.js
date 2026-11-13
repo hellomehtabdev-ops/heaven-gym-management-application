@@ -16,7 +16,7 @@ export function hashToken(token) {
 
 export function generateAccessToken(user, sessionId) {
   return jwt.sign(
-    { id: user._id.toString(), role: user.role, sid: sessionId.toString(), type: 'access', jti: crypto.randomUUID() },
+    { id: user._id.toString(), sid: sessionId.toString(), type: 'access', jti: crypto.randomUUID() },
     requiredSecret('JWT_ACCESS_SECRET'),
     { expiresIn: '15m', issuer: 'gym-management-api', audience: 'gym-management-client' }
   );

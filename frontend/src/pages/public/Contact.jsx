@@ -15,6 +15,7 @@ import Button from '@/components/ui/Button';
 import ScrollReveal from '@/components/public/ScrollReveal';
 import SectionDivider from '@/components/public/SectionDivider';
 import api from '@/services/apiClient';
+import { getWhatsAppNumber } from '@/utils/phone';
 
 export default function Contact() {
   const [settings, setSettings] = useState(null);
@@ -43,7 +44,7 @@ export default function Contact() {
   const email = settings?.contact_email?.trim() || '';
   const address = settings?.address?.trim() || '';
   const cleanPhone = phone.replace(/[^+\d]/g, '');
-  const digitsOnly = phone.replace(/[^0-9]/g, '');
+  const internationalNumber = getWhatsAppNumber(phone);
 
   return (
     <div className="bg-[#070709] text-white selection:bg-brand-500 selection:text-white min-h-screen">
@@ -95,7 +96,7 @@ export default function Contact() {
             <ScrollReveal animation="fade-right">
               <div>
                 <p className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-brand-500">
-                  Verified Details
+                  Gym Contact Details
                 </p>
                 <h2 className="mt-2 font-display text-3xl sm:text-4xl font-black text-white">
                   VISIT & CONNECT.
@@ -140,7 +141,7 @@ export default function Contact() {
                     <h3 className="font-display text-base font-bold text-white">Phone Inquiries</h3>
                     <p className="mt-2 text-xs leading-relaxed text-surface-300">
                       {loading ? (
-                        <span className="animate-pulse text-surface-500">Loading verified phone...</span>
+                        <span className="animate-pulse text-surface-500">Loading contact phone...</span>
                       ) : phone ? (
                         <a href={`tel:${cleanPhone}`} className="text-white hover:text-brand-400 font-mono font-semibold transition">
                           {phone}
@@ -162,7 +163,7 @@ export default function Contact() {
                     <h3 className="font-display text-base font-bold text-white">Email Communications</h3>
                     <p className="mt-2 text-xs leading-relaxed text-surface-300">
                       {loading ? (
-                        <span className="animate-pulse text-surface-500">Loading verified email...</span>
+                        <span className="animate-pulse text-surface-500">Loading contact email...</span>
                       ) : email ? (
                         <a href={`mailto:${email}`} className="text-white hover:text-brand-400 font-mono transition break-all">
                           {email}
@@ -183,10 +184,10 @@ export default function Contact() {
                     </div>
                     <h3 className="font-display text-base font-bold text-white">Operating Schedule</h3>
                     <p className="mt-2 text-xs font-mono text-white font-semibold">
-                      Monday &ndash; Sunday: 5:00 AM &ndash; 10:00 PM
+                      {settings?.opening_hours || 'Contact Heaven Gym for current opening hours.'}
                     </p>
                     <p className="mt-2 text-[11px] text-surface-500">
-                      Doors open early every morning for discipline lifters.
+                      Opening hours are maintained by gym administration.
                     </p>
                   </div>
                 </div>
@@ -205,7 +206,7 @@ export default function Contact() {
                 </h3>
 
                 <p className="mt-3 text-xs leading-relaxed text-surface-300">
-                  To ensure 100% genuine response and avoid lost web forms, our desk communicates directly via phone call, email, or verified instant message.
+                  Choose a contact method below to reach the gym team. WhatsApp opens a chat with the contact number configured by gym administration.
                 </p>
 
                 <div className="mt-8 space-y-3.5">
@@ -221,9 +222,9 @@ export default function Contact() {
                     </a>
                   )}
 
-                  {phone && (
+                  {internationalNumber && (
                     <a
-                      href={`https://wa.me/${digitsOnly}`}
+                      href={`https://wa.me/${internationalNumber}`}
                       target="_blank"
                       rel="noreferrer"
                       className="flex items-center justify-between rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-6 py-4 font-mono text-xs font-bold uppercase tracking-wider text-emerald-400 transition hover:bg-emerald-500/20"

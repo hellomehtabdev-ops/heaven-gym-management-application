@@ -1,9 +1,8 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   ArrowRight,
   Check,
   Dumbbell,
-  Heart,
   Target,
   Users,
   Shield,
@@ -11,31 +10,31 @@ import {
   Flame,
   Compass,
   Sparkles,
-  Zap,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import Button from '@/components/ui/Button';
 import ScrollReveal from '@/components/public/ScrollReveal';
 import ImageLightbox from '@/components/public/ImageLightbox';
 import SectionDivider from '@/components/public/SectionDivider';
+import api from '@/services/apiClient';
 
 const ENVIRONMENT_IMAGES = [
   {
     id: 1,
     title: 'Main Strength Floor',
-    description: 'Generous spacing between power racks and platforms for uninterrupted focus.',
+    description: 'Illustrative gym image. Visit or contact Heaven Gym to confirm its current layout and available facilities.',
     src: 'https://images.unsplash.com/photo-1540497077202-7c8a3999166f?auto=format&fit=crop&w=1000&q=80',
   },
   {
     id: 2,
-    title: 'Precision Free Weights',
-    description: 'Dual racks with full urethane dumbbell progression and adjustable commercial benches.',
+    title: 'Strength Training',
+    description: 'Illustrative training image. Ask the gym about the equipment currently available.',
     src: 'https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?auto=format&fit=crop&w=1000&q=80',
   },
   {
     id: 3,
-    title: 'Functional Performance Bay',
-    description: 'Indoor turf designed for sprint mechanics, sled pushing, and metabolic intervals.',
+    title: 'Fitness Training',
+    description: 'Illustrative fitness image. Contact Heaven Gym for details about its training spaces.',
     src: 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=1000&q=80',
   },
 ];
@@ -66,6 +65,15 @@ const BRAND_VALUES = [
 export default function About() {
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [currentIdx, setCurrentIdx] = useState(0);
+  const [openingHours, setOpeningHours] = useState('');
+
+  useEffect(() => {
+    let active = true;
+    api.get('/gym-settings').then(({ data }) => {
+      if (active) setOpeningHours(data?.opening_hours || '');
+    }).catch(() => {});
+    return () => { active = false; };
+  }, []);
 
   const openLightbox = (index) => {
     setCurrentIdx(index);
@@ -79,7 +87,7 @@ export default function About() {
         <div className="absolute inset-0 z-0">
           <img
             src="https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&w=1920&q=80"
-            alt="Heaven Gym Architecture & Philosophy"
+            alt="Illustrative gym interior"
             className="h-full w-full object-cover filter brightness-[0.3] contrast-125"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-[#070709] via-[#070709]/75 to-transparent" />
@@ -124,7 +132,7 @@ export default function About() {
                   <span className="public-text-silver-gradient">MORE INTENTION.</span>
                 </h2>
                 <p className="mt-6 text-sm sm:text-base text-surface-300 leading-relaxed">
-                  We believe the quality of your physical environment determines the quality of your training session. When you step inside Heaven Gym, the tone is established immediately: organized weights, uncrowded stations, and an atmosphere centered on hard work.
+                  We believe consistent effort and a clear training purpose can make fitness a meaningful part of everyday life. Heaven Gym’s facilities, equipment, and available support can be explored by contacting or visiting the gym.
                 </p>
                 <p className="mt-4 text-sm sm:text-base text-surface-300 leading-relaxed">
                   We cater to individuals who view fitness not as a temporary chore, but as an enduring discipline that builds character, energy, and physical capability.
@@ -132,8 +140,8 @@ export default function About() {
 
                 <div className="mt-8 flex items-center gap-4">
                   <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4 text-center min-w-[120px]">
-                    <p className="font-display text-2xl font-bold text-brand-400">5:00 AM</p>
-                    <p className="text-[11px] text-surface-400 uppercase tracking-wider font-mono">Daily Doors Open</p>
+                    <p className="font-display text-lg font-bold leading-tight text-brand-400">{openingHours || 'Ask us'}</p>
+                    <p className="mt-1 text-[11px] text-surface-400 uppercase tracking-wider font-mono">Current Opening Hours</p>
                   </div>
                   <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4 text-center min-w-[120px]">
                     <p className="font-display text-2xl font-bold text-white">Zero</p>
@@ -184,7 +192,7 @@ export default function About() {
                   Empowering Real Transformation
                 </h3>
                 <p className="text-sm text-surface-300 leading-relaxed">
-                  To provide an uncompromising training environment equipped with professional strength equipment, certified coaching expertise, and a community standard that turns effort into compounding physical resilience.
+                  To offer a place where people can pursue their fitness goals through regular training. Contact Heaven Gym to learn about the equipment, facilities, and coaching options currently available.
                 </p>
               </div>
             </ScrollReveal>
@@ -198,7 +206,7 @@ export default function About() {
                   A Benchmark for Athletic Fitness
                 </h3>
                 <p className="text-sm text-surface-300 leading-relaxed">
-                  To establish Heaven Gym as the benchmark fitness club where discipline is celebrated, technique is respected, and members discover the true bounds of their physical capability.
+                  To keep building a gym experience centered on consistency, respect, and helping members work toward their individual fitness goals.
                 </p>
               </div>
             </ScrollReveal>
@@ -218,7 +226,7 @@ export default function About() {
                 HOW WE TRAIN.
               </h2>
               <p className="mt-3 text-sm sm:text-base text-surface-400">
-                Our approach is rooted in sports science and the universal laws of physical adaptation:
+                These are general training concepts. Choose exercises and training intensity appropriate to your experience and seek qualified guidance when needed:
               </p>
             </div>
           </ScrollReveal>
@@ -269,14 +277,14 @@ export default function About() {
             <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-10">
               <div>
                 <p className="font-mono text-xs font-bold uppercase tracking-[0.2em] text-brand-500">
-                  Spaces & Zones
+                  Gym Photo Gallery
                 </p>
                 <h2 className="mt-2 font-display text-3xl sm:text-4xl font-black text-white">
                   THE TRAINING GROUNDS.
                 </h2>
               </div>
               <span className="text-xs font-mono text-surface-400 uppercase tracking-wider">
-                Click to expand view
+                Illustrative images — select to enlarge
               </span>
             </div>
           </ScrollReveal>
@@ -284,27 +292,29 @@ export default function About() {
           <div className="grid gap-6 md:grid-cols-3">
             {ENVIRONMENT_IMAGES.map((img, idx) => (
               <ScrollReveal key={img.id} animation="fade-up" delay={idx * 90}>
-                <div
+                <button
+                  type="button"
                   onClick={() => openLightbox(idx)}
-                  className="group cursor-pointer overflow-hidden rounded-2xl border border-white/10 bg-white/[0.02] transition hover:border-brand-500/50"
+                  aria-label={`Enlarge image: ${img.title}`}
+                  className="group w-full text-left cursor-pointer overflow-hidden rounded-2xl border border-white/10 bg-white/[0.02] transition hover:border-brand-500/50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-500"
                 >
-                  <div className="aspect-[16/11] overflow-hidden bg-black/40">
+                  <span className="block aspect-[16/11] overflow-hidden bg-black/40">
                     <img
                       src={img.src}
                       alt={img.title}
                       loading="lazy"
                       className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-108"
                     />
-                  </div>
-                  <div className="p-5">
-                    <h3 className="font-display text-base font-bold text-white group-hover:text-brand-400 transition-colors">
+                  </span>
+                  <span className="block p-5">
+                    <span className="block font-display text-base font-bold text-white group-hover:text-brand-400 transition-colors">
                       {img.title}
-                    </h3>
-                    <p className="mt-1 text-xs text-surface-400 leading-relaxed">
+                    </span>
+                    <span className="mt-1 block text-xs text-surface-400 leading-relaxed">
                       {img.description}
-                    </p>
-                  </div>
-                </div>
+                    </span>
+                  </span>
+                </button>
               </ScrollReveal>
             ))}
           </div>
@@ -319,17 +329,17 @@ export default function About() {
               <div className="relative aspect-[4/3] rounded-3xl overflow-hidden border border-white/10 shadow-2xl">
                 <img
                   src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?auto=format&fit=crop&w=1000&q=80"
-                  alt="Coaching in Action at Heaven Gym"
+                  alt="Personal training and fitness coaching"
                   loading="lazy"
                   className="h-full w-full object-cover filter contrast-110"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
                 <div className="absolute bottom-6 left-6 right-6">
                   <span className="text-[10px] font-mono uppercase tracking-wider text-brand-400 font-bold">
-                    1-on-1 Guidance
+                    Training Support
                   </span>
                   <p className="font-display text-lg font-bold text-white">
-                    Certified Mentorship on Every Lift
+                    Ask About Coaching
                   </p>
                 </div>
               </div>
@@ -344,17 +354,17 @@ export default function About() {
                   A COMMUNITY OF FOCUS.
                 </h2>
                 <p className="mt-6 text-sm sm:text-base text-surface-300 leading-relaxed">
-                  Heaven Gym is home to doctors, engineers, students, competitive lifters, and busy parents who all share one common thread: when the gym timer starts, they put their heads down and do the work.
+                  People come to gyms with different backgrounds and fitness goals. Ask the Heaven Gym team about its membership options and the environment you can expect during a visit.
                 </p>
                 <p className="mt-4 text-sm sm:text-base text-surface-300 leading-relaxed">
-                  Our coaches don&rsquo;t stand on sidelines shouting empty motivational slogans. They check your stance, refine your elbow path, ensure your safety, and hold you accountable to your personal best.
+                  If coaching or exercise guidance is important to you, contact the gym to confirm what support is available and whether it suits your needs.
                 </p>
 
                 <div className="mt-8 space-y-3">
                   {[
-                    'Zero intimidation — beginners receive proper guidance',
-                    'Calibrated plates and strict re-racking etiquette',
-                    'Clean, well-ventilated training floors daily',
+                    'Ask about beginner support and coaching availability',
+                    'Confirm available equipment before your visit',
+                    'Ask the team about cleaning and safety practices',
                   ].map((pt) => (
                     <div key={pt} className="flex items-center gap-3 text-sm text-surface-200">
                       <span className="flex h-5 w-5 items-center justify-center rounded-full bg-brand-500/20 text-brand-400">

@@ -30,7 +30,8 @@ paymentSchema.index(
   { unique: true, partialFilterExpression: { status: 'pending', order_id: { $type: 'objectId' } } },
 );
 paymentSchema.index(
-  { user_id: 1, membership_id: 1 },
+  // Reverse key order keeps this partial unique constraint distinct from the general lookup index above.
+  { membership_id: 1, user_id: 1 },
   { unique: true, partialFilterExpression: { status: 'pending', membership_id: { $type: 'objectId' } } },
 );
 

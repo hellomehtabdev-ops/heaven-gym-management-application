@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
-import { Menu, X, ArrowRight, Shield } from 'lucide-react';
+import { Menu, X, ArrowRight, User, Shield, Sparkles } from 'lucide-react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import ThemeToggle from '@/components/ui/ThemeToggle';
 import Button from '@/components/ui/Button';
 import HeavenLogo from '@/components/public/HeavenLogo';
@@ -9,13 +10,12 @@ export default function PublicNavbar() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
+  const user = useSelector((state) => state.auth.user);
 
-  // Close mobile nav on route change
   useEffect(() => {
     setOpen(false);
   }, [location.pathname]);
 
-  // Handle scroll effect for glassmorphic navbar
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 20);
@@ -27,17 +27,23 @@ export default function PublicNavbar() {
   const links = [
     { label: 'Home', path: '/' },
     { label: 'About', path: '/about' },
+    { label: 'Facilities', path: '/facilities' },
+    { label: 'Transformations', path: '/transformations' },
     { label: 'Membership', path: '/membership' },
-    { label: 'Store', path: '/store' },
+    { label: 'Supplements', path: '/store' },
+    { label: 'Equipment', path: '/gym-equipment' },
+    { label: 'Franchise', path: '/franchise' },
     { label: 'Contact', path: '/contact' },
   ];
+
+  const dashboardRoute = user?.role === 'admin' ? '/admin/dashboard' : '/user/dashboard';
 
   return (
     <header
       className={`fixed inset-x-0 top-0 z-50 transition-all duration-300 ${
         scrolled
-          ? 'border-b border-white/10 bg-[#070709]/92 shadow-2xl backdrop-blur-xl py-3'
-          : 'border-b border-white/5 bg-gradient-to-b from-[#070709]/90 to-transparent py-4 sm:py-5'
+          ? 'border-b border-white/10 bg-[#07080b]/95 shadow-[0_10px_30px_rgba(0,0,0,0.8)] backdrop-blur-xl py-3'
+          : 'border-b border-white/5 bg-gradient-to-b from-[#07080b]/90 via-[#07080b]/50 to-transparent py-4 sm:py-5'
       }`}
     >
       <div className="mx-auto flex max-w-7xl items-center justify-between px-5 lg:px-8">
@@ -52,7 +58,7 @@ export default function PublicNavbar() {
 
         {/* Desktop Navigation Links */}
         <nav
-          className="hidden items-center gap-1 lg:gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 backdrop-blur-md md:flex"
+          className="hidden items-center gap-0.5 xl:gap-1 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 backdrop-blur-md lg:flex"
           aria-label="Main Navigation"
         >
           {links.map(({ label, path }) => (
@@ -61,10 +67,10 @@ export default function PublicNavbar() {
               to={path}
               end={path === '/'}
               className={({ isActive }) =>
-                `relative px-3.5 py-1.5 text-xs font-semibold uppercase tracking-wider transition-all duration-200 rounded-full ${
+                `relative px-3 py-1.5 text-[11px] xl:text-xs font-mono uppercase tracking-wider transition-all duration-200 rounded-full ${
                   isActive
-                    ? 'text-white bg-brand-600/90 shadow-sm shadow-brand-600/30'
-                    : 'text-surface-300 hover:text-white hover:bg-white/5'
+                    ? 'text-white bg-brand-600/90 shadow-sm shadow-brand-600/30 font-bold'
+                    : 'text-surface-300 hover:text-white hover:bg-white/5 font-semibold'
                 }`
               }
             >
@@ -74,31 +80,45 @@ export default function PublicNavbar() {
         </nav>
 
         {/* Action Controls & Authentication */}
-        <div className="hidden items-center gap-3 md:flex">
+        <div className="hidden items-center gap-2.5 sm:flex">
           <ThemeToggle />
 
-          <Link to="/login">
-            <Button
-              variant="outline"
-              size="sm"
-              className="border-white/15 bg-white/[0.02] text-xs font-semibold uppercase tracking-wider text-white hover:border-brand-500 hover:bg-brand-500/10 hover:text-white transition-colors"
-            >
-              Sign In
-            </Button>
-          </Link>
+          {user ? (
+            <Link to={dashboardRoute}>
+              <Button
+                size="sm"
+                className="bg-brand-600 hover:bg-brand-500 text-white text-xs font-mono font-bold uppercase tracking-wider shadow-lg shadow-brand-600/25 border border-brand-400/20"
+              >
+                <User size={14} className="mr-1.5" />
+                {user.role === 'admin' ? 'Admin Panel' : 'My Dashboard'}
+              </Button>
+            </Link>
+          ) : (
+            <>
+              <Link to="/login">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="border-white/15 bg-white/[0.02] text-xs font-mono font-semibold uppercase tracking-wider text-white hover:border-brand-500 hover:bg-brand-500/10 hover:text-white transition-colors"
+                >
+                  Sign In
+                </Button>
+              </Link>
 
-          <Link to="/register">
-            <Button
-              size="sm"
-              className="bg-brand-600 hover:bg-brand-500 text-white text-xs font-bold uppercase tracking-wider shadow-lg shadow-brand-600/25 border border-brand-400/20"
-            >
-              Join Now <ArrowRight size={14} className="ml-1" />
-            </Button>
-          </Link>
+              <Link to="/register">
+                <Button
+                  size="sm"
+                  className="bg-brand-600 hover:bg-brand-500 text-white text-xs font-mono font-bold uppercase tracking-wider shadow-lg shadow-brand-600/25 border border-brand-400/20"
+                >
+                  Join Now <ArrowRight size={13} className="ml-1" />
+                </Button>
+              </Link>
+            </>
+          )}
         </div>
 
         {/* Mobile Hamburger & Theme Toggle */}
-        <div className="flex items-center gap-2 md:hidden">
+        <div className="flex items-center gap-2 lg:hidden">
           <ThemeToggle />
           <button
             onClick={() => setOpen(!open)}
@@ -113,7 +133,7 @@ export default function PublicNavbar() {
 
       {/* Mobile Drawer Menu */}
       {open && (
-        <div className="border-b border-white/10 bg-[#09090c]/98 px-5 pb-6 pt-3 shadow-2xl backdrop-blur-2xl md:hidden animate-fade-up">
+        <div className="border-b border-white/10 bg-[#090a0e]/98 px-5 pb-6 pt-3 shadow-2xl backdrop-blur-2xl lg:hidden animate-fade-up max-h-[85vh] overflow-y-auto">
           <nav className="divide-y divide-white/5">
             {links.map(({ label, path }) => (
               <NavLink
@@ -122,10 +142,10 @@ export default function PublicNavbar() {
                 end={path === '/'}
                 onClick={() => setOpen(false)}
                 className={({ isActive }) =>
-                  `flex items-center justify-between py-3.5 text-sm font-semibold tracking-wide transition ${
+                  `flex items-center justify-between py-3 text-xs font-mono uppercase tracking-wider transition ${
                     isActive
                       ? 'text-brand-400 font-bold'
-                      : 'text-surface-200 hover:text-white'
+                      : 'text-surface-300 hover:text-white'
                   }`
                 }
               >
@@ -136,21 +156,30 @@ export default function PublicNavbar() {
           </nav>
 
           <div className="mt-5 flex flex-col gap-2.5 pt-4 border-t border-white/10">
-            <Link to="/login" onClick={() => setOpen(false)}>
-              <Button
-                variant="outline"
-                className="w-full justify-center border-white/20 text-white hover:border-brand-500 text-xs font-bold uppercase tracking-wider"
-              >
-                Sign In
-              </Button>
-            </Link>
-            <Link to="/register" onClick={() => setOpen(false)}>
-              <Button
-                className="w-full justify-center bg-brand-600 text-white text-xs font-bold uppercase tracking-wider"
-              >
-                Join Heaven Gym <ArrowRight size={14} className="ml-1" />
-              </Button>
-            </Link>
+            {user ? (
+              <Link to={dashboardRoute} onClick={() => setOpen(false)}>
+                <Button className="w-full justify-center bg-brand-600 text-white text-xs font-mono font-bold uppercase tracking-wider">
+                  <User size={15} className="mr-2" />
+                  {user.role === 'admin' ? 'Open Admin Panel' : 'Go to Dashboard'}
+                </Button>
+              </Link>
+            ) : (
+              <>
+                <Link to="/login" onClick={() => setOpen(false)}>
+                  <Button
+                    variant="outline"
+                    className="w-full justify-center border-white/20 text-white hover:border-brand-500 text-xs font-mono font-bold uppercase tracking-wider"
+                  >
+                    Sign In
+                  </Button>
+                </Link>
+                <Link to="/register" onClick={() => setOpen(false)}>
+                  <Button className="w-full justify-center bg-brand-600 text-white text-xs font-mono font-bold uppercase tracking-wider">
+                    Join Heaven Gym <ArrowRight size={14} className="ml-1" />
+                  </Button>
+                </Link>
+              </>
+            )}
           </div>
         </div>
       )}

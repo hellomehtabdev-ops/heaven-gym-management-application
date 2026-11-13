@@ -5,6 +5,10 @@ const gymSettingsSchema = new mongoose.Schema({
   contact_phone: { type: String, default: '' },
   contact_email: { type: String, default: '' },
   address: { type: String, default: '' },
+  opening_hours: { type: String, trim: true, maxlength: 120, default: '' },
+  instagram_url: { type: String, trim: true, maxlength: 300, default: '' },
+  facebook_url: { type: String, trim: true, maxlength: 300, default: '' },
+  youtube_url: { type: String, trim: true, maxlength: 300, default: '' },
   membership_advance_amount: { type: Number, default: 0, min: 0 },
   low_stock_threshold: { type: Number, default: 10, min: 0 },
 }, { timestamps: true });

@@ -90,6 +90,8 @@ export async function registerUser({ email, password, full_name, fullName, phone
     user = await User.create({
       email: normalizedEmail,
       password: await bcrypt.hash(password, 12),
+      // Never accept a role from registration input. New public accounts are always regular users.
+      role: 'user',
       full_name: String(full_name ?? fullName ?? '').trim().slice(0, 100),
       phone: String(phone || '').trim().slice(0, 30),
       email_verified: false,
@@ -156,7 +158,7 @@ export async function getLoginPasswordError(user, password) {
 
   const passwordMatches = await bcrypt.compare(password, user?.password || DUMMY_PASSWORD_HASH);
   if (!user) return 'Invalid email or password';
-  if (!passwordMatches) return 'Incorrect password. Please try again.';
+  if (!passwordMatches) return 'Invalid email or password';
   return null;
 }
 
