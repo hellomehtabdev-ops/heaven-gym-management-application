@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react';
 import {
-  Dumbbell, Menu, X, LayoutDashboard, Users, UserPlus, CreditCard, Ruler,
+  Menu, X, LayoutDashboard, Users, UserPlus, CreditCard, Ruler,
   Package, ShoppingCart, Bell, Settings, LogOut, ClipboardList, UserRound,
   PanelsTopLeft, ChevronDown, PanelLeftClose, PanelLeftOpen, Sparkles,
 } from 'lucide-react';
 import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import AdminAvatar from '@/components/admin/AdminAvatar';
+import HeavenLogo from '@/components/public/HeavenLogo';
 import ThemeToggle from '@/components/ui/ThemeToggle';
 import AdminLoadingSkeleton from '@/components/admin/AdminLoadingSkeleton';
 import { signOut, signOutAll } from '@/redux/slices/authSlice';
@@ -124,14 +125,7 @@ export default function AdminLayout() {
           collapsed ? 'justify-center px-3' : 'justify-between px-5'
         }`}>
           <Link to="/admin/dashboard" className="group flex min-w-0 items-center gap-3">
-            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-500 text-white shadow-[0_0_24px_rgba(220,38,38,0.20)] transition group-hover:scale-105">
-              <Dumbbell size={20} strokeWidth={2.5} />
-            </span>
-            {!collapsed && (
-              <span className="font-display whitespace-nowrap text-[17px] font-extrabold tracking-tight text-ink-900 dark:text-white">
-                Heaven<span className="text-brand-500"> Gym</span>
-              </span>
-            )}
+            {collapsed ? <HeavenLogo variant="emblem" size="xs" /> : <HeavenLogo variant="header" size="sm" />}
           </Link>
           {!collapsed && (
             <button
@@ -209,12 +203,7 @@ export default function AdminLayout() {
       }`}>
         <div className="flex h-[72px] items-center justify-between border-b border-surface-200 px-5 dark:border-white/[0.08]">
           <Link to="/admin/dashboard" className="flex items-center gap-3">
-            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-500 text-white">
-              <Dumbbell size={20} />
-            </span>
-            <span className="font-display text-[17px] font-extrabold text-ink-900 dark:text-white">
-              Heaven<span className="text-brand-500"> Gym</span>
-            </span>
+<HeavenLogo variant="header" size="sm" />
           </Link>
           <button
             type="button"
