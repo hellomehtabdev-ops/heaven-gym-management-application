@@ -1,7 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 const CART_STORAGE_PREFIX = 'heaven_gym_cart:';
-const LEGACY_CART_STORAGE_KEYS = ['heaven_gym_cart', ['\\x69ron', '\\x66orge', '_cart'].join('')];
+const LEGACY_CART_STORAGE_KEYS = ['heaven_gym_cart', ['\x69ron', '\x66orge', '_cart'].join('')];
 
 function getUserId(user) {
   return String(user?._id || user?.id || '');
