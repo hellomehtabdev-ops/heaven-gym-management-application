@@ -298,22 +298,22 @@ export default function About() {
                   aria-label={`Enlarge image: ${img.title}`}
                   className="group w-full text-left cursor-pointer overflow-hidden rounded-2xl border border-white/10 bg-white/[0.02] transition hover:border-brand-500/50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-500"
                 >
-                  <div className="aspect-[16/11] overflow-hidden bg-black/40">
+                  <span className="block aspect-[16/11] overflow-hidden bg-black/40">
                     <img
                       src={img.src}
                       alt={img.title}
                       loading="lazy"
                       className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-108"
                     />
-                  </div>
-                  <div className="p-5">
-                    <h3 className="font-display text-base font-bold text-white group-hover:text-brand-400 transition-colors">
+                  </span>
+                  <span className="block p-5">
+                    <span className="block font-display text-base font-bold text-white group-hover:text-brand-400 transition-colors">
                       {img.title}
-                    </h3>
-                    <p className="mt-1 text-xs text-surface-400 leading-relaxed">
+                    </span>
+                    <span className="mt-1 block text-xs text-surface-400 leading-relaxed">
                       {img.description}
-                    </p>
-                  </div>
+                    </span>
+                  </span>
                 </button>
               </ScrollReveal>
             ))}
