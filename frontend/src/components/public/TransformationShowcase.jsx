@@ -138,8 +138,16 @@ export default function TransformationShowcase({ className = '' }) {
                 key={item._id}
                 className="w-[320px] sm:w-[400px] shrink-0 snap-start flex flex-col rounded-3xl border border-white/10 bg-[#0e1017] p-5 shadow-2xl transition-all duration-300 hover:border-brand-500/40 hover:-translate-y-1"
               >
-                {/* Interactive comparison slider inside card */}
-                <div className="relative mb-5">
+                {/* Duration is kept above the image so it never overlaps the BEFORE/AFTER labels. */}
+                <div className="mb-5">
+                  {item.duration && (
+                    <div className="mb-2 flex justify-end">
+                      <span className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-black/80 px-3 py-1 text-[10px] font-mono font-semibold text-white">
+                        <Clock size={11} className="text-amber-400" />
+                        {item.duration}
+                      </span>
+                    </div>
+                  )}
                   <BeforeAfterSlider
                     beforeImage={item.before_image?.url}
                     afterImage={item.after_image?.url}
@@ -148,13 +156,6 @@ export default function TransformationShowcase({ className = '' }) {
                     initialPosition={50}
                     aspectRatio="aspect-[4/5]"
                   />
-
-                  {item.duration && (
-                    <div className="absolute top-3 left-3 z-20 flex items-center gap-1.5 rounded-full border border-white/10 bg-black/80 px-3 py-1 text-[10px] font-mono font-semibold text-white backdrop-blur-md">
-                      <Clock size={11} className="text-amber-400" />
-                      {item.duration}
-                    </div>
-                  )}
                 </div>
 
                 {/* Information */}
