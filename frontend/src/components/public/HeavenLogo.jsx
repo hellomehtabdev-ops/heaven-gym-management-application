@@ -18,6 +18,7 @@ export default function HeavenLogo({
   iconOnly = false,
 }) {
   const isLight = theme === 'light';
+  const isAuto = theme === 'auto';
 
   // Sizing scale
   const sizeMap = {
@@ -31,9 +32,9 @@ export default function HeavenLogo({
   const { iconWidth, iconHeight, text, sub } = sizeMap[size] || sizeMap.md;
 
   // Primary colors
-  const plateColor = isLight ? '#0f172a' : '#ffffff';
-  const wingColor = isLight ? '#1e293b' : '#ffffff';
-  const collarColor = isLight ? '#475569' : '#e2e8f0';
+  const plateColor = isLight ? '#0f172a' : isAuto ? 'currentColor' : '#ffffff';
+  const wingColor = isLight ? '#1e293b' : isAuto ? 'currentColor' : '#ffffff';
+  const collarColor = isLight ? '#475569' : isAuto ? 'currentColor' : '#e2e8f0';
 
   /**
    * The Official Winged Dumbbell Emblem
@@ -46,7 +47,7 @@ export default function HeavenLogo({
       viewBox="0 0 160 90"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
-      className="shrink-0 transition-transform duration-300 group-hover:scale-105"
+      className={`shrink-0 transition-transform duration-300 group-hover:scale-105 ${isAuto ? 'text-slate-900 dark:text-white' : ''}`}
       aria-label="Heaven Gym Winged Dumbbell Emblem"
     >
       <defs>
@@ -69,30 +70,30 @@ export default function HeavenLogo({
         {/* Top Primary Feather */}
         <path
           d="M62 42C56 32 46 20 22 15C12 13 4 15 2 17C14 22 28 28 42 36C49 40 56 42 62 42Z"
-          fill={isLight ? wingColor : 'url(#hgWingGrad)'}
+          fill={isLight || isAuto ? wingColor : 'url(#hgWingGrad)'}
         />
         {/* Second Feather */}
         <path
           d="M60 45C52 38 40 28 20 26C12 25 6 28 5 30C16 34 29 40 43 45C50 48 56 47 60 45Z"
-          fill={isLight ? wingColor : 'url(#hgWingGrad)'}
+          fill={isLight || isAuto ? wingColor : 'url(#hgWingGrad)'}
           opacity="0.95"
         />
         {/* Third Feather */}
         <path
           d="M58 50C50 46 38 38 23 38C16 38 12 41 11 43C20 46 32 50 44 53C50 54 55 53 58 50Z"
-          fill={isLight ? wingColor : 'url(#hgWingGrad)'}
+          fill={isLight || isAuto ? wingColor : 'url(#hgWingGrad)'}
           opacity="0.9"
         />
         {/* Fourth Feather */}
         <path
           d="M56 55C48 52 38 48 28 49C22 50 18 53 18 55C26 57 36 60 45 61C50 61 54 58 56 55Z"
-          fill={isLight ? wingColor : 'url(#hgWingGrad)'}
+          fill={isLight || isAuto ? wingColor : 'url(#hgWingGrad)'}
           opacity="0.85"
         />
         {/* Bottom Taper Feather */}
         <path
           d="M55 60C48 59 40 58 34 60C30 61 28 64 29 65C36 66 44 66 50 65C53 64 55 62 55 60Z"
-          fill={isLight ? wingColor : 'url(#hgWingGrad)'}
+          fill={isLight || isAuto ? wingColor : 'url(#hgWingGrad)'}
           opacity="0.75"
         />
       </g>
@@ -104,30 +105,30 @@ export default function HeavenLogo({
         {/* Top Primary Feather */}
         <path
           d="M98 42C104 32 114 20 138 15C148 13 156 15 158 17C146 22 132 28 118 36C111 40 104 42 98 42Z"
-          fill={isLight ? wingColor : 'url(#hgWingGrad)'}
+          fill={isLight || isAuto ? wingColor : 'url(#hgWingGrad)'}
         />
         {/* Second Feather */}
         <path
           d="M100 45C108 38 120 28 140 26C148 25 154 28 155 30C144 34 131 40 117 45C110 48 104 47 100 45Z"
-          fill={isLight ? wingColor : 'url(#hgWingGrad)'}
+          fill={isLight || isAuto ? wingColor : 'url(#hgWingGrad)'}
           opacity="0.95"
         />
         {/* Third Feather */}
         <path
           d="M102 50C110 46 122 38 137 38C144 38 148 41 149 43C140 46 128 50 116 53C110 54 105 53 102 50Z"
-          fill={isLight ? wingColor : 'url(#hgWingGrad)'}
+          fill={isLight || isAuto ? wingColor : 'url(#hgWingGrad)'}
           opacity="0.9"
         />
         {/* Fourth Feather */}
         <path
           d="M104 55C112 52 122 48 132 49C138 50 142 53 142 55C134 57 124 60 115 61C110 61 106 58 104 55Z"
-          fill={isLight ? wingColor : 'url(#hgWingGrad)'}
+          fill={isLight || isAuto ? wingColor : 'url(#hgWingGrad)'}
           opacity="0.85"
         />
         {/* Bottom Taper Feather */}
         <path
           d="M105 60C112 59 120 58 126 60C130 61 132 64 131 65C124 66 116 66 110 65C107 64 105 62 105 60Z"
-          fill={isLight ? wingColor : 'url(#hgWingGrad)'}
+          fill={isLight || isAuto ? wingColor : 'url(#hgWingGrad)'}
           opacity="0.75"
         />
       </g>
@@ -204,13 +205,13 @@ export default function HeavenLogo({
       <div className={`group flex flex-col items-center text-center ${className}`}>
         <WingedDumbbell width={iconWidth * 1.3} height={iconHeight * 1.3} />
         <div className="mt-3 flex flex-col items-center leading-none">
-          <span className={`font-display font-black tracking-[0.22em] ${text} ${isLight ? 'text-slate-950' : 'text-white'}`}>
+          <span className={`font-display font-black tracking-[0.22em] ${text} ${isAuto ? 'text-slate-900 dark:text-white' : isLight ? 'text-slate-950' : 'text-white'}`}>
             HEAVEN
           </span>
           <span className={`mt-1 font-display font-extrabold tracking-[0.35em] text-xs sm:text-sm text-brand-500`}>
             GYM
           </span>
-          <span className={`mt-2 font-mono font-semibold uppercase tracking-[0.28em] ${sub} ${isLight ? 'text-slate-500' : 'text-surface-400'}`}>
+          <span className={`mt-2 font-mono font-semibold uppercase tracking-[0.28em] ${sub} ${isAuto ? 'text-slate-500 dark:text-surface-400' : isLight ? 'text-slate-500' : 'text-surface-400'}`}>
             Discipline &bull; Strength
           </span>
         </div>
@@ -244,14 +245,14 @@ export default function HeavenLogo({
       <WingedDumbbell />
       <div className="flex flex-col justify-center leading-none">
         <div className="flex items-baseline gap-1.5">
-          <span className={`font-display font-black tracking-[0.12em] text-lg sm:text-xl ${isLight ? 'text-slate-900' : 'text-white'}`}>
+          <span className={`font-display font-black tracking-[0.12em] text-lg sm:text-xl ${isAuto ? 'text-slate-900 dark:text-white' : isLight ? 'text-slate-900' : 'text-white'}`}>
             HEAVEN
           </span>
           <span className="font-display font-black tracking-[0.14em] text-lg sm:text-xl text-brand-500">
             GYM
           </span>
         </div>
-        <span className={`mt-1 font-mono text-[8px] sm:text-[8.5px] font-bold uppercase tracking-[0.22em] ${isLight ? 'text-slate-500' : 'text-surface-400'}`}>
+        <span className={`mt-1 font-mono text-[8px] sm:text-[8.5px] font-bold uppercase tracking-[0.22em] ${isAuto ? 'text-slate-500 dark:text-surface-400' : isLight ? 'text-slate-500' : 'text-surface-400'}`}>
           Built Through Discipline
         </span>
       </div>

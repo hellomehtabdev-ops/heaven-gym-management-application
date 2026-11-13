@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Dumbbell } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
+import HeavenLogo from '@/components/public/HeavenLogo';
 
 const sections = [
   { title: '1. Age Eligibility (18+)', body: 'Heaven Gym account, online membership aur services sirf 18 saal ya usse zyada age ke logon ke liye hain. Account create karke aap confirm karte hain ki aap 18+ hain. Agar aap 18 saal se kam hain, to account create na karein aur membership purchase na karein.' },
@@ -16,7 +17,7 @@ export default function TermsAndConditions() {
     <main className="min-h-screen bg-surface-50 px-4 py-8 dark:bg-surface-950 sm:px-6 sm:py-12">
       <article className="mx-auto max-w-3xl rounded-2xl border border-surface-200 bg-white p-5 shadow-sm dark:border-surface-800 dark:bg-surface-900 sm:p-8">
         <Link to="/register" className="inline-flex items-center gap-2 text-sm font-semibold text-brand-600 hover:text-brand-700"><ArrowLeft size={16} /> Back to registration</Link>
-        <div className="mt-7 flex items-center gap-3"><span className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-500 text-white"><Dumbbell size={20} /></span><span className="font-display text-lg font-bold text-ink-950 dark:text-white">HEAVEN<span className="text-brand-500">GYM</span></span></div>
+        <div className="mt-7"><HeavenLogo variant="header" theme="auto" size="sm" /></div>
         <p className="mt-7 text-xs font-bold uppercase tracking-[.16em] text-brand-600">Please read before creating an account</p>
         <h1 className="mt-2 font-display text-3xl font-bold text-ink-950 dark:text-white">Terms & Conditions</h1>
         <p className="mt-3 text-sm leading-6 text-surface-500 dark:text-surface-400">Last updated: 8 November 2026. Ye terms Heaven Gym account, membership aur related services ke use par apply hote hain.</p>

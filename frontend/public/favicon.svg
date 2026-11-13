@@ -1,32 +1,28 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" fill="none">
-  <!-- Dark Background -->
   <rect width="160" height="160" rx="36" fill="#08080a"/>
   <rect x="2" y="2" width="156" height="156" rx="34" stroke="#dc2626" stroke-width="3" stroke-opacity="0.35"/>
-  
-  <!-- Left Wing -->
-  <g fill="#ffffff">
-    <path d="M58 72C52 62 42 50 20 45C10 43 3 45 1 47C13 52 26 58 39 66C46 70 52 72 58 72Z"/>
-    <path d="M56 75C48 68 37 58 19 56C11 55 5 58 4 60C15 64 27 70 40 75C47 78 52 77 56 75Z" opacity="0.95"/>
-    <path d="M54 80C47 76 36 68 22 68C15 68 11 71 10 73C19 76 30 80 41 83C47 84 51 83 54 80Z" opacity="0.9"/>
-    <path d="M52 85C45 82 36 78 27 79C21 80 17 83 17 85C25 87 34 90 43 91C47 91 50 88 52 85Z" opacity="0.85"/>
+  <g transform="translate(0 24)">
+    <g fill="#ffffff">
+      <path d="M62 42C56 32 46 20 22 15C12 13 4 15 2 17C14 22 28 28 42 36C49 40 56 42 62 42Z"/>
+      <path d="M60 45C52 38 40 28 20 26C12 25 6 28 5 30C16 34 29 40 43 45C50 48 56 47 60 45Z" opacity=".95"/>
+      <path d="M58 50C50 46 38 38 23 38C16 38 12 41 11 43C20 46 32 50 44 53C50 54 55 53 58 50Z" opacity=".9"/>
+      <path d="M56 55C48 52 38 48 28 49C22 50 18 53 18 55C26 57 36 60 45 61C50 61 54 58 56 55Z" opacity=".85"/>
+      <path d="M55 60C48 59 40 58 34 60C30 61 28 64 29 65C36 66 44 66 50 65C53 64 55 62 55 60Z" opacity=".75"/>
+    </g>
+    <g fill="#ffffff">
+      <path d="M98 42C104 32 114 20 138 15C148 13 156 15 158 17C146 22 132 28 118 36C111 40 104 42 98 42Z"/>
+      <path d="M100 45C108 38 120 28 140 26C148 25 154 28 155 30C144 34 131 40 117 45C110 48 104 47 100 45Z" opacity=".95"/>
+      <path d="M102 50C110 46 122 38 137 38C144 38 148 41 149 43C140 46 128 50 116 53C110 54 105 53 102 50Z" opacity=".9"/>
+      <path d="M104 55C112 52 122 48 132 49C138 50 142 53 142 55C134 57 124 60 115 61C110 61 106 58 104 55Z" opacity=".85"/>
+      <path d="M105 60C112 59 120 58 126 60C130 61 132 64 131 65C124 66 116 66 110 65C107 64 105 62 105 60Z" opacity=".75"/>
+    </g>
+    <rect x="72" y="42" width="16" height="7" rx="2" fill="#dc2626"/>
+    <path d="M76 42V49M80 42V49M84 42V49" stroke="#ffffff" stroke-opacity=".4"/>
+    <rect x="67" y="33" width="5" height="25" rx="2.5" fill="#ffffff"/>
+    <rect x="61" y="36" width="4" height="19" rx="2" fill="#cbd5e1"/>
+    <rect x="88" y="33" width="5" height="25" rx="2.5" fill="#ffffff"/>
+    <rect x="95" y="36" width="4" height="19" rx="2" fill="#cbd5e1"/>
   </g>
-  
-  <!-- Right Wing -->
-  <g fill="#ffffff">
-    <path d="M102 72C108 62 118 50 140 45C150 43 157 45 159 47C147 52 134 58 121 66C114 70 108 72 102 72Z"/>
-    <path d="M104 75C112 68 123 58 141 56C149 55 155 58 156 60C145 64 133 70 120 75C113 78 108 77 104 75Z" opacity="0.95"/>
-    <path d="M106 80C113 76 124 68 138 68C145 68 149 71 150 73C141 76 130 80 119 83C113 84 109 83 106 80Z" opacity="0.9"/>
-    <path d="M108 85C115 82 124 78 133 79C139 80 143 83 143 85C135 87 126 90 117 91C113 91 110 88 108 85Z" opacity="0.85"/>
-  </g>
-  
-  <!-- Center Barbell -->
-  <rect x="70" y="73" width="20" height="8" rx="2" fill="#dc2626"/>
-  <rect x="64" y="63" width="6" height="28" rx="3" fill="#ffffff"/>
-  <rect x="57" y="67" width="5" height="20" rx="2.5" fill="#cbd5e1"/>
-  <rect x="90" y="63" width="6" height="28" rx="3" fill="#ffffff"/>
-  <rect x="98" y="67" width="5" height="20" rx="2.5" fill="#cbd5e1"/>
-
-  <!-- Brand Typography -->
-  <text x="80" y="122" font-family="'Manrope', sans-serif" font-size="16" font-weight="900" letter-spacing="4" fill="#ffffff" text-anchor="middle">HEAVEN</text>
-  <text x="80" y="140" font-family="'Manrope', sans-serif" font-size="11" font-weight="800" letter-spacing="6" fill="#dc2626" text-anchor="middle">GYM</text>
+  <text x="80" y="124" font-family="Arial,sans-serif" font-size="16" font-weight="900" letter-spacing="4" fill="#ffffff" text-anchor="middle">HEAVEN</text>
+  <text x="80" y="142" font-family="Arial,sans-serif" font-size="11" font-weight="800" letter-spacing="6" fill="#dc2626" text-anchor="middle">GYM</text>
 </svg>

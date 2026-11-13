@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { ArrowLeft, Dumbbell, Lock, Mail } from 'lucide-react';
+import { ArrowLeft, Lock, Mail } from 'lucide-react';
+import HeavenLogo from '@/components/public/HeavenLogo';
 import { Link, useNavigate } from 'react-router-dom';
 import { authService } from '@/services/authService';
 import Button from '@/components/ui/Button';
@@ -123,8 +124,7 @@ export default function ForgotPassword() {
     <div className="flex min-h-screen items-center justify-center bg-surface-50 px-5 dark:bg-surface-950">
       <div className="w-full max-w-md">
         <Link to="/" className="mb-8 flex items-center justify-center gap-3">
-          <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-500 text-white"><Dumbbell size={21} /></span>
-          <span className="font-display text-lg font-bold text-ink-950 dark:text-white">HEAVEN<span className="text-brand-500">GYM</span></span>
+<HeavenLogo variant="header" theme="auto" size="sm" />
         </Link>
         <div className="rounded-2xl border border-surface-200 bg-white p-8 shadow-sm dark:border-surface-800 dark:bg-surface-900">
           <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-xl bg-brand-50 text-brand-600 dark:bg-brand-500/10 dark:text-brand-400">
