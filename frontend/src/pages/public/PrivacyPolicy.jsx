@@ -47,7 +47,7 @@ export default function PrivacyPolicy() {
       <article className="mx-auto max-w-3xl rounded-2xl border border-surface-200 bg-white p-5 shadow-sm dark:border-surface-800 dark:bg-surface-900 sm:p-8">
         <Link to="/" className="inline-flex items-center gap-2 text-sm font-semibold text-brand-600 hover:text-brand-700"><ArrowLeft size={16} /> Back to Heaven Gym</Link>
         <div className="mt-7 flex items-center gap-3">
-          <HeavenLogo variant="primary" size="md" />
+          <HeavenLogo variant="primary" theme="auto" size="md" />
         </div>
         <p className="mt-7 text-xs font-bold uppercase tracking-[.16em] text-brand-600">Member information</p>
         <h1 className="mt-2 font-display text-3xl font-bold text-ink-950 dark:text-white">Privacy Policy</h1>
