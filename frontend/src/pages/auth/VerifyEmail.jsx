@@ -51,7 +51,7 @@ export default function VerifyEmail() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-surface-50 px-5 py-12 dark:bg-surface-950">
       <div className="w-full max-w-md rounded-2xl border border-surface-200 bg-white p-7 shadow-sm dark:border-surface-800 dark:bg-surface-900">
-        <Link to="/" aria-label="Heaven Gym home" className="mb-8 block"><HeavenLogo variant="header" theme="light" size="sm" /></Link>
+        <Link to="/" aria-label="Heaven Gym home" className="mb-8 block"><HeavenLogo variant="header" theme="auto" size="sm" /></Link>
         <h1 className="font-display text-2xl font-bold text-ink-950 dark:text-white">Verify your email</h1>
         <p className="mt-2 text-sm text-surface-500">Enter the 6-digit code sent to your email. The code expires in 5 minutes.</p>
         {message && <div role="status" className="mt-5 rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">{message}</div>}
