@@ -1,207 +1,90 @@
 import { useState } from 'react';
 import {
   Activity,
-  Award,
-  CheckCircle2,
-  Clock,
-  Coffee,
-  Crosshair,
+  ArrowRight,
   Dumbbell,
-  Flame,
   HeartPulse,
-  Leaf,
-  Medal,
-  Music,
-  PlusCircle,
   ShieldCheck,
   Sparkles,
-  Waves,
-  Zap,
-  ArrowRight,
+  Target,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import ScrollReveal from '@/components/public/ScrollReveal';
-import Card3D from '@/components/public/Card3D';
 
-const FACILITIES = [
+const TRAINING_AREAS = [
   {
     id: 'strength',
-    title: 'Strength Training Arena',
-    tag: 'Iron & Biomechanics',
+    title: 'Strength Training',
+    tag: 'Resistance Training',
     icon: Dumbbell,
     image: 'https://images.unsplash.com/photo-1540497077202-7c8a3999166f?auto=format&fit=crop&w=1600&q=80',
     description:
-      'Explore strength-training stations and resistance equipment for progressive workouts. Contact the team for the current equipment list and available weight ranges.',
+      'Ask the Heaven Gym team about the strength-training equipment, available weight ranges and workout areas currently offered at this location.',
     highlights: [
-      'Barbells and weight plates, where available',
-      'Dumbbells and free-weight options',
-      'Power racks and strength stations, where available',
-      'Dedicated lifting platforms, where available',
-    ],
-  },
-  {
-    id: 'machines',
-    title: 'Luxury Pin-Select & Plate-Loaded Machines',
-    tag: 'Precision Biomechanics',
-    icon: Zap,
-    image: 'https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?auto=format&fit=crop&w=1600&q=80',
-    description:
-      'Explore strength and resistance-training equipment for a range of movement patterns. Ask the team about the machines and stations currently available.',
-    highlights: [
-      'Isolateral Diverging & Converging Movements',
-      'Adjustable cable stations, where available',
-      'Adjustable Pivot Ergonomic Seating',
-      'Plate-loaded strength equipment, where available',
+      'Ask which free-weight options are available',
+      'Confirm the current strength-machine selection',
+      'Check equipment availability before your visit',
+      'Ask about beginner-friendly equipment guidance',
     ],
   },
   {
     id: 'cardio',
-    title: 'High-Performance Cardio Deck',
-    tag: 'Aerobic & Metabolic Conditioning',
+    title: 'Cardio & Conditioning',
+    tag: 'Endurance Training',
     icon: Activity,
     image: 'https://images.unsplash.com/photo-1574680096145-d05b474e2155?auto=format&fit=crop&w=1600&q=80',
     description:
-      'A cardio area for endurance and conditioning. Contact the team for the current machine list, brands and available features.',
+      'If cardio is part of your routine, contact reception to confirm which machines and conditioning options are currently available.',
     highlights: [
-      'Treadmills for walking and running workouts',
-      'Rowing and air-resistance cardio options, where available',
-      'Low-Impact Commercial Ellipticals',
-      'Ask about heart-rate and console features on available machines',
+      'Ask about available cardio machines',
+      'Confirm machine features and availability',
+      'Discuss options that suit your training needs',
+      'Check current access and usage arrangements',
     ],
   },
   {
-    id: 'steam',
-    title: 'Thermal Steam Facility',
-    tag: 'Restorative Wellness',
-    icon: Waves,
-    image: 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=1600&q=80',
-    description:
-      'Post-training recovery helps you recharge. Warm steam therapy relieves muscular tension, relaxes connective tissues, and provides a calming retreat after intense training sessions.',
-    highlights: [
-      'Warm Steam for Muscle Relaxation & Heat Therapy',
-      'Steam-room facilities, subject to current availability',
-      'Private Shower & Changing Facilities',
-      'Ask the team whether recovery facilities are included in your selected membership',
-    ],
-  },
-  {
-    id: 'hyrox',
-    title: 'Functional Conditioning & Athletic Turf',
-    tag: 'Functional Performance',
-    icon: Crosshair,
+    id: 'functional',
+    title: 'Functional Movement',
+    tag: 'Movement & Mobility',
+    icon: Target,
     image: 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&w=1600&q=80',
     description:
-      'A functional training area for movement-based conditioning. Ask the team which training tools and equipment are currently available.',
+      'Ask the team whether a dedicated functional-training area, accessories or guided movement sessions are available at the gym.',
     highlights: [
-      'Functional movement and conditioning space, where available',
-      'Sled-based training equipment, where available',
-      'Functional training accessories, where available',
-      'Commercial Battle Ropes & Kettlebell Stacks',
+      'Confirm which functional-training tools are available',
+      'Ask about movement and mobility options',
+      'Check whether group sessions are scheduled',
+      'Discuss suitable options with the gym team',
     ],
   },
   {
-    id: 'yoga',
-    title: 'Mind-Body & Mobility Yoga Studio',
-    tag: 'Mobility & Posture',
-    icon: Leaf,
-    image: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&w=1600&q=80',
+    id: 'coaching',
+    title: 'Coaching & Member Support',
+    tag: 'Training Guidance',
+    icon: HeartPulse,
+    image: 'https://images.unsplash.com/photo-1567013127542-490d757e51fc?auto=format&fit=crop&w=1600&q=80',
     description:
-      'A calm space for mobility, stretching and guided movement sessions. Contact the team for current class schedules and studio availability.',
+      'Coaching services, trainer availability and individual guidance can vary. Contact Heaven Gym to confirm the current options and any additional charges.',
     highlights: [
-      'Studio flooring and setup, subject to location',
-      'Warm Natural Lighting & Clean Air Circulation',
-      'Supportive Cork Blocks, Straps & Bolsters',
-      'Guided Mobility & Flow Sessions',
+      'Ask about trainer availability and experience',
+      'Confirm whether personal training is offered',
+      'Check what guidance is included in each plan',
+      'Discuss membership and support options',
     ],
   },
   {
-    id: 'zumba',
-    title: 'High-Energy Zumba & Group Studio',
-    tag: 'Rhythm & Caloric Burn',
-    icon: Music,
-    image: 'https://images.unsplash.com/photo-1518611012118-696072aa579a?auto=format&fit=crop&w=1600&q=80',
-    description:
-      'A group movement space for guided cardio-dance and fitness sessions. Contact the team for current schedules and studio facilities.',
-    highlights: [
-      'Group movement studio space',
-      'Acoustic Surround Sound System',
-      'Full-Length Wall Mirrors for Cadence & Form',
-      'Energetic Group Choreography Sessions',
-    ],
-  },
-  {
-    id: 'cafe',
-    title: 'Nutrition & Fuel Bar',
-    tag: 'Nutritional Recovery',
-    icon: Coffee,
-    image: 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=1600&q=80',
-    description:
-      'Convenient post-workout nutrition right at the club. The fuel bar offers protein shakes, pre-workout options, BCAA drinks, and healthy recovery refreshments.',
-    highlights: [
-      'Fresh Whey Isolate Protein Shakes',
-      'Pre-Workout Energy & Hydration Brews',
-      'Zero-Sugar Electrolytes & Hydration Beverages',
-      'Comfortable Seating & Clean Recovery Snacks',
-    ],
-  },
-  {
-    id: 'hygiene',
-    title: 'Clean & Comfortable Training Spaces',
-    tag: 'Pristine Standards',
+    id: 'safety',
+    title: 'Gym Information & Safety',
+    tag: 'Before Your Visit',
     icon: ShieldCheck,
     image: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=1600&q=80',
     description:
-      'A comfortable training environment depends on clean equipment and organized spaces. Contact the team to learn about current cleaning routines and available facilities.',
+      'Every location has its own facilities and operating arrangements. Please contact reception to confirm opening hours, hygiene arrangements and available safety support before visiting.',
     highlights: [
-      'Ventilation and airflow across training areas',
-      'Cleaning supplies and hygiene facilities, where available',
-      'Regular equipment and high-touch surface cleaning',
-      'Clean and organized training spaces',
-    ],
-  },
-  {
-    id: 'trainers',
-    title: 'Coaching & Training Support',
-    tag: 'Dedicated Coaching',
-    icon: Medal,
-    image: 'https://images.unsplash.com/photo-1567013127542-490d757e51fc?auto=format&fit=crop&w=1600&q=80',
-    description:
-      'Ask the Heaven Gym team about trainer experience, coaching availability and the support options currently offered to members.',
-    highlights: [
-      'Trainer experience and qualifications can be discussed with the team',
-      'Form and technique guidance, where available',
-      'Structured training guidance, where available',
-      'Ask about personal training availability and booking options',
-    ],
-  },
-  {
-    id: 'dietician',
-    title: 'Personalized Nutrition & Diet Guidance',
-    tag: 'Calculated Fuel',
-    icon: Flame,
-    image: 'https://images.unsplash.com/photo-1490645935967-10de6ba17061?auto=format&fit=crop&w=1600&q=80',
-    description:
-      'Training without proper nutrition is half the equation. Our nutrition team formulates realistic dietary protocols with calculated macronutrient splits tailored to your specific metabolic rate and lifestyle.',
-    highlights: [
-      'Individual Metabolic Rate & Caloric Profiling',
-      'Customized Protein & Caloric Target Schedules',
-      'Sustainable Nutrition — No Extreme Crash Diets',
-      'Regular In-Body Composition Progress Checks',
-    ],
-  },
-  {
-    id: 'first-aid',
-    title: 'Floor Safety & First-Aid Preparedness',
-    tag: 'Member Security',
-    icon: HeartPulse,
-    image: 'https://images.unsplash.com/photo-1584515979956-d9f6e5d09982?auto=format&fit=crop&w=1600&q=80',
-    description:
-      'Your physical security and health are paramount. The gym floor is monitored with trained first-aid staff, emergency supplies, cold packs for sprains, and established safety response protocols.',
-    highlights: [
-      'Trained First-Aid Floor Management',
-      'Fully Stocked First-Aid Emergency Kits',
-      'Cold Packs for Joint Sprains & Minor Strains',
-      'Established Emergency Assistance Protocols',
+      'Confirm current opening hours',
+      'Ask about changing and washroom facilities',
+      'Check the gym\'s current cleaning arrangements',
+      'Ask how to get assistance during your visit',
     ],
   },
 ];
@@ -209,140 +92,141 @@ const FACILITIES = [
 export default function Facilities() {
   const [activeTab, setActiveTab] = useState('all');
 
-  const filteredFacilities =
+  const filteredAreas =
     activeTab === 'all'
-      ? FACILITIES
-      : FACILITIES.filter((f) => f.id === activeTab);
+      ? TRAINING_AREAS
+      : TRAINING_AREAS.filter((area) => area.id === activeTab);
 
   return (
-    <div className="bg-[#06070a] text-white min-h-screen pt-32 pb-24">
-      {/* Header */}
-      <section className="relative overflow-hidden py-16 sm:py-24 border-b border-white/10">
-        <div className="absolute inset-0 -z-10 pointer-events-none">
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[500px] w-[500px] rounded-full bg-brand-500/10 blur-[180px]" />
+    <div className="min-h-screen bg-[#06070a] pb-24 pt-32 text-white">
+      <section className="relative overflow-hidden border-b border-white/10 py-16 sm:py-24">
+        <div className="pointer-events-none absolute inset-0 -z-10">
+          <div className="absolute left-1/2 top-1/2 h-[500px] w-[500px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-brand-500/10 blur-[180px]" />
         </div>
 
-        <div className="mx-auto max-w-7xl px-5 lg:px-8 text-center">
+        <div className="mx-auto max-w-7xl px-5 text-center lg:px-8">
           <ScrollReveal animation="fade-up">
-            <div className="inline-flex items-center gap-2 rounded-full border border-brand-500/30 bg-brand-500/10 px-4 py-1.5 text-xs font-mono font-bold uppercase tracking-[0.25em] text-brand-400 backdrop-blur-md">
-              <Sparkles size={14} className="text-brand-400" />
-              World-Class Infrastructure
+            <div className="inline-flex items-center gap-2 rounded-full border border-brand-500/30 bg-brand-500/10 px-4 py-1.5 text-xs font-mono font-bold uppercase tracking-[0.2em] text-brand-400">
+              <Sparkles size={14} />
+              Training Areas & Gym Information
             </div>
 
-            <h1 className="mt-5 font-display text-2xl sm:text-4xl md:text-5xl lg:text-7xl font-black tracking-tight text-white leading-tight break-words">
-              EVERYTHING YOU NEED <br />
+            <h1 className="mt-5 break-words font-display text-3xl font-black leading-tight tracking-tight text-white sm:text-4xl md:text-5xl lg:text-7xl">
+              FIND THE RIGHT WAY
+              <br />
               <span className="bg-gradient-to-r from-brand-400 via-amber-300 to-amber-500 bg-clip-text text-transparent">
-                TO GO FURTHER.
+                TO TRAIN.
               </span>
             </h1>
 
-            <p className="mt-6 max-w-2xl mx-auto text-base sm:text-lg text-surface-300 leading-relaxed">
-              Explore 12 signature zones meticulously engineered for athletic strength, clinical recovery, energetic group conditioning, and daily wellness.
+            <p className="mx-auto mt-6 max-w-2xl text-sm leading-relaxed text-surface-300 sm:text-base">
+              Explore the training areas and support options you can ask us about. Equipment, facilities, classes and services vary by location and availability, so please confirm the current details with Heaven Gym before visiting.
             </p>
           </ScrollReveal>
 
-          {/* Facility Pills */}
-          <div className="mt-10 flex flex-wrap items-center justify-center gap-2 max-w-4xl mx-auto">
+          <div className="mx-auto mt-10 flex max-w-4xl flex-wrap items-center justify-center gap-2">
             <button
+              type="button"
+              aria-pressed={activeTab === 'all'}
               onClick={() => setActiveTab('all')}
               className={`rounded-full px-4 py-2 text-xs font-mono font-bold uppercase tracking-wider transition ${
                 activeTab === 'all'
                   ? 'bg-brand-600 text-white shadow-lg shadow-brand-600/30'
-                  : 'bg-white/5 text-surface-400 hover:bg-white/10 hover:text-white border border-white/10'
+                  : 'border border-white/10 bg-white/5 text-surface-400 hover:bg-white/10 hover:text-white'
               }`}
             >
-              All Zones ({FACILITIES.length})
+              All Areas ({TRAINING_AREAS.length})
             </button>
-            {FACILITIES.map((f) => (
+            {TRAINING_AREAS.map((area) => (
               <button
-                key={f.id}
-                onClick={() => setActiveTab(f.id)}
-                className={`rounded-full px-3.5 py-1.5 text-[11px] font-mono font-semibold uppercase tracking-wider transition ${
-                  activeTab === f.id
-                    ? 'bg-brand-600 text-white shadow-lg shadow-brand-600/30'
-                    : 'bg-white/5 text-surface-400 hover:bg-white/10 hover:text-white border border-white/10'
+                type="button"
+                key={area.id}
+                aria-pressed={activeTab === area.id}
+                onClick={() => setActiveTab(area.id)}
+                className={`rounded-full border px-3.5 py-2 text-[11px] font-mono font-semibold uppercase tracking-wider transition ${
+                  activeTab === area.id
+                    ? 'border-brand-600 bg-brand-600 text-white shadow-lg shadow-brand-600/30'
+                    : 'border-white/10 bg-white/5 text-surface-400 hover:bg-white/10 hover:text-white'
                 }`}
               >
-                {f.title.split(' ')[0]}
+                {area.title}
               </button>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Facilities List / Grid */}
-      <section className="mx-auto max-w-7xl px-5 lg:px-8 py-20">
-        <div className="space-y-24">
-          {filteredFacilities.map((facility, index) => {
+      <section className="mx-auto max-w-7xl px-5 py-16 lg:px-8 lg:py-20">
+        <div className="space-y-12 lg:space-y-16">
+          {filteredAreas.map((area, index) => {
+            const Icon = area.icon;
             const isReversed = index % 2 === 1;
+
             return (
-              <ScrollReveal key={facility.id} animation="fade-up">
+              <ScrollReveal key={area.id} animation="fade-up">
                 <article
-                  id={facility.id}
-                  className={`grid gap-12 lg:grid-cols-2 items-center rounded-3xl border border-white/10 bg-[#0e1017]/80 p-6 sm:p-10 shadow-2xl backdrop-blur-md ${
+                  id={area.id}
+                  className={`grid items-center gap-8 rounded-3xl border border-white/10 bg-[#0e1017]/80 p-5 shadow-2xl backdrop-blur-md sm:p-8 lg:grid-cols-2 lg:gap-12 lg:p-10 ${
                     isReversed ? 'lg:grid-flow-dense' : ''
                   }`}
                 >
-                  {/* Photo composition */}
-                  <div className={`relative overflow-hidden rounded-2xl group ${isReversed ? 'lg:col-start-2' : ''}`}>
+                  <div className={`relative overflow-hidden rounded-2xl ${isReversed ? 'lg:col-start-2' : ''}`}>
                     <div className="relative aspect-[16/11] overflow-hidden rounded-2xl border border-white/10">
                       <img
-                        src={facility.image}
-                        alt={facility.title}
+                        src={area.image}
+                        alt={`Illustrative image for ${area.title}`}
                         loading="lazy"
-                        className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105 filter brightness-90 contrast-110"
+                        className="h-full w-full object-cover brightness-90 contrast-110"
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-[#0e1017] via-transparent to-transparent opacity-60" />
-                      
-                      <div className="absolute top-4 left-4 flex items-center gap-2 rounded-full border border-white/15 bg-black/75 px-3 py-1.5 text-xs font-mono font-bold text-amber-400 backdrop-blur-md">
-                        <facility.icon size={15} />
-                        <span>{facility.tag}</span>
+                      <div className="absolute inset-0 bg-gradient-to-t from-[#0e1017]/70 via-transparent to-transparent" />
+                      <div className="absolute left-4 top-4 flex items-center gap-2 rounded-full border border-white/15 bg-black/75 px-3 py-1.5 text-xs font-mono font-bold text-amber-400 backdrop-blur-md">
+                        <Icon size={15} />
+                        <span>{area.tag}</span>
                       </div>
                     </div>
+                    <p className="mt-2 text-[10px] text-surface-500">
+                      Illustrative image — contact the gym to confirm on-site facilities.
+                    </p>
                   </div>
 
-                  {/* Text details */}
-                  <div className="space-y-6">
+                  <div className="space-y-5">
                     <div>
                       <span className="text-xs font-mono font-bold uppercase tracking-[0.2em] text-brand-500">
-                        Signature Facility &bull; Zone {String(index + 1).padStart(2, '0')}
+                        Training Information · {String(index + 1).padStart(2, '0')}
                       </span>
-                      <h2 className="mt-2 font-display text-2xl sm:text-4xl font-black text-white">
-                        {facility.title}
+                      <h2 className="mt-2 font-display text-2xl font-black text-white sm:text-3xl lg:text-4xl">
+                        {area.title}
                       </h2>
                     </div>
 
-                    <p className="text-sm sm:text-base text-surface-300 leading-relaxed">
-                      {facility.description}
+                    <p className="text-sm leading-relaxed text-surface-300 sm:text-base">
+                      {area.description}
                     </p>
 
-                    {/* Highlights bullet list */}
-                    <div className="grid gap-3 sm:grid-cols-2 pt-2">
-                      {facility.highlights.map((item) => (
+                    <div className="grid gap-3 pt-1 sm:grid-cols-2">
+                      {area.highlights.map((item) => (
                         <div
                           key={item}
                           className="flex items-start gap-2.5 rounded-xl border border-white/5 bg-white/[0.02] p-3 text-xs text-surface-200"
                         >
-                          <CheckCircle2 size={15} className="text-brand-400 shrink-0 mt-0.5" />
+                          <ShieldCheck size={15} className="mt-0.5 shrink-0 text-brand-400" />
                           <span className="font-medium">{item}</span>
                         </div>
                       ))}
                     </div>
 
-                    <div className="pt-4 flex flex-wrap items-center gap-4 border-t border-white/10">
-                      <Link
-                        to="/membership"
-                        className="inline-flex items-center gap-2 rounded-full bg-brand-600 px-6 py-3 text-xs font-mono font-bold uppercase tracking-wider text-white shadow-lg shadow-brand-600/30 hover:bg-brand-500 transition"
-                      >
-                        <span>Access With Membership</span>
-                        <ArrowRight size={14} />
-                      </Link>
-
+                    <div className="flex flex-wrap items-center gap-3 border-t border-white/10 pt-5">
                       <Link
                         to="/contact"
-                        className="inline-flex items-center gap-2 rounded-full border border-white/15 px-6 py-3 text-xs font-mono font-bold uppercase tracking-wider text-surface-300 hover:text-white hover:border-white/30 transition"
+                        className="inline-flex items-center gap-2 rounded-full bg-brand-600 px-5 py-3 text-xs font-mono font-bold uppercase tracking-wider text-white shadow-lg shadow-brand-600/30 transition hover:bg-brand-500"
                       >
-                        <span>Schedule a Tour</span>
+                        Ask the Gym <ArrowRight size={14} />
+                      </Link>
+                      <Link
+                        to="/membership"
+                        className="inline-flex items-center rounded-full border border-white/15 px-5 py-3 text-xs font-mono font-bold uppercase tracking-wider text-surface-300 transition hover:border-white/30 hover:text-white"
+                      >
+                        View Membership
                       </Link>
                     </div>
                   </div>
@@ -353,27 +237,26 @@ export default function Facilities() {
         </div>
       </section>
 
-      {/* Conversion Banner */}
-      <section className="mx-auto max-w-7xl px-5 lg:px-8 mt-12">
-        <div className="relative overflow-hidden rounded-3xl border border-white/15 bg-gradient-to-r from-brand-950/40 via-[#0e1017] to-black p-8 sm:p-14 text-center">
-          <h2 className="font-display text-3xl sm:text-5xl font-black text-white">
-            EXPERIENCE THE HEAVEN GYM STANDARD.
+      <section className="mx-auto mt-8 max-w-7xl px-5 lg:px-8">
+        <div className="rounded-3xl border border-white/15 bg-gradient-to-r from-brand-950/40 via-[#0e1017] to-black p-8 text-center sm:p-14">
+          <h2 className="font-display text-2xl font-black text-white sm:text-4xl">
+            WANT TO KNOW WHAT IS AVAILABLE?
           </h2>
-          <p className="mt-4 max-w-xl mx-auto text-sm sm:text-base text-surface-300">
-            Book a complimentary walk-through with a master coach and explore our complete strength, cardio, and recovery floors in person.
+          <p className="mx-auto mt-4 max-w-xl text-sm leading-relaxed text-surface-300 sm:text-base">
+            Contact Heaven Gym to confirm the current equipment, facilities, opening hours and membership details before planning your visit.
           </p>
           <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
             <Link
-              to="/membership"
-              className="rounded-full bg-brand-600 px-8 py-3.5 text-xs font-mono font-bold uppercase tracking-wider text-white shadow-xl shadow-brand-600/30 hover:bg-brand-500 transition"
+              to="/contact"
+              className="rounded-full bg-brand-600 px-8 py-3.5 text-xs font-mono font-bold uppercase tracking-wider text-white shadow-xl shadow-brand-600/30 transition hover:bg-brand-500"
             >
-              View Membership Plans
+              Contact Heaven Gym
             </Link>
             <Link
-              to="/contact"
-              className="rounded-full border border-white/20 bg-white/5 px-8 py-3.5 text-xs font-mono font-bold uppercase tracking-wider text-white hover:bg-white/10 transition"
+              to="/membership"
+              className="rounded-full border border-white/20 bg-white/5 px-8 py-3.5 text-xs font-mono font-bold uppercase tracking-wider text-white transition hover:bg-white/10"
             >
-              Contact Reception
+              View Membership Plans
             </Link>
           </div>
         </div>
