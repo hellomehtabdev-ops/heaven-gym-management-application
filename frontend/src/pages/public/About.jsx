@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import {
   ArrowRight,
+  Check,
   Dumbbell,
   Target,
   Users,
@@ -262,7 +263,7 @@ export default function About() {
                   <div className="h-2 w-8 bg-brand-500 rounded-full mb-4" />
                   <h3 className="font-display text-base font-bold text-white mb-2">{item.title}</h3>
                   <p className="text-xs text-surface-400 leading-relaxed">{item.desc}</p>
-                </button>
+                </div>
               </ScrollReveal>
             ))}
           </div>
@@ -313,7 +314,7 @@ export default function About() {
                       {img.description}
                     </p>
                   </div>
-                </div>
+                </button>
               </ScrollReveal>
             ))}
           </div>
