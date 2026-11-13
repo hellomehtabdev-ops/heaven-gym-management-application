@@ -33,11 +33,10 @@ export const transformationService = {
       .then((res) => res.data);
   },
 
-  togglePublish(id, is_published, member_consent_obtained) {
+  togglePublish(id, is_published) {
     return api
       .patch(`/transformations/admin/${id}/publish`, {
         is_published,
-        member_consent_obtained,
       })
       .then((res) => res.data);
   },
