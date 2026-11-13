@@ -37,7 +37,7 @@ export async function getAdminStats() {
       { $match: { 'user.role': 'user' } },
       { $count: 'total' },
     ]),
-    Membership.countDocuments({ status: 'active' }),
+    Membership.countDocuments({ status: 'active', payment_status: 'paid' }),
     Membership.countDocuments({ status: 'expired' }),
     Order.countDocuments(),
     Order.countDocuments({ status: 'pending', payment_status: 'pending' }),
