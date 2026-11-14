@@ -10,7 +10,7 @@ import { fetchMyMemberships, fetchActivePlans, purchaseMembership, renewMembersh
 import { fetchMyAdmission } from '@/redux/slices/admissionSlice';
 import { paymentService } from '@/services/paymentService';
 import { membershipService } from '@/services/membershipService';
-import { formatCurrency, formatDate, getDaysRemaining } from '@/utils/formatters';
+import { formatCurrency, formatDate, getMembershipExpiryInfo } from '@/utils/formatters';
 
 function getMembershipId(membership) {
   return membership?.id || membership?._id;
@@ -35,7 +35,8 @@ export default function Membership() {
   const scheduledMembership = (memberships || []).find((m) => (m.effective_status || m.status) === 'scheduled' && m.payment_status === 'paid');
   const pendingPaymentMembership = (memberships || []).find((m) => m.payment_status === 'pending' && Number(m.amount_due) > 0);
   const currentMembership = activeMembership || scheduledMembership;
-  const daysLeft = getDaysRemaining(currentMembership?.end_date);
+  const expiryInfo = getMembershipExpiryInfo(currentMembership?.end_date);
+  const daysLeft = expiryInfo.days;
 
   async function payMembership(membership) {
     const { keyId, razorpayOrder } = await paymentService.createRazorpayOrder({ membershipId: getMembershipId(membership) });
@@ -111,8 +112,8 @@ export default function Membership() {
 
       {currentMembership && (
         <Card className="border-l-4 border-l-brand-600">
-          <div className="flex items-center justify-between"><div><p className="text-sm text-brand-700 dark:text-brand-400">{scheduledMembership ? 'Upcoming Membership' : 'Active Membership'}</p><h3 className="mt-1 font-display text-xl font-bold text-ink-950 dark:text-white">{currentMembership.plan_name_snapshot}</h3><p className="mt-1 text-sm text-surface-600 dark:text-surface-400">{formatDate(currentMembership.start_date)} — {formatDate(currentMembership.end_date)}{scheduledMembership ? ' (upcoming)' : ` (${daysLeft} days left)`}</p></div><Badge tone={scheduledMembership ? 'info' : 'success'}>{scheduledMembership ? 'Scheduled' : 'Active'}</Badge></div>
-          {activeMembership && daysLeft <= 7 && <div className="mt-4 flex items-center justify-between rounded-xl bg-amber-50 px-4 py-3 dark:bg-amber-500/10"><span className="text-sm font-medium text-amber-700 dark:text-amber-400">{daysLeft <= 0 ? 'Membership expired' : `Expiring in ${daysLeft} days`}</span><Button size="sm" onClick={() => renew(activeMembership.id)}>Renew Now</Button></div>}
+          <div className="flex items-center justify-between"><div><p className="text-sm text-brand-700 dark:text-brand-400">{scheduledMembership ? 'Upcoming Membership' : 'Active Membership'}</p><h3 className="mt-1 font-display text-xl font-bold text-ink-950 dark:text-white">{currentMembership.plan_name_snapshot}</h3><p className="mt-1 text-sm text-surface-600 dark:text-surface-400">{formatDate(currentMembership.start_date)} — {formatDate(currentMembership.end_date)}{scheduledMembership ? ' (upcoming)' : ` (${expiryInfo.label})`}</p></div><Badge tone={scheduledMembership ? 'info' : 'success'}>{scheduledMembership ? 'Scheduled' : 'Active'}</Badge></div>
+          {activeMembership && (expiryInfo.status === 'expired' || expiryInfo.status === 'today' || daysLeft <= 7) && <div className="mt-4 flex items-center justify-between rounded-xl bg-amber-50 px-4 py-3 dark:bg-amber-500/10"><span className="text-sm font-medium text-amber-700 dark:text-amber-400">{expiryInfo.status === 'expired' ? 'Membership expired' : expiryInfo.status === 'today' ? 'Expires today' : `Expiring in ${daysLeft === 1 ? '1 day' : `${daysLeft} days`}`}</span><Button size="sm" onClick={() => renew(getMembershipId(activeMembership))}>Renew Now</Button></div>}
         </Card>
       )}
 

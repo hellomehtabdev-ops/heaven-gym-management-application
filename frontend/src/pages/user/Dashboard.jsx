@@ -9,7 +9,7 @@ import Button from '@/components/ui/Button';
 import EmptyState from '@/components/ui/EmptyState';
 import BannerCarousel from '@/components/public/BannerCarousel';
 import { fetchUserDashboard } from '@/redux/slices/dashboardSlice';
-import { formatCurrency, formatDate, getDaysRemaining } from '@/utils/formatters';
+import { formatCurrency, formatDate, getMembershipExpiryInfo } from '@/utils/formatters';
 
 function MiniTrendChart({ measurements }) {
   const sorted = [...measurements].reverse().slice(-6);
@@ -50,7 +50,8 @@ export default function UserDashboard() {
   const scheduledMembership = (data.memberships || []).find((m) => (m.effective_status || m.status) === 'scheduled' && m.payment_status === 'paid');
   const pendingMembership = (data.memberships || []).find((m) => m.payment_status === 'pending' && Number(m.amount_due) > 0);
   const currentMembership = activeMembership || scheduledMembership || pendingMembership;
-  const daysLeft = getDaysRemaining(currentMembership?.end_date);
+  const expiryInfo = getMembershipExpiryInfo(currentMembership?.end_date);
+  const daysLeft = expiryInfo.days;
   const totalPaid = (data.payments || []).filter((p) => p.status === 'success').reduce((sum, p) => sum + Number(p.amount), 0);
   const latestMeasurement = (data.measurements || [])[0];
   const previousMeasurement = (data.measurements || [])[1];
@@ -61,7 +62,7 @@ export default function UserDashboard() {
     return diff === 0 ? null : diff;
   }
 
-  const showRenewalBanner = activeMembership && daysLeft <= 7;
+  const showRenewalBanner = activeMembership && (expiryInfo.status === 'expired' || expiryInfo.status === 'today' || daysLeft <= 7);
 
   return (
     <div className="space-y-6">
@@ -74,12 +75,18 @@ export default function UserDashboard() {
       </div>
 
       {showRenewalBanner && (
-        <Card className={`border-2 ${daysLeft <= 2 ? 'border-red-500 bg-red-50 dark:bg-red-500/10' : 'border-amber-500 bg-amber-50 dark:bg-amber-500/10'}`}>
+        <Card className={`border-2 ${daysLeft <= 2 || expiryInfo.status === 'today' || expiryInfo.status === 'expired' ? 'border-red-500 bg-red-50 dark:bg-red-500/10' : 'border-amber-500 bg-amber-50 dark:bg-amber-500/10'}`}>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <AlertCircle size={24} className={daysLeft <= 2 ? 'text-red-500' : 'text-amber-500'} />
+              <AlertCircle size={24} className={daysLeft <= 2 || expiryInfo.status === 'today' || expiryInfo.status === 'expired' ? 'text-red-500' : 'text-amber-500'} />
               <div>
-                <p className="font-semibold text-ink-900 dark:text-white">{daysLeft <= 0 ? 'Membership Expired' : `Membership expires in ${daysLeft} days`}</p>
+                <p className="font-semibold text-ink-900 dark:text-white">
+                  {expiryInfo.status === 'expired'
+                    ? 'Membership Expired'
+                    : expiryInfo.status === 'today'
+                      ? 'Membership expires today'
+                      : `Membership expires in ${daysLeft === 1 ? '1 day' : `${daysLeft} days`}`}
+                </p>
                 <p className="text-sm text-surface-500">{currentMembership.plan_name_snapshot} · Renew now to keep your gym access active</p>
               </div>
             </div>
@@ -112,10 +119,14 @@ export default function UserDashboard() {
         <Card className="!border-amber-200/80 !bg-amber-50/70 dark:!border-amber-500/20 dark:!bg-amber-500/[0.08]">
           <div className="flex items-center justify-between">
             <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-500/10 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400"><Calendar size={20} /></span>
-            <Badge tone={currentMembership ? (scheduledMembership ? 'info' : daysLeft < 7 ? 'warning' : 'success') : 'neutral'}>{pendingMembership ? 'Due' : scheduledMembership ? 'Soon' : activeMembership ? `${daysLeft}d` : '—'}</Badge>
+            <Badge tone={currentMembership ? (scheduledMembership ? 'info' : expiryInfo.status === 'today' || daysLeft < 7 ? 'warning' : 'success') : 'neutral'}>
+              {pendingMembership ? 'Due' : scheduledMembership ? 'Soon' : activeMembership ? (expiryInfo.status === 'today' ? 'Today' : `${daysLeft}d`) : '—'}
+            </Badge>
           </div>
           <p className="mt-4 text-xs text-surface-500">{pendingMembership ? 'Payment Status' : scheduledMembership ? 'Starts On' : 'Days Remaining'}</p>
-          <p className="mt-1 font-display text-lg font-bold text-ink-950 dark:text-white">{pendingMembership ? 'Payment pending' : scheduledMembership ? formatDate(scheduledMembership.start_date) : activeMembership ? `${daysLeft} days` : '—'}</p>
+          <p className="mt-1 font-display text-lg font-bold text-ink-950 dark:text-white">
+            {pendingMembership ? 'Payment pending' : scheduledMembership ? formatDate(scheduledMembership.start_date) : activeMembership ? (expiryInfo.status === 'today' ? 'Expires today' : `${daysLeft} days`) : '—'}
+          </p>
         </Card>
         <Card className="!border-blue-200/80 !bg-blue-50/70 dark:!border-blue-500/20 dark:!bg-blue-500/[0.08]">
           <div className="flex items-center justify-between">

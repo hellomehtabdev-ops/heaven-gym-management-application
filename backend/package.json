@@ -3,11 +3,12 @@
   "version": "1.1.0",
   "type": "module",
   "engines": {
-    "node": ">=22 <25"
+    "node": ">=20 <25"
   },
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server.js",
+    "cron:expiry": "node jobs/runExpiryCli.js",
     "test": "node --test"
   },
   "dependencies": {
