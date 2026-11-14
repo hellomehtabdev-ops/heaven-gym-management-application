@@ -198,7 +198,7 @@ export default function UserDashboard() {
           {(data.orders || []).length > 0 ? (
             <div className="space-y-3">
               {(data.orders || []).slice(0, 4).map((order) => (
-                <div key={order.id} className="flex items-center justify-between border-b border-surface-100 pb-3 last:border-0 dark:border-surface-800">
+                <div key={order._id || order.id} className="flex items-center justify-between border-b border-surface-100 pb-3 last:border-0 dark:border-surface-800">
                   <div>
                     <p className="text-sm font-medium text-ink-900 dark:text-white">{order.order_number}</p>
                     <p className="text-xs text-surface-500">{formatDate(order.created_at)}</p>
@@ -221,7 +221,7 @@ export default function UserDashboard() {
           {(data.payments || []).length > 0 ? (
             <div className="space-y-3">
               {(data.payments || []).slice(0, 4).map((payment) => (
-                <div key={payment.id} className="flex items-center justify-between border-b border-surface-100 pb-3 last:border-0 dark:border-surface-800">
+                <div key={payment._id || payment.id} className="flex items-center justify-between border-b border-surface-100 pb-3 last:border-0 dark:border-surface-800">
                   <div>
                     <p className="text-sm font-medium text-ink-900 dark:text-white capitalize">{payment.payment_type.replace(/_/g, ' ')}</p>
                     <p className="text-xs text-surface-500">{formatDate(payment.payment_date || payment.created_at)}</p>

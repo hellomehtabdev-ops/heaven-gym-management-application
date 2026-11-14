@@ -26,16 +26,24 @@ const notificationSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(fetchNotifications.pending, (state) => { state.loading = true; state.error = null; })
-      .addCase(fetchNotifications.fulfilled, (state, action) => { state.items = action.payload; state.loading = false; })
+      .addCase(fetchNotifications.fulfilled, (state, action) => {
+        state.items = action.payload;
+        state.unreadCount = action.payload.filter((notification) => !notification.is_read).length;
+        state.loading = false;
+      })
       .addCase(fetchNotifications.rejected, (state, action) => { state.loading = false; state.error = action.payload; })
       .addCase(fetchUnreadCount.fulfilled, (state, action) => { state.unreadCount = action.payload.count; })
       .addCase(markNotificationRead.fulfilled, (state, action) => {
-        const idx = state.items.findIndex((n) => n.id === action.payload.id);
-        if (idx !== -1) state.items[idx].is_read = true;
-        state.unreadCount = Math.max(0, state.unreadCount - 1);
+        const notificationId = action.payload?._id || action.payload?.id;
+        if (!notificationId) return;
+        const notification = state.items.find((item) => (item._id || item.id) === notificationId);
+        if (notification && !notification.is_read) {
+          notification.is_read = true;
+          state.unreadCount = Math.max(0, state.unreadCount - 1);
+        }
       })
       .addCase(markAllNotificationsRead.fulfilled, (state) => {
-        state.items.forEach((n) => { n.is_read = true; });
+        state.items.forEach((notification) => { notification.is_read = true; });
         state.unreadCount = 0;
       });
   },

@@ -1,7 +1,7 @@
 import UserLoadingSkeleton from '@/components/ui/UserLoadingSkeleton';
 import { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { Moon, Sun, Bell, Shield, Save } from 'lucide-react';
+import { Moon, Sun, Bell, Save } from 'lucide-react';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import { toggleTheme } from '@/redux/slices/themeSlice';
@@ -11,7 +11,7 @@ export default function Settings() {
   const dispatch = useDispatch();
   const userId = useSelector((state) => state.auth.user?.id);
   const themeMode = useSelector((state) => state.theme.mode);
-  const [prefs, setPrefs] = useState({ notify_membership: true, notify_orders: true, notify_payments: true, language: 'en', font_size: 'medium' });
+  const [prefs, setPrefs] = useState({ notify_membership: true, notify_orders: true, notify_payments: true });
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState('');
@@ -72,13 +72,7 @@ export default function Settings() {
         </div>
       </Card>
 
-      <Card>
-        <div className="mb-4 flex items-center gap-2"><Shield size={20} className="text-brand-600" /><h3 className="font-display text-lg font-semibold text-ink-950 dark:text-white">Preferences</h3></div>
-        <div className="grid gap-4 sm:grid-cols-2">
-          <label className="block space-y-2"><span className="text-sm font-medium text-ink-700 dark:text-surface-200">Language</span><select value={prefs.language} onChange={(e) => setPrefs({ ...prefs, language: e.target.value })} className="w-full rounded-xl border border-surface-300 bg-white px-4 py-3 text-sm dark:border-surface-700 dark:bg-surface-950 dark:text-white"><option value="en">English</option><option value="hi">Hindi</option></select></label>
-          <label className="block space-y-2"><span className="text-sm font-medium text-ink-700 dark:text-surface-200">Font size</span><select value={prefs.font_size} onChange={(e) => setPrefs({ ...prefs, font_size: e.target.value })} className="w-full rounded-xl border border-surface-300 bg-white px-4 py-3 text-sm dark:border-surface-700 dark:bg-surface-950 dark:text-white"><option value="small">Small</option><option value="medium">Medium</option><option value="large">Large</option></select></label>
-        </div>
-      </Card>
+      <p className="text-xs text-surface-500">The member panel is currently available in English. Additional language and text-size preferences will be added when they are supported across the full application.</p>
 
       {message && <p className={`text-sm ${message.includes('saved') ? 'text-brand-600' : 'text-red-500'}`}>{message}</p>}
       <Button onClick={handleSave} loading={saving}><Save size={16} /> Save settings</Button>
