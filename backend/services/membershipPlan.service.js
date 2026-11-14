@@ -28,7 +28,19 @@ function validatePlan(data, partial = false) {
 }
 
 export async function getAllPlans({ includeInactive = false } = {}) {
-  const filter = includeInactive ? {} : { is_active: true };
+  const now = new Date();
+  const filter = includeInactive ? {} : {
+    is_active: true,
+    $or: [
+      { is_offer: { $ne: true } },
+      {
+        $and: [
+          { $or: [{ offer_start_date: null }, { offer_start_date: { $lte: now } }] },
+          { $or: [{ offer_end_date: null }, { offer_end_date: { $gte: now } }] },
+        ],
+      },
+    ],
+  };
   return MembershipPlan.find(filter).sort({ display_order: 1, createdAt: -1 });
 }
 

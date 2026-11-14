@@ -1,8 +1,10 @@
 import { Router } from 'express';
-import { createOfflineSale, getOfflineSale } from '../controllers/offlineSale.controller.js';
+import { createOfflineSale, getOfflineSale, listOfflineSales } from '../controllers/offlineSale.controller.js';
 import { adminMiddleware } from '../middlewares/admin.middleware.js';
 
 const router = Router();
-router.get('/:id', adminMiddleware, getOfflineSale);
-router.post('/', adminMiddleware, createOfflineSale);
+router.use(adminMiddleware);
+router.get('/', listOfflineSales);
+router.get('/:id', getOfflineSale);
+router.post('/', createOfflineSale);
 export default router;

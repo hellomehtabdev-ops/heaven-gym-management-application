@@ -182,10 +182,10 @@ export default function AdminDashboard() {
             {adminStats.recentOrders.length > 0 ? (
               <div className="space-y-3">
                 {adminStats.recentOrders.slice(0, 5).map((o) => (
-                  <div key={o.id} className="flex items-center justify-between border-b border-surface-100 pb-3 last:border-0 dark:border-surface-800">
+                  <div key={o._id} className="flex items-center justify-between border-b border-surface-100 pb-3 last:border-0 dark:border-surface-800">
                     <div>
                       <p className="text-sm font-medium text-ink-900 dark:text-white">{o.order_number}</p>
-                      <p className="text-xs text-surface-500">{o.user_id?.full_name || '—'} · {formatDate(o.created_at)}</p>
+                      <p className="text-xs text-surface-500">{o.user_id?.full_name || '—'} · {formatDate(o.createdAt)}</p>
                     </div>
                     <div className="text-right">
                       <p className="text-sm font-semibold">{formatCurrency(o.total_amount)}</p>
@@ -209,7 +209,7 @@ export default function AdminDashboard() {
                 {adminStats.expiringMemberships.slice(0, 5).map((m) => {
                   const days = getDaysRemaining(m.end_date);
                   return (
-                    <div key={m.id} className="flex items-center justify-between border-b border-surface-100 pb-3 last:border-0 dark:border-surface-800">
+                    <div key={m._id} className="flex items-center justify-between border-b border-surface-100 pb-3 last:border-0 dark:border-surface-800">
                       <div>
                         <p className="text-sm font-medium text-ink-900 dark:text-white">{m.user_id?.full_name || '—'}</p>
                         <p className="text-xs text-surface-500">{m.plan_name_snapshot} · {formatDate(m.end_date)}</p>
@@ -234,7 +234,7 @@ export default function AdminDashboard() {
             {adminStats.lowStockProducts.length > 0 ? (
               <div className="space-y-3">
                 {adminStats.lowStockProducts.slice(0, 5).map((p) => (
-                  <div key={p.id} className="flex items-center justify-between border-b border-surface-100 pb-3 last:border-0 dark:border-surface-800">
+                  <div key={p._id} className="flex items-center justify-between border-b border-surface-100 pb-3 last:border-0 dark:border-surface-800">
                     <p className="text-sm font-medium text-ink-900 dark:text-white">{p.name}</p>
                     <Badge tone={p.available_quantity === 0 ? 'danger' : 'warning'}>{p.available_quantity} available</Badge>
                   </div>
@@ -253,10 +253,10 @@ export default function AdminDashboard() {
             {adminStats.recentPayments.length > 0 ? (
               <div className="space-y-3">
                 {adminStats.recentPayments.slice(0, 5).map((p) => (
-                  <div key={p.id} className="flex items-center justify-between border-b border-surface-100 pb-3 last:border-0 dark:border-surface-800">
+                  <div key={p._id} className="flex items-center justify-between border-b border-surface-100 pb-3 last:border-0 dark:border-surface-800">
                     <div>
                       <p className="text-sm font-medium capitalize text-ink-900 dark:text-white">{p.payment_type.replace(/_/g, ' ')}</p>
-                      <p className="text-xs text-surface-500">{p.user_id?.full_name || '—'} · {formatDate(p.payment_date || p.created_at)}</p>
+                      <p className="text-xs text-surface-500">{p.user_id?.full_name || '—'} · {formatDate(p.payment_date || p.createdAt)}</p>
                     </div>
                     <div className="text-right">
                       <p className="text-sm font-semibold">{formatCurrency(p.amount)}</p>
