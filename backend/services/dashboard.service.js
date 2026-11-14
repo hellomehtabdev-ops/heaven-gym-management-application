@@ -133,7 +133,7 @@ export async function getUserDashboard(userId) {
   const isAdmitted = admission?.status === 'active';
 
   const activeMembership = memberships.find((membership) => (
-    ['active', 'scheduled'].includes(membership.status) && membership.payment_status === 'paid'
+    ['active', 'scheduled'].includes(membership.effective_status || membership.status) && membership.payment_status === 'paid'
   )) || null;
   const pendingMembership = memberships.find((membership) => (
     membership.payment_status === 'pending' && Number(membership.amount_due) > 0

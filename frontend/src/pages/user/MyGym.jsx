@@ -8,7 +8,7 @@ import Badge from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
 import { fetchMyAdmission } from '@/redux/slices/admissionSlice';
 import { fetchMyMemberships } from '@/redux/slices/membershipSlice';
-import { formatCurrency, formatDate, getDaysRemaining } from '@/utils/formatters';
+import { formatCurrency, formatDate, getMembershipExpiryInfo } from '@/utils/formatters';
 
 export default function MyGym() {
   const dispatch = useDispatch();
@@ -29,7 +29,8 @@ export default function MyGym() {
   const scheduledMembership = (memberships || []).find((m) => (m.effective_status || m.status) === 'scheduled' && m.payment_status === 'paid');
   const pendingMembership = (memberships || []).find((m) => m.payment_status === 'pending' && Number(m.amount_due) > 0);
   const currentMembership = activeMembership || scheduledMembership || pendingMembership;
-  const daysLeft = getDaysRemaining(currentMembership?.end_date);
+  const expiryInfo = getMembershipExpiryInfo(currentMembership?.end_date);
+  const daysLeft = expiryInfo.days;
 
   return (
     <div className="space-y-6">
@@ -74,11 +75,11 @@ export default function MyGym() {
               <div className="flex justify-between text-sm"><span className="text-surface-500">Price</span><span className="font-semibold">{formatCurrency(currentMembership.plan_price_snapshot)}</span></div>
               <div className="flex justify-between text-sm"><span className="text-surface-500">Start date</span><span className="font-medium">{formatDate(currentMembership.start_date)}</span></div>
               <div className="flex justify-between text-sm"><span className="text-surface-500">End date</span><span className="font-medium">{formatDate(currentMembership.end_date)}</span></div>
-              <div className="flex justify-between text-sm"><span className="text-surface-500">{pendingMembership ? 'Payment status' : scheduledMembership ? 'Membership status' : 'Days remaining'}</span><Badge tone={pendingMembership ? 'warning' : scheduledMembership ? 'info' : daysLeft < 7 ? 'warning' : 'success'}>{pendingMembership ? 'Payment Due' : scheduledMembership ? 'Scheduled' : `${daysLeft} days`}</Badge></div>
+              <div className="flex justify-between text-sm"><span className="text-surface-500">{pendingMembership ? 'Payment status' : scheduledMembership ? 'Membership status' : 'Days remaining'}</span><Badge tone={pendingMembership ? 'warning' : scheduledMembership ? 'info' : expiryInfo.status === 'today' || daysLeft < 7 ? 'warning' : 'success'}>{pendingMembership ? 'Payment Due' : scheduledMembership ? 'Scheduled' : expiryInfo.text}</Badge></div>
               <div className="mt-4 h-2 overflow-hidden rounded-full bg-surface-100 dark:bg-surface-800">
                 <div className="h-full rounded-full bg-brand-600" style={{ width: `${Math.min(100, (daysLeft / currentMembership.duration_days) * 100)}%` }} />
               </div>
-              {activeMembership && daysLeft <= 7 && (
+              {activeMembership && (expiryInfo.status === 'expired' || expiryInfo.status === 'today' || daysLeft <= 7) && (
                 <Link to="/user/membership" className="mt-3 inline-block"><Button size="sm">Renew Now <ArrowRight size={14} /></Button></Link>
               )}
             </div>

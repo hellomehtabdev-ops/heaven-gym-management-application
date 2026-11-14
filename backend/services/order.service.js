@@ -214,6 +214,9 @@ export async function releaseExpiredOrderReservations() {
         if (!order) return;
 
         for (const item of order.order_items) {
+          const productExists = await Product.findById(item.product_id).session(session);
+          if (!productExists) continue;
+
           const product = await Product.findOneAndUpdate(
             { _id: item.product_id, reserved_quantity: { $gte: item.quantity } },
             { $inc: { reserved_quantity: -item.quantity } },

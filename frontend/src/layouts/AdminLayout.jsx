@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import {
-  Menu, X, LayoutDashboard, Users, UserPlus, CreditCard, Ruler,
+  Dumbbell, Menu, X, LayoutDashboard, Users, UserPlus, CreditCard, Ruler,
   Package, ShoppingCart, Bell, Settings, LogOut, ClipboardList, UserRound,
   PanelsTopLeft, ChevronDown, PanelLeftClose, PanelLeftOpen, Sparkles,
 } from 'lucide-react';
@@ -205,7 +205,7 @@ export default function AdminLayout() {
       }`}>
         <div className="flex h-[72px] items-center justify-between border-b border-surface-200 px-5 dark:border-white/[0.08]">
           <Link to="/admin/dashboard" className="flex items-center gap-3">
-<HeavenLogo variant="header" theme="auto" size="sm" />
+            <HeavenLogo variant="header" theme="auto" size="sm" />
           </Link>
           <button
             type="button"
