@@ -2,6 +2,7 @@ const SAFE_METHODS = new Set(['GET', 'HEAD', 'OPTIONS']);
 const DEFAULT_ALLOWED_ORIGINS = [
   'https://heaven-gym-management-frontend.vercel.app',
   'http://localhost:5173',
+  'http://localhost:4173',
 ];
 
 function allowedOrigins() {
