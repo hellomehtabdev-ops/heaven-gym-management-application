@@ -3,8 +3,9 @@
 **Repository:** `https://github.com/hellomehtabdev-ops/heaven-gym-management-application`  
 **Consolidation Date:** November 14, 2026  
 **Primary Branch:** `main` (Sole Source of Truth)  
-**Consolidation Head SHA:** `66322e9`  
-**Initial Baseline SHA:** `6e6413bcad996b5a456b46b42be3233c6301ed9b` (Merge PR #9)  
+**Local Main HEAD SHA:** `29168dd` (Full SHA: `29168dd5c3b9618f7d72aab331f2082114ff61c3`)  
+**Remote `origin/main` SHA:** `6e6413b` (Full SHA: `6e6413bcad996b5a456b46b42be3233c6301ed9b`)  
+**Remote Sync Status:** Local `main` is ahead of `origin/main` by 50 commits (pending `git push origin main`). Commit `29168dd` exists locally on `main` and has not yet been pushed to remote.  
 
 ---
 
@@ -34,18 +35,18 @@ Before any branch manipulation or code modification, local and remote states wer
 
 All remote branches discovered during the audit (`git ls-remote --heads origin`) were inspected against `main`. Below is the exhaustive classification and integration record:
 
-| Branch Name | Latest SHA | Files Changed vs Main | Status Before | Conflict Status | Integration Action Taken |
+| Branch Name | Latest Remote SHA | GitHub PR Status | Status Before | Conflict Status | Integration Action Taken |
 |---|---|---|---|---|---|
-| `branding/unify-official-winged-logo` | `77b683a` | 4 files | Diverged | None (clean) | Merged cleanly into integration branch. Standardized official winged barbell emblem across headers, footers, and auth pages. |
-| `fix/admin-desktop-responsive-layout` | `359b80c` | 3 files | Diverged | None (clean) | Merged cleanly into integration branch. Corrected admin desktop responsive grid and dashboard layout. |
-| `ui/admin-layout-match-user-shell` | `704150f` | 1 file | Diverged | Conflict in `AdminLayout.jsx` | Merged with manual conflict resolution. Preserved navigation links for Gym Equipment and Offline Sales History while harmonizing layout with the user panel shell. |
-| `fix/user-panel-notification-payment-ids` (PR #10) | `8d334ac` | 8 files | Unmerged PR | Conflict in `Orders.jsx` | Merged with manual conflict resolution. Resolved MongoDB `_id` vs `id` normalization across user pages while preserving retry payment capabilities. |
-| `fix/client-handover-ci-and-payment` (PR #2) | `03ebec1` | 4 files | Diverged | Conflict in `.github/workflows/ci.yml` | Merged with manual conflict resolution. Maintained comprehensive 5-suite CI test suite while integrating payment status reconciliation logic. |
-| `feature/order-history-tabs` | `88f96d5` | 1 file | Incorporated | None | Verified 100% incorporated into `main` via earlier cherry-pick `6409c7e`. No orphaned code. |
-| `fix/profile-cart-payment-audit` | `86eebe8` | 1 file | Incorporated | None | Verified 100% incorporated into `main` via earlier cherry-pick `89c228a`. No orphaned code. |
-| `fix/dashboard-paid-membership-count` | `0aad8ac` | 1 file | Incorporated | None | Verified 100% merged into `main` via merge commit `6e6413b` (PR #9). |
-| `fix/login-specific-password-error` | `d291757` | 2 files | Incorporated | None | Verified 100% incorporated on `main`. Generic auth error response preserves credentials security. |
-| `fix/online-offline-store-labels` | `4c0966b` | 2 files | Incorporated | None | Verified 100% incorporated on `main`. Supplement and equipment store labels verified. |
+| `branding/unify-official-winged-logo` | `77b683a` | PR #12 (Closed / Merged) | Diverged | None (clean) | Merged cleanly into integration branch. Standardized official winged barbell emblem across headers, footers, and auth pages. |
+| `fix/admin-desktop-responsive-layout` | `359b80c` | PR #4 (Closed / Merged) | Diverged | None (clean) | Merged cleanly into integration branch. Corrected admin desktop responsive grid and dashboard layout. |
+| `ui/admin-layout-match-user-shell` | `704150f` | PR #3 (Closed / Merged) | Diverged | Conflict in `AdminLayout.jsx` | Merged with manual conflict resolution. Preserved navigation links for Gym Equipment and Offline Sales History while harmonizing layout with the user panel shell. |
+| `fix/user-panel-notification-payment-ids` | `8d334ac` | **PR #10 (Open / Dirty)** | Unmerged PR | Conflict in `Orders.jsx` | Merged with manual conflict resolution on local `main`. Resolved MongoDB `_id` vs `id` normalization across user pages while preserving retry payment capabilities. (Will close on GitHub upon pushing `main`). |
+| `fix/client-handover-ci-and-payment` | `03ebec1` | PR #2 (Closed / Merged) | Diverged | Conflict in `.github/workflows/ci.yml` | Merged with manual conflict resolution. Maintained comprehensive 5-suite CI test runner while integrating payment status reconciliation logic. |
+| `feature/order-history-tabs` | `88f96d5` | PR #7 (Closed / Merged) | Incorporated | None | Verified 100% incorporated into `main` via earlier cherry-pick `6409c7e` and PR #7 merge. No orphaned code. |
+| `fix/profile-cart-payment-audit` | `86eebe8` | PR #11 (Closed / Merged) | Incorporated | None | Verified 100% incorporated into `main` via earlier cherry-pick `89c228a` and PR #11 merge. No orphaned code. |
+| `fix/dashboard-paid-membership-count` | `0aad8ac` | PR #9 (Closed / Merged) | Incorporated | None | Verified 100% merged into `main` via merge commit `6e6413b` (PR #9). |
+| `fix/login-specific-password-error` | `d291757` | PR #5 (Closed / Merged) | Incorporated | None | Verified 100% incorporated on `main`. Generic auth error response preserves credentials security. |
+| `fix/online-offline-store-labels` | `4c0966b` | PR #6 (Closed / Merged) | Incorporated | None | Verified 100% incorporated on `main`. Supplement and equipment store labels verified. |
 
 ---
 
@@ -98,8 +99,9 @@ Valuable local operational and deployment enhancements (previously unstaged) wer
 | Verification Stage | Command Executed | Result | Notes |
 |---|---|---|---|
 | Backend Unit Tests | `node --test tests/*.test.js` | **PASS (22/22 passed)** | Auth login, gym equipment, transformations, membership billing, and profile tests pass in ~3.1s. |
+| Backend Integration Tests | `node --test tests/independentVerification.test.js tests/gapClosingAudit.test.js` | **PASS (25/25 passed)** | Executed against isolated local replica set; all ACID transactions, Razorpay HMAC webhooks, and stock reservations pass. |
 | Frontend Code Quality | `npm run lint` | **PASS (0 errors, 0 warnings)** | Clean ESLint verification across all React components. |
-| Production Build | `npm run build` | **PASS (built in ~13.1s)** | Production bundle generated with gzip optimization. |
+| Production Build | `npm run build` | **PASS (built in ~13.1s)** | Production bundle generated with gzip optimization and `.htaccess` in `dist/`. |
 | Dependency Audit | `npm audit` | **PASS (0 vulnerabilities)** | Both backend and frontend clean. |
 | End-to-End Browser | Webview Browser Agent | **PASS** | Home, navigation drawer, theme toggle, /about, /facilities, /transformations, /store, /gym-equipment, and /login visually verified. |
 
@@ -109,4 +111,4 @@ Valuable local operational and deployment enhancements (previously unstaged) wer
 
 The Heaven Gym Management Application repository is now fully consolidated. All historical branches have been accounted for, all unique client improvements have been preserved, and no dead or unmerged code remains orphaned. 
 
-The `main` branch at commit `66322e9` is stable, verified, and ready for deployment to Hostinger and MongoDB Atlas.
+The local `main` branch at commit `29168dd` is stable, verified, and ready to be pushed to `origin/main` (`git push origin main`) to update the remote GitHub repository and automatically close PR #10.

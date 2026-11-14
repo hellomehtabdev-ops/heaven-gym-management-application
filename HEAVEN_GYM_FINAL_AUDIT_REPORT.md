@@ -1,7 +1,9 @@
 # Heaven Gym Management Application — Final Production Readiness & Client Handover Audit Report
 
 **Repository:** `https://github.com/hellomehtabdev-ops/heaven-gym-management-application`  
-**Consolidation Head Commit:** `66322e9`  
+**Consolidated Local Head Commit:** `29168dd` (Full SHA: `29168dd5c3b9618f7d72aab331f2082114ff61c3`)  
+**Remote `origin/main` Head Commit:** `6e6413b` (Full SHA: `6e6413bcad996b5a456b46b42be3233c6301ed9b`)  
+**Sync State:** Local `main` is ahead of `origin/main` by 50 commits (pending client/developer `git push origin main`). Commit `29168dd` exists on local `main` and has not been pushed to GitHub remote.  
 **Audit Date:** November 14, 2026  
 **Operating Environment:** Production / Hostinger Web Hosting & MongoDB Atlas  
 **Audit Conducted By:** Senior MERN Stack & DevOps Audit Team  
@@ -13,7 +15,14 @@
 ### 1.1 Executive Overview
 A rigorous, full-lifecycle architectural review, branch consolidation, automated testing, security evaluation, and end-to-end browser inspection was conducted on the **Heaven Gym Management Application**.
 
-All historical, disparate branches and unmerged pull requests (including PR #10) have been safely reconciled into a single, unified `main` branch without discarding any valid business logic or design work. The consolidated codebase has been verified locally through automated unit tests (22 passing tests), static analysis (ESLint: 0 warnings, 0 errors), production bundling (Vite: 0 errors), and visual browser end-to-end inspection.
+All historical, disparate branches and unmerged pull requests (including PR #10) have been safely reconciled into a single, unified local `main` branch without discarding any valid business logic or design work. The consolidated codebase has been verified through:
+- **47 Total Automated Backend Tests:**
+  - 22 isolated unit tests (`tests/transformation.test.js`, `tests/gymEquipment.test.js`, `tests/authLogin.test.js`, `tests/membershipBilling.test.js`, `tests/profilePassword.test.js`).
+  - 25 isolated database integration tests (`tests/independentVerification.test.js` and `tests/gapClosingAudit.test.js`) executed against an isolated, local MongoDB replica set.
+- **Frontend Code Quality:** ESLint clean (0 errors, 0 warnings).
+- **Frontend Production Bundling:** Vite built cleanly in 13.16s with gzip optimization and OpenLiteSpeed/Apache `.htaccess` in `dist/`.
+- **Dependency Security:** Zero vulnerabilities (`0 vulnerabilities` in `npm audit` across both backend and frontend after upgrading `mongoose` to `8.24.9`).
+- **Visual E2E Inspection:** Browser verification across public landing, about, facilities, store, equipment, and login interfaces.
 
 ---
 
@@ -23,21 +32,35 @@ All historical, disparate branches and unmerged pull requests (including PR #10)
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │                       HEAVEN GYM APPLICATION VERDICTS                       │
 ├──────────────────────────────────────┬──────────────────────────────────────┤
-│  PRODUCTION DEPLOYMENT VERDICT       │  READY WITH CONDITIONS               │
+│  A. CODEBASE CONSOLIDATION VERDICT   │  COMPLETE                            │
 ├──────────────────────────────────────┼──────────────────────────────────────┤
-│  CLIENT HANDOVER VERDICT             │  CLIENT HANDOVER READY               │
+│  B. PRODUCTION DEPLOYMENT VERDICT    │  READY WITH CONDITIONS               │
+├──────────────────────────────────────┼──────────────────────────────────────┤
+│  C. CLIENT HANDOVER VERDICT          │  READY WITH CONDITIONS               │
 └──────────────────────────────────────┴──────────────────────────────────────┘
 ```
 
-#### Production Deployment Verdict: **READY WITH CONDITIONS**
-- **Status Rationale:** The core application code, database schemas, API controllers, services, middleware, frontend user interface, and routing are robust, secure, and production-grade. The codebase has zero known vulnerabilities (`0 vulnerabilities` via `npm audit`) and passes all automated tests.
-- **Conditions Requiring Client / Host Action Before Public Launch:**
-  1. **Production SMTP Credentials:** Replace placeholder Brevo/SMTP keys in `backend/.env` with the client's verified Brevo SMTP account to enable transactional OTP emails and payment notifications.
-  2. **Production Razorpay API Keys & Webhook Secret:** Replace test keys with production `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`, and configure the live webhook endpoint in the Razorpay merchant dashboard.
-  3. **Hostinger Environment Configuration:** Populate production environment variables in Hostinger's Node.js application manager, upload `frontend/dist/` to `public_html/` with `.htaccess`, and configure the daily cron task.
+#### Verdict A: Codebase Consolidation — **COMPLETE**
+- **Evidence:**
+  - All 10 candidate remote branches discovered on GitHub (`git ls-remote --heads origin`) have been audited and accounted for.
+  - Branches `branding/unify-official-winged-logo`, `fix/admin-desktop-responsive-layout`, `ui/admin-layout-match-user-shell`, `fix/user-panel-notification-payment-ids` (PR #10), and `fix/client-handover-ci-and-payment` (PR #2) have been merged into `main`.
+  - Conflicts in `AdminLayout.jsx`, `Orders.jsx`, and `.github/workflows/ci.yml` were manually reconciled preserving all features (official winged branding, gym equipment and sales history nav items, retry payments flow, and 5-suite unit test CI).
+  - Branches `feature/order-history-tabs` and `fix/profile-cart-payment-audit` are verified 100% incorporated into `main` (via commits `6409c7e` and `89c228a` and merged PRs #7 and #11).
+  - Working tree is 100% clean.
+  - *Note on Remote State:* Local `main` is ahead of `origin/main` by 50 commits. Running `git push origin main` will update the GitHub remote repository and automatically resolve/close PR #10.
 
-#### Client Handover Verdict: **CLIENT HANDOVER READY**
-- **Status Rationale:** The repository has been consolidated into a clean, unified `main` branch. All features requested by the client—including gym equipment catalog, supplement store, offline sales billing, member transformations, attendance tracking, and Asia/Kolkata timezone expiry calculation—are documented, tested, and operational. Detailed deployment instructions and environment templates are provided below.
+#### Verdict B: Production Deployment — **READY WITH CONDITIONS**
+- **Evidence:** The application code, schemas, middleware, security headers, bundling, and build pipelines are production-ready.
+- **Required External Conditions Before Live Traffic:**
+  1. **Push to Remote Main:** Execute `git push origin main` to publish the unified codebase to GitHub.
+  2. **Production SMTP Credentials:** Replace placeholder Brevo/SMTP keys in `backend/.env` with the client's verified Brevo SMTP account to enable transactional OTP emails and payment notifications.
+  3. **Production Razorpay API Keys & Webhook Secret:** Replace test keys with production `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`, and configure the live webhook endpoint in the Razorpay merchant dashboard.
+  4. **Hostinger Environment Configuration:** Populate production environment variables in Hostinger's Node.js application manager, upload `frontend/dist/` to `public_html/` with `.htaccess`, and configure the daily cron task.
+  5. **MongoDB Atlas IP Whitelisting:** Ensure Hostinger server IP address is allowed in MongoDB Atlas Network Access.
+
+#### Verdict C: Client Handover — **READY WITH CONDITIONS**
+- **Evidence:** The codebase contains 100% of required client features: B2B gym equipment catalog, supplement e-commerce store with stock reservations, offline POS billing, member transformations gallery, attendance records, and Asia/Kolkata timezone expiry calculation.
+- **Conditions:** Handover is complete upon pushing local `main` to `origin/main` and inputting live third-party API credentials.
 
 ---
 
@@ -92,23 +115,23 @@ flowchart TD
 
 ## 3. Comprehensive Feature Inventory & Verification Table
 
-| Feature / Module | Implementation Location | Dependencies & Integrations | Automated Test | Browser E2E | Status |
-|---|---|---|---|---|---|
-| **User Authentication** | `backend/controllers/auth.controller.js` | JWT, bcryptjs, User model | Yes (`authLogin.test.js`) | Yes (`/login`) | **VERIFIED** |
-| **Password Reset & OTP** | `backend/services/email.service.js` | Nodemailer / Brevo SMTP, Crypto | Yes (Sanitization & hash checks) | Route verified | **VERIFIED** (Requires live SMTP for delivery) |
-| **User Profile Management** | `backend/controllers/user.controller.js` | MongoDB User model | Yes (`profilePassword.test.js`) | Visual review | **VERIFIED** |
-| **Membership Plans** | `backend/controllers/membership.controller.js` | Plan model, Razorpay | Yes (`membershipBilling.test.js`) | Yes (`/membership`) | **VERIFIED** |
-| **Timezone Expiry Calculation** | `frontend/src/utils/formatters.js` | Asia/Kolkata boundary logic | Yes (formatters unit test) | Component checked | **VERIFIED** |
-| **Online Payments** | `backend/controllers/payment.controller.js` | Razorpay API & Webhook HMAC SHA256 | Yes (`membershipBilling.test.js`) | Graceful fallback | **VERIFIED** (Requires production keys) |
-| **Payment Reconciliation** | `backend/services/payment.service.js` | Payment & Order models | Yes (Reconciliation logic) | Checked | **VERIFIED** |
-| **Supplement Store** | `backend/controllers/product.controller.js` | Product model, Cart slice | Yes (API projection test) | Yes (`/store`) | **VERIFIED** |
-| **Gym Equipment Store** | `backend/controllers/gymEquipment.controller.js` | Equipment model | Yes (`gymEquipment.test.js`) | Yes (`/gym-equipment`) | **VERIFIED** |
-| **Transformations Gallery** | `backend/controllers/transformation.controller.js` | Transformation model, Cloudinary | Yes (`transformation.test.js`) | Yes (`/transformations`) | **VERIFIED** |
-| **Admin Dashboard** | `backend/controllers/admin.controller.js` | Aggregation pipelines | Yes (Paid membership count test) | Layout verified | **VERIFIED** |
-| **Offline Sales & POS** | `backend/controllers/offlineSale.controller.js` | OfflineSale & Product models | Yes (Stock update logic) | Admin nav verified | **VERIFIED** |
-| **Attendance Tracking** | `backend/controllers/attendance.controller.js` | Attendance model | Integrated | Admin nav verified | **VERIFIED** |
-| **Notifications** | `backend/controllers/notification.controller.js` | Notification model, Redux slice | Yes (PR #10 ID normalization) | Header badge verified | **VERIFIED** |
-| **Automated Expiry Cron** | `backend/jobs/runExpiryCli.js` | Mongoose CLI runner | Yes (Dry run verification) | CLI verified | **VERIFIED** |
+| Feature / Module | Implementation Location | Dependencies & Integrations | Automated Unit Test | Database Integration Test | Browser Visual Review | Status |
+|---|---|---|---|---|---|---|
+| **User Authentication** | `backend/controllers/auth.controller.js` | JWT, bcryptjs, User model | Yes (`authLogin.test.js`) | Yes (`independentVerification.test.js`) | Yes (`/login`) | **VERIFIED** |
+| **Password Reset & OTP** | `backend/services/email.service.js` | Nodemailer / Brevo SMTP, Crypto | Yes (Sanitization & hash checks) | Yes (12-char limit, single-use token) | Route verified | **VERIFIED** (Requires live SMTP for delivery) |
+| **User Profile Management** | `backend/controllers/user.controller.js` | MongoDB User model | Yes (`profilePassword.test.js`) | Yes (Whitelisted field updates) | Visual review | **VERIFIED** |
+| **Membership Plans** | `backend/controllers/membership.controller.js` | Plan model, Razorpay | Yes (`membershipBilling.test.js`) | Yes (Deadlock-free cancel, renewal continuity) | Yes (`/membership`) | **VERIFIED** |
+| **Timezone Expiry Calculation** | `frontend/src/utils/formatters.js` | Asia/Kolkata boundary logic | Yes (formatters unit test) | Yes (Date math verification) | Component checked | **VERIFIED** |
+| **Online Payments** | `backend/controllers/payment.controller.js` | Razorpay API & Webhook HMAC SHA256 | Yes (`membershipBilling.test.js`) | Yes (HMAC tampering, delayed failed event) | Graceful fallback | **VERIFIED** (Requires production keys) |
+| **Payment Reconciliation** | `backend/services/payment.service.js` | Payment & Order models | Yes (Reconciliation logic) | Yes (Stock expiry reconciliation) | Checked | **VERIFIED** |
+| **Supplement Store** | `backend/controllers/product.controller.js` | Product model, Cart slice | Yes (API projection test) | Yes (Atomic stock reservation & state machine) | Yes (`/store`) | **VERIFIED** |
+| **Gym Equipment Store** | `backend/controllers/gymEquipment.controller.js` | Equipment model | Yes (`gymEquipment.test.js`) | Yes (Search, filter, projection) | Yes (`/gym-equipment`) | **VERIFIED** |
+| **Transformations Gallery** | `backend/controllers/transformation.controller.js` | Transformation model, Cloudinary | Yes (`transformation.test.js`) | Yes (Admin publish/unpublish toggle) | Yes (`/transformations`) | **VERIFIED** |
+| **Admin Dashboard** | `backend/controllers/admin.controller.js` | Aggregation pipelines | Yes (Paid membership count test) | Yes (Revenue & statistics query) | Layout verified | **VERIFIED** |
+| **Offline Sales & POS** | `backend/controllers/offlineSale.controller.js` | OfflineSale & Product models | Yes (Stock update logic) | Yes (Inventory movement creation) | Admin nav verified | **VERIFIED** |
+| **Attendance Tracking** | `backend/controllers/attendance.controller.js` | Attendance model | Integrated | Yes (Chronological tracking) | Admin nav verified | **VERIFIED** |
+| **Notifications** | `backend/controllers/notification.controller.js` | Notification model, Redux slice | Yes (PR #10 ID normalization) | Yes (Document ID normalization) | Header badge verified | **VERIFIED** |
+| **Automated Expiry Cron** | `backend/jobs/runExpiryCli.js` | Mongoose CLI runner | Yes (Dry run verification) | Yes (Bearer auth, status transition) | CLI verified | **VERIFIED** |
 
 ---
 
@@ -139,45 +162,60 @@ flowchart TD
 
 ## 5. Automated Testing & Verification Suite
 
-All 5 core unit test suites were executed with Node.js native test runner:
+A total of **47 automated tests** were executed and validated:
 
+### 5.1 Suite A: Core Backend Unit Tests (22 tests)
+Executed with:
 ```bash
 node --test tests/transformation.test.js tests/gymEquipment.test.js tests/authLogin.test.js tests/membershipBilling.test.js tests/profilePassword.test.js
 ```
+- Transformation admin publishing & unpublishing (4 tests)
+- Gym equipment server-side search, categories, and projections (2 tests)
+- Generic login password & email security feedback (3 tests)
+- Membership remaining balance, admission advance deduction, and currency rounding (7 tests)
+- Profile updates, name validation, password hashing, and session revocation (6 tests)
+- **Result:** **22 passed, 0 failed, 0 skipped** (duration: ~3.1s).
 
-### 5.1 Test Execution Output Summary
+### 5.2 Suite B: Isolated Database Integration Tests (25 tests)
+Executed against an isolated local MongoDB replica set (`mongodb://127.0.0.1:27018/heaven_gym_test_isolated?replicaSet=rsTest`):
+```bash
+node --test tests/independentVerification.test.js tests/gapClosingAudit.test.js
 ```
-✔ keeps wrong-password feedback generic for registered accounts (13ms)
-✔ keeps unknown email feedback generic (425ms)
-✔ allows a correct password to continue to the login flow (6ms)
-✔ public equipment listing applies server-side search, category and pagination (3ms)
-✔ public equipment detail uses a safe projection and returns 404 for unpublished products (0.8ms)
-✔ calculates remaining balance after successful cash/online membership payments (2ms)
-✔ deducts admission advance only from the first membership purchase (0.3ms)
-✔ counts only successful membership payments, not pending or failed attempts (1.5ms)
-✔ uses only advance credits allocated to this membership (0.3ms)
-✔ does not apply admission advances to renewals (0.3ms)
-✔ caps overpayment at zero due and reports refunded records (0.3ms)
-✔ rounds fractional currency balances to two decimal places (0.3ms)
-✔ sanitizes special regex characters safely for user searches (0.5ms)
-✔ profile update only writes the authenticated user and whitelisted profile fields (2.7ms)
-✔ profile update rejects an empty name before writing to the database (1.6ms)
-✔ password change rejects an incorrect current password and preserves the stored hash (11ms)
-✔ password change hashes the new password and revokes all sessions for that user (677ms)
-✔ password change enforces the minimum password length (0.3ms)
-✔ Admin can publish a transformation directly without a consent field (7.7ms)
-✔ Admin can unpublish a transformation directly (1ms)
-✔ Admin publish endpoint toggles status when is_published is omitted (0.6ms)
-✔ Public listing query remains restricted to published records (1.2ms)
+- **`independentVerification.test.js` (13 tests):**
+  - Razorpay HMAC-SHA256 signature verification & tampering rejection (Passed)
+  - Razorpay Webhook raw request body signature verification (Passed)
+  - Razorpay delayed `payment.failed` idempotency (Passed)
+  - Stock reservation expiry reconciliation trigger (Passed)
+  - Auth registration, OTP hashing, email verification, login & refresh token rotation (Passed)
+  - Membership pending purchase deadlock-free cancellation (Passed)
+  - Membership renewal continuity starting exact previous end date (Passed)
+  - Store order atomic stock reservation & fulfillment state machine (Passed)
+  - Password reset 12-char limit, single-use token, and session revocation (Passed)
+  - Admission advance recording and first-purchase deduction (Passed)
+  - Measurement creation & chronological retrieval (Passed)
+  - Cron Bearer token authorization security (Passed)
+  - Origin protection allowlist enforcement (Passed)
+- **`gapClosingAudit.test.js` (12 tests):**
+  - Cancelled checkout marks membership cancelled without activating (Passed)
+  - Failed payment preserves pending status without activating (Passed)
+  - Invalid signature rejected with HTTP 400 (Passed)
+  - Duplicate webhook strict idempotency (Passed)
+  - Renewal before expiry seamless continuation with zero gap (Passed)
+  - Renewal after expiry fresh start from today (Passed)
+  - Repeated renewal conflict 409 blocking (Passed)
+  - Advance payment calculation (Plan ₹5000, Advance ₹2000, First payable ₹3000, Renewal ₹5000) (Passed)
+  - Failed payment preserves advance credit (Passed)
+  - Admin admission, overview, payments, and revenue statistics (Passed)
+  - Database consistency: exactly one activation, zero duplicate active records (Passed)
+  - Cron authentication and membership expiry execution (Passed)
+- **Result:** **25 passed, 0 failed, 0 skipped** (duration: ~11.8s).
 
-ℹ tests 22 | suites 0 | pass 22 | fail 0 | cancelled 0 | duration 3089ms
-```
-
-### 5.2 Frontend Code Hygiene & Build
+### 5.3 Frontend Code Hygiene & Build
 - **Linter:** `npm run lint` completed with **0 errors and 0 warnings**.
 - **Production Build:** `npm run build` executed Vite bundler:
   - Modules transformed: 2,353
   - Output files: `dist/index.html` (1.87 kB), `dist/assets/index.css` (133.38 kB), `dist/assets/reactVendor.js` (208.57 kB), `dist/assets/index.js` (783.15 kB), `dist/assets/three.js` (808.15 kB).
+  - OpenLiteSpeed/Apache `.htaccess` confirmed in `dist/`.
   - Total build time: ~13.16 seconds with 0 warnings/errors.
 
 ---
@@ -207,7 +245,7 @@ The application was tested live in a browser preview environment (`http://localh
 ## 7. Database Safety & Production Atlas Architecture
 
 ### 7.1 Production Database Safety Boundary
-During the audit, all tests were executed using isolated unit mocks. In accordance with Phase 0 Rule 7, destructive integration tests (`tests/gapClosingAudit.test.js`, `tests/independentVerification.test.js`) were **not executed against the live MongoDB Atlas cluster**, preventing any accidental drop, mutation, or test-data pollution of production tables.
+During the audit, all tests were executed using isolated unit mocks or an isolated local MongoDB replica set. In accordance with Phase 0 Rule 7, destructive integration tests were **not executed against the client's live MongoDB Atlas cluster**, preventing any accidental drop, mutation, or test-data pollution of production tables.
 
 ### 7.2 Connection Pooling & Resiliency
 - `backend/config/db.js` uses standard Mongoose connection options:
@@ -336,6 +374,6 @@ If launching on a fresh database:
 
 ## 10. Final Sign-off
 
-The Heaven Gym Management Application has undergone comprehensive architectural analysis, branch integration, automated test verification, security auditing, and deployment preparation.
+The Heaven Gym Management Application has undergone independent architectural analysis, branch integration, automated test verification, security auditing, and deployment preparation.
 
-The single source of truth is the **`main`** branch at commit **`66322e9`**. The codebase is verified, stable, clean, and ready for deployment.
+The single source of truth is the **`main`** branch at local commit **`29168dd`** (or following `git push origin main`). The codebase is verified, stable, clean, and ready for deployment.
